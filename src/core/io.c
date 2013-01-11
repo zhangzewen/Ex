@@ -8,8 +8,7 @@ void *Calloc(size_t n,size_t size)
 	return ptr;
 }
 
-void
-Close(int fd)
+void Close(int fd)
 {
   if (close(fd) == -1)
     err_sys("close error");
