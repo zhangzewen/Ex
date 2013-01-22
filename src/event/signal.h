@@ -1,0 +1,4 @@
+#ifndef _HTTP_SIGNAL_H_INCLUDED
+#define _HTTP_SIGNAL_H_INCLUDED
+
+#endif
