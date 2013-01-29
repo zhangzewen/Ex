@@ -135,3 +135,17 @@ long Sysconf(int name)
   return(val);
 }
 
+void set_file_flag(int fd, int flags)
+{
+	int old_flag;
+	
+	if ((val = fcntl(*fd, F_GETFL, 0)) < 0) {
+		perror("fcntl GETFL error");
+	}
+	
+	old_flag |= flags;
+	
+	if((val = fcntl(*fd, F_SETFL, old_flag)) < 0) {
+		perror("fcntl SETFL error");
+	}
+}

@@ -27,4 +27,5 @@ key_t Ftok(const char *pathname, int id);
 void Ftruncate(int fd, off_t length);
 long Sysconf(int name);
 
+void set_file_flag(int *fd, int flags);
 #endif
