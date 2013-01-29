@@ -11,6 +11,6 @@ int Sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int Kill(pid_t pid, int sig);
 int Raise(int sig);
 
-int
+void signal_handler(int signo, void (*handler)(void));
 
 #endif
