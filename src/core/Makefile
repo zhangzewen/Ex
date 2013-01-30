@@ -1,10 +1,6 @@
 CFLAGS = -g -Wall -Werror
 
 
-ifneq ($(ACTION), release)
-CFLAGS += -DDEBUG
-endif
-
 _OBJS = $(shell ls *.c)
 OBJS = $(_OBJS:.c=.o)
 

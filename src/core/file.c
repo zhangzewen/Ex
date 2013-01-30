@@ -1,4 +1,6 @@
-
+#include "file.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 unsigned int ReadLine(int filefb, char *buff)
 {

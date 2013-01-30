@@ -226,3 +226,91 @@ int tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 	return(listenfd);
 }
 
+int sock_cmp_addr(const struct sockaddr *sa1, const struct sockaddr *sa2,
+			 socklen_t salen)
+{
+	if (sa1->sa_family != sa2->sa_family)
+		return(-1);
+
+	switch (sa1->sa_family) {
+	case AF_INET: {
+		return(memcmp( &((struct sockaddr_in *) sa1)->sin_addr,
+					   &((struct sockaddr_in *) sa2)->sin_addr,
+					   sizeof(struct in_addr)));
+	}
+
+#ifdef	IPV6
+	case AF_INET6: {
+		return(memcmp( &((struct sockaddr_in6 *) sa1)->sin6_addr,
+					   &((struct sockaddr_in6 *) sa2)->sin6_addr,
+					   sizeof(struct in6_addr)));
+	}
+#endif
+
+#ifdef	AF_UNIX
+	case AF_UNIX: {
+		return(strcmp( ((struct sockaddr_un *) sa1)->sun_path,
+					   ((struct sockaddr_un *) sa2)->sun_path));
+	}
+#endif
+
+#ifdef	HAVE_SOCKADDR_DL_STRUCT
+	case AF_LINK: {
+		return(-1);		/* no idea what to compare here ? */
+	}
+#endif
+	}
+    return (-1);
+}
+
+int sock_bind_wild(int sockfd, int family)
+{
+	socklen_t	len;
+
+	switch (family) {
+	case AF_INET: {
+		struct sockaddr_in	sin;
+
+		bzero(&sin, sizeof(sin));
+		sin.sin_family = AF_INET;
+		sin.sin_addr.s_addr = htonl(INADDR_ANY);
+		sin.sin_port = htons(0);	/* bind ephemeral port */
+
+		if (bind(sockfd, (SA *) &sin, sizeof(sin)) < 0)
+			return(-1);
+		len = sizeof(sin);
+		if (getsockname(sockfd, (SA *) &sin, &len) < 0)
+			return(-1);
+		return(sin.sin_port);
+	}
+
+#ifdef	IPV6
+	case AF_INET6: {
+		struct sockaddr_in6	sin6;
+
+		bzero(&sin6, sizeof(sin6));
+		sin6.sin6_family = AF_INET6;
+		sin6.sin6_addr = in6addr_any;
+		sin6.sin6_port = htons(0);	/* bind ephemeral port */
+
+		if (bind(sockfd, (SA *) &sin6, sizeof(sin6)) < 0)
+			return(-1);
+		len = sizeof(sin6);
+		if (getsockname(sockfd, (SA *) &sin6, &len) < 0)
+			return(-1);
+		return(sin6.sin6_port);
+	}
+#endif
+	}
+	return(-1);
+}
+
+int Sock_bind_wild(int sockfd, int family)
+{
+	int		port;
+
+	if ( (port = sock_bind_wild(sockfd, family)) < 0)
+		err_sys("sock_bind_wild error");
+
+	return(port);
+}
