@@ -11,4 +11,6 @@ unsigned int ReadLine(int filefb, char *buff)
     if(NULL == buff){
         return -1;
     }
+	
+	return 0;
 }

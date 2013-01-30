@@ -1,4 +1,17 @@
 #include "io.h"
+#include "error.h"
+
+#include <sys/ipc.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <stdarg.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <fcntl.h>
+
 void *Calloc(size_t n,size_t size)
 {
 	void *ptr;
@@ -86,16 +99,15 @@ int Open(const char *pathname, int oflag, ...)
   }
   return(fd);
 }
-
+#if 0
 int Ioctl(int fd, int request, void *arg)
 {
   int   n;
-
   if ( (n = ioctl(fd, request, arg)) == -1)
     err_sys("ioctl error");
   return(n);  /* streamio of I_LIST returns value */
 }
-
+#endif
 int Getopt(int argc, char *const *argv, const char *str)
 {
   int   opt;
@@ -134,12 +146,12 @@ long Sysconf(int name)
   }
   return(val);
 }
-
+#if 0
 void set_file_flag(int fd, int flags)
 {
 	int old_flag;
 	
-	if ((val = fcntl(fd, F_GETFL, 0)) < 0) {
+	if ((old_flag = fcntl(fd, F_GETFL, 0)) < 0) {
 		perror("fcntl GETFL error");
 	}
 	
@@ -153,6 +165,7 @@ void set_file_flag(int fd, int flags)
 void clear_file_flag(int fd, int flags)
 {
 	int old_flag;
+	int val;
 	
 	if ((val = fcntl(fd, F_GETFL, 0)) < 0) {
 		perror("fcntl GETFL error");
@@ -164,3 +177,5 @@ void clear_file_flag(int fd, int flags)
 		perror("fcntl SETFL error");
 	}
 }
+
+#endif
