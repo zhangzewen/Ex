@@ -2,6 +2,8 @@
 #define _HTTP_IO_H_INCLUDED_
 
 #include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
 void *Calloc(size_t n,size_t size);
 void Close(int fd);
 void Dup2(int fd1, int fd2);
