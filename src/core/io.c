@@ -22,13 +22,11 @@ void *Calloc(size_t n,size_t size)
 void Close(int fd)
 {
   if (close(fd) == -1)
-    err_sys("close error");
 }
 
 void Dup2(int fd1, int fd2)
 {
   if (dup2(fd1, fd2) == -1)
-    err_sys("dup2 error");
 }
 
 int Fcntl(int fd, int cmd, void *arg)
@@ -36,7 +34,6 @@ int Fcntl(int fd, int cmd, void *arg)
   int n;
 
   if ( (n = fcntl(fd, cmd, arg)) == -1)
-    err_sys("fcntl error");
   return(n);
 }
 
@@ -45,13 +42,11 @@ void * Malloc(size_t size)
   void  *ptr;
 
   if ( (ptr = malloc(size)) == NULL)
-    err_sys("malloc error");
   return(ptr);
 }
 void Fstat(int fd, struct stat *ptr)
 {
   if (fstat(fd, ptr) == -1)
-    err_sys("fstat error");
 }
 
 off_t Lseek(int fd, off_t offset, int whence)
@@ -59,7 +54,6 @@ off_t Lseek(int fd, off_t offset, int whence)
   off_t pos;
 
   if ( (pos = lseek(fd, offset, whence)) == (off_t) -1)
-    err_sys("lseek error");
   return(pos);
 }
 
@@ -68,14 +62,12 @@ off_t Lseek(int fd, off_t offset, int whence)
   void  *ptr;
 
   if ( (ptr = mmap(addr, len, prot, flags, fd, offset)) == MAP_FAILED)
-    err_sys("mmap error");
   return(ptr);
 }
 
 void Munmap(void *addr, size_t len)
 {
   if (munmap(addr, len) == -1)
-    err_sys("munmap error");
 }
 
 
@@ -89,11 +81,9 @@ int Open(const char *pathname, int oflag, ...)
     va_start(ap, oflag);    /* init ap to final named argument */
     mode = va_arg(ap, mode_t);
     if ( (fd = open(pathname, oflag, mode)) == -1)
-      err_sys("open error for %s", pathname);
     va_end(ap);
   } else {
     if ( (fd = open(pathname, oflag)) == -1)
-      err_sys("open error for %s", pathname);
   }
   return(fd);
 }
