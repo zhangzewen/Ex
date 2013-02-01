@@ -1,12 +1,12 @@
 #ifndef	__HTTP_PTHREAD_H_INCLUDED
 #define	__HTTP_PTHREAD_H_INCLUDED
+#include <pthread.h>
 
 struct pthread_pool{
 	pthread_mutex_t pool_mutex;
 	unsigned int current_pthreads;
 	unsigned int current_free_pthreads;
 	unsigned int max_free_pthreads;
-	unsigned int 
 };
 
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
