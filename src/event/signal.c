@@ -92,41 +92,7 @@ void signal_handler(int signo, void (*handler)(int))
 	
 	sigaction(signo, &act, NULL);
 }
-/* 
- * Soft:        Keepalived is a failover program for the LVS project
- *              <www.linuxvirtualserver.org>. It monitor & manipulate
- *              a loadbalanced server pool using multi-layer checks.
- * 
- * Part:        Signals framework.
- *  
- * Author:      Kevin Lindsay, <kevinl@netnation.com>
- *              Alexandre Cassen, <acassen@linux-vs.org>
- *              
- *              This program is distributed in the hope that it will be useful,
- *              but WITHOUT ANY WARRANTY; without even the implied warranty of
- *              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *              See the GNU General Public License for more details.
- *
- *              This program is free software; you can redistribute it and/or
- *              modify it under the terms of the GNU General Public License
- *              as published by the Free Software Foundation; either version
- *              2 of the License, or (at your option) any later version.
- *
- * Copyright (C) 2001-2011 Alexandre Cassen, <acassen@linux-vs.org>
- */
 
-#include <signal.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include <assert.h>
-
-
-#include "signals.h"
-#include "utils.h"
 
 /* Local Vars */
 void (*signal_SIGHUP_handler)(void *, int sig);
