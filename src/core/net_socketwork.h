@@ -1,7 +1,8 @@
 #ifndef _HTTP_NET_SOCKETWORK_H_INCLUDED
 #define _HTTP_NET_SOCKETWORK_H_INCLUDED
 
-
+#include <sys/socket.h>
+#include <sys/types.h>
 int Accept(int fd, struct sockaddr *sa, socklen_t *salenptr);
 
 void Bind(int fd, const struct sockaddr *sa, socklen_t salen);

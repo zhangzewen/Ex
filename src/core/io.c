@@ -22,11 +22,13 @@ void *Calloc(size_t n,size_t size)
 void Close(int fd)
 {
   if (close(fd) == -1)
+	{}
 }
 
 void Dup2(int fd1, int fd2)
 {
   if (dup2(fd1, fd2) == -1)
+	{}
 }
 
 int Fcntl(int fd, int cmd, void *arg)
@@ -34,6 +36,7 @@ int Fcntl(int fd, int cmd, void *arg)
   int n;
 
   if ( (n = fcntl(fd, cmd, arg)) == -1)
+	{}
   return(n);
 }
 
@@ -42,11 +45,13 @@ void * Malloc(size_t size)
   void  *ptr;
 
   if ( (ptr = malloc(size)) == NULL)
+	{}
   return(ptr);
 }
 void Fstat(int fd, struct stat *ptr)
 {
   if (fstat(fd, ptr) == -1)
+	{}
 }
 
 off_t Lseek(int fd, off_t offset, int whence)
@@ -54,6 +59,7 @@ off_t Lseek(int fd, off_t offset, int whence)
   off_t pos;
 
   if ( (pos = lseek(fd, offset, whence)) == (off_t) -1)
+	{}
   return(pos);
 }
 
@@ -62,12 +68,14 @@ off_t Lseek(int fd, off_t offset, int whence)
   void  *ptr;
 
   if ( (ptr = mmap(addr, len, prot, flags, fd, offset)) == MAP_FAILED)
+	{}
   return(ptr);
 }
 
 void Munmap(void *addr, size_t len)
 {
   if (munmap(addr, len) == -1)
+	{}
 }
 
 
@@ -81,9 +89,11 @@ int Open(const char *pathname, int oflag, ...)
     va_start(ap, oflag);    /* init ap to final named argument */
     mode = va_arg(ap, mode_t);
     if ( (fd = open(pathname, oflag, mode)) == -1)
+		{}
     va_end(ap);
   } else {
     if ( (fd = open(pathname, oflag)) == -1)
+		{}
   }
   return(fd);
 }
@@ -110,13 +120,13 @@ key_t Ftok(const char *pathname, int id)
   key_t key;
 
   if ( (key = ftok(pathname, id)) == -1)
-    err_sys("ftok error for pathname \"%s\" and id %d", pathname, id);
+	{}
   return(key);
 }
 void Ftruncate(int fd, off_t length)
 {
   if (ftruncate(fd, length) == -1)
-    err_sys("ftruncate error");
+	{}
 }
 
 
@@ -128,9 +138,9 @@ long Sysconf(int name)
   errno = 0;    /* in case sysconf() does not change this */
   if ( (val = sysconf(name)) == -1) {
     if (errno != 0)
-      err_sys("sysconf error");
+		{}
     else
-      err_sys("sysconf: %d not defined", name);
+		{}
   }
   return(val);
 }
