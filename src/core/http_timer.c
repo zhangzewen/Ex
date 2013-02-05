@@ -131,11 +131,6 @@ int monotonic_gettimeofday(struct timeval * now)
 	return 0;
 
       fixup:
-	/* Now we have to recompute the drift between sys_date and
-	 * mono_date. Since it can be negative and we don't want to
-	 * play with negative carries in all computations, we take
-	 * care of always having the microseconds positive.
-	 */
 	drift.tv_sec = mono_date.tv_sec - sys_date.tv_sec;
 	drift.tv_usec = mono_date.tv_usec - sys_date.tv_usec;
 	if (drift.tv_usec < 0)
