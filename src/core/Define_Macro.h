@@ -7,5 +7,7 @@
 #define SERV_PORT_STR "9890"
 
 
+#define	SA	struct sockaddr
+#define	LISTENQ		1024	
 
 #endif

@@ -1,4 +1,9 @@
-#include "net_sockwork.h"
+#include "net_socketwork.h"
+#include "Define_Macro.h"
+#include "io.h"
+//#include "addrinfo.h"
+#include <string.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <stdio.h>
@@ -16,7 +21,7 @@ again:
 #endif
 			goto again;
 		else
-			{}("accept error");
+			{}
 	}
 	return(n);
 }
@@ -165,8 +170,11 @@ int tcp_connect(const char *host, const char *serv)
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( (n = getaddrinfo(host, serv, &hints, &res)) != 0)
+	{}
+#if 0
 		err_quit("tcp_connect error for %s, %s: %s",
 				 host, serv, gai_strerror(n));
+#endif
 	ressave = res;
 
 	do {
@@ -200,8 +208,10 @@ int tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ( (n = getaddrinfo(host, serv, &hints, &res)) != 0)
+#if 0
 		err_quit("tcp_listen error for %s, %s: %s",
 				 host, serv, gai_strerror(n));
+#endif
 	ressave = res;
 
 	do {
@@ -228,7 +238,7 @@ int tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	return(listenfd);
 }
-
+#if 0
 int sock_cmp_addr(const struct sockaddr *sa1, const struct sockaddr *sa2,
 			 socklen_t salen)
 {
@@ -266,6 +276,7 @@ int sock_cmp_addr(const struct sockaddr *sa1, const struct sockaddr *sa2,
     return (-1);
 }
 
+#endif
 int sock_bind_wild(int sockfd, int family)
 {
 	socklen_t	len;
