@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Werror
+CFLAGS = -g -Wall -Werror -I ../core/
 
 
 ifneq ($(ACTION), release)

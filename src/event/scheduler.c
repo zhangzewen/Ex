@@ -30,8 +30,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "signals.h"
-#include "logger.h"
-
+#include <syslog.h>
 /* global vars */
 thread_master_t *master = NULL;
 
@@ -222,7 +221,7 @@ thread_t *thread_add_read(thread_master_t *m, int (*func)(thread_t *), void *arg
 
 	if (FD_ISSET(fd, &m->readfd))
 	{
-		log_message(LOG_WARNING, "There is already read fd [%d]", fd);
+		syslog(LOG_INFO, "There is already read fd [%d]", fd);
 		return NULL;
 	}
 
@@ -257,7 +256,7 @@ thread_t *thread_add_write(thread_master_t *m, int (*func)(thread_t *), void *ar
 	assert(m != NULL);
 
 	if (FD_ISSET(fd, &m->writefd)) {
-		log_message(LOG_WARNING, "There is already write fd [%d]", fd);
+		syslog(LOG_INFO, "There is already write fd [%d]", fd);
 		return NULL;
 	}
 
@@ -494,13 +493,13 @@ thread_t *thread_fetch(thread_master_t *m, thread_t *fetch)
 	fd_set readfd;
 	fd_set writefd;
 	fd_set exceptfd;
-	TIMEVAL timer_wait;
+	struct timeval timer_wait;
 	int signal_fd;
 
 	assert(m != NULL);
 
 	/* Timer initialization */
-	memset(&timer_wait, 0, sizeof(TIMEVAL));
+	memset(&timer_wait, 0, sizeof(struct timeval));
 
 retry:	/* When thread can't fetch try to find next thread again. */
 
@@ -562,7 +561,7 @@ retry:	/* When thread can't fetch try to find next thread again. */
 		if (old_errno == EINTR)
 			goto retry;
 		/* Real error. */
-		log_message(LOG_INFO, "select error: %s", strerror(old_errno));
+		syslog(LOG_INFO, "select error: %s", strerror(old_errno));
 		assert(0);
 	}
 
