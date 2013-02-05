@@ -13,8 +13,6 @@ int Raise(int sig);
 
 void signal_handler(int signo, void (*handler)(void));
 
-#endif
-/* Prototypes */
 extern int signal_pending(void);
 extern void *signal_set(int signo, void (*func) (void *, int), void *);
 extern void *signal_ignore(int signo);
