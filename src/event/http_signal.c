@@ -1,5 +1,11 @@
-#include "Signal.h"
+#include "http_signal.h"
 #include "core/error.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 int Sigaction(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact)
 {
 	if(sigaction(signo, act, oact)  < 0 ) {

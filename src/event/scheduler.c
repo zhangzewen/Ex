@@ -29,7 +29,7 @@
 #include "scheduler.h"
 #include "memory.h"
 #include "utils.h"
-#include "signals.h"
+#include "http_signal.h"
 #include <syslog.h>
 /* global vars */
 thread_master_t *master = NULL;

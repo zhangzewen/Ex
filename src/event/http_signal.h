@@ -1,6 +1,6 @@
 #ifndef _HTTP_SIGNAL_H_INCLUDED
 #define _HTTP_SIGNAL_H_INCLUDED
-
+#include <signal.h>
 int Sigacton(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact);
 int Sigemptyset(sigset_t *set);
 int Sigfillset(sigset_t *set);
