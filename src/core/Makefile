@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Werror
+CFLAGS = -g -Wall
 
 
 _OBJS = $(shell ls *.c)
