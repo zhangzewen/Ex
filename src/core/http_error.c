@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-void error_sys(const char *text)
+int error_sys(const char *text)
 {
 	fprintf(stderr,"%s at %s:%d desc:%s\n",strerror(errno), __FILE__, __LINE__, text);	
-	abort();
+	return -1;
 }
 void error_quit(const char *text)
 {
