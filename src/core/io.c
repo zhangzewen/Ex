@@ -1,5 +1,5 @@
 #include "io.h"
-#include "error.h"
+#include "http_error.h"
 
 #include <sys/ipc.h>
 
@@ -14,21 +14,20 @@ void *Calloc(size_t n,size_t size)
 {
 	void *ptr;
 	if ( (ptr = calloc(n ,size)) == NULL)
-		perror("calloc()");
-		exit(1);
+		error_quit("calloc error");
 	return ptr;
 }
 
 void Close(int fd)
 {
   if (close(fd) == -1)
-	{}
+		error_sys("Can not close!\n");	
 }
 
 void Dup2(int fd1, int fd2)
 {
   if (dup2(fd1, fd2) == -1)
-	{}
+		error_sys("dup2 error\n");	
 }
 
 int Fcntl(int fd, int cmd, void *arg)
@@ -36,7 +35,7 @@ int Fcntl(int fd, int cmd, void *arg)
   int n;
 
   if ( (n = fcntl(fd, cmd, arg)) == -1)
-	{}
+		error_sys("fcntl error\n");
   return(n);
 }
 
@@ -45,13 +44,13 @@ void * Malloc(size_t size)
   void  *ptr;
 
   if ( (ptr = malloc(size)) == NULL)
-	{}
+		error_quit("malloc error\n");
   return(ptr);
 }
 void Fstat(int fd, struct stat *ptr)
 {
   if (fstat(fd, ptr) == -1)
-	{}
+		error_sys("fstat error\n");
 }
 
 off_t Lseek(int fd, off_t offset, int whence)
@@ -59,7 +58,7 @@ off_t Lseek(int fd, off_t offset, int whence)
   off_t pos;
 
   if ( (pos = lseek(fd, offset, whence)) == (off_t) -1)
-	{}
+		error_quit("lseek error\n");
   return(pos);
 }
 
@@ -68,14 +67,14 @@ off_t Lseek(int fd, off_t offset, int whence)
   void  *ptr;
 
   if ( (ptr = mmap(addr, len, prot, flags, fd, offset)) == MAP_FAILED)
-	{}
+		error_sys("mmap error\n");	
   return(ptr);
 }
 
 void Munmap(void *addr, size_t len)
 {
   if (munmap(addr, len) == -1)
-	{}
+		error_sys("munmap error");
 }
 
 
@@ -89,11 +88,11 @@ int Open(const char *pathname, int oflag, ...)
     va_start(ap, oflag);    /* init ap to final named argument */
     mode = va_arg(ap, mode_t);
     if ( (fd = open(pathname, oflag, mode)) == -1)
-		{}
+			error_quit("open error");
     va_end(ap);
   } else {
     if ( (fd = open(pathname, oflag)) == -1)
-		{}
+			error_quit("open error");
   }
   return(fd);
 }
@@ -120,13 +119,13 @@ key_t Ftok(const char *pathname, int id)
   key_t key;
 
   if ( (key = ftok(pathname, id)) == -1)
-	{}
+		error_sys("ftok error");
   return(key);
 }
 void Ftruncate(int fd, off_t length)
 {
   if (ftruncate(fd, length) == -1)
-	{}
+		error_sys("ftruncate error");
 }
 
 
