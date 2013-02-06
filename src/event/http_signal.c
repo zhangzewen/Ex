@@ -1,5 +1,5 @@
 #include "http_signal.h"
-#include "core/error.h"
+#include "http_error.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -9,7 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-int Sigaction(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact)
+int Sigaction(int signo, const struct sigaction * act, struct sigaction * oact)
 {
 	if(sigaction(signo, act, oact)  < 0 ) {
 			{}
@@ -90,18 +90,6 @@ int Raise(int sig)
 	return 0;
 }
 
-void signal_handler(int signo, void (*handler)(int))
-{
-	struct sigaction act;
-	
-	memset(&act, '\0', sizeof(act));
-	act.sa_handler = handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	
-	sigaction(signo, &act, NULL);
-}
-
 
 /* Local Vars */
 void (*signal_SIGHUP_handler)(void *, int sig);
@@ -141,7 +129,7 @@ void signal_handler(int sig)
 {
 	if (write(signal_pipe[1], &sig, sizeof(int)) != sizeof(int))
 	{
-		DBG("signal_pipe write error %s", strerror(errno));
+		printf("signal_pipe write error %s", strerror(errno));
 		assert(0);
 	}
 }

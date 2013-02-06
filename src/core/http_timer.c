@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "timer.h"
+#include "http_timer.h"
 
 /* time_now holds current time */
 struct timeval time_now = { tv_sec: 0, tv_usec:0 };

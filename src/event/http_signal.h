@@ -1,7 +1,7 @@
 #ifndef _HTTP_SIGNAL_H_INCLUDED
 #define _HTTP_SIGNAL_H_INCLUDED
 #include <signal.h>
-int Sigacton(int signo, const struct sigaction *restrict act, struct sigaction *restrict oact);
+int Sigacton(int signo, const struct sigaction *act, struct sigaction *oact);
 int Sigemptyset(sigset_t *set);
 int Sigfillset(sigset_t *set);
 int Sigaddset(sigset_t *set, int signum);
@@ -10,8 +10,6 @@ int Sigismember(const sigset_t *set, int signum);
 int Sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int Kill(pid_t pid, int sig);
 int Raise(int sig);
-
-void signal_handler(int signo, void (*handler)(void));
 
 extern int signal_pending(void);
 extern void *signal_set(int signo, void (*func) (void *, int), void *);

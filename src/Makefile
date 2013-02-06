@@ -7,7 +7,7 @@ DIRS = core http event
 all: libhttp_zhangjie.a 
 
 .PHONY: all
-libcomm.a:: dep
+libhttp_zhangjie.a:: dep
 	for i in $(DIRS); do make -C $$i || exit -1; done;
 	find . -name "*.o" -print | xargs -l ar cr libhttp_zhangjie.a
 
