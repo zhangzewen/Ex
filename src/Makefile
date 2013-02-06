@@ -11,10 +11,6 @@ libhttp_zhangjie.a:: dep
 	for i in $(DIRS); do make -C $$i || exit -1; done;
 	find . -name "*.o" -print | xargs -l ar cr libhttp_zhangjie.a
 
-#liblog4c:: log4c-localtime/src/log4c.h
-#	cd ./log4c-localtime && ./configure --enable-static --without-expat && make;
-#	cp log4c-localtime/src/log4c/.libs/liblog4c.a liblog4c.a
-
 
 clean:
 	rm -fr libhttp_zhangjie.a 

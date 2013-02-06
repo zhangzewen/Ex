@@ -1,29 +1,7 @@
-/*
- * Soft:        Keepalived is a failover program for the LVS project
- *              <www.linuxvirtualserver.org>. It monitor & manipulate
- *              a loadbalanced server pool using multi-layer checks.
- *
- * Part:        scheduler.c include file.
- *
- * Author:      Alexandre Cassen, <acassen@linux-vs.org>
- *
- *              This program is distributed in the hope that it will be useful,
- *              but WITHOUT ANY WARRANTY; without even the implied warranty of
- *              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *              See the GNU General Public License for more details.
- *
- *              This program is free software; you can redistribute it and/or
- *              modify it under the terms of the GNU General Public License
- *              as published by the Free Software Foundation; either version
- *              2 of the License, or (at your option) any later version.
- *
- * Copyright (C) 2001-2011 Alexandre Cassen, <acassen@linux-vs.org>
- */
 
-#ifndef _SCHEDULER_H
-#define _SCHEDULER_H
+#ifndef _HTTP_SCHEDULER_H_INCLUDED
+#define _HTTP_SCHEDULER_H_INCLUDED
 
-/* system includes */
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -31,9 +9,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "timer.h"
+#include <timer.h>
 
-/* Thread itself. */
 typedef struct _thread 
 {
 	unsigned long id;
@@ -80,7 +57,6 @@ typedef struct _thread_master
 	unsigned long alloc;
 } thread_master_t;
 
-/* Thread types. */
 #define THREAD_READ		0
 #define THREAD_WRITE		1
 #define THREAD_TIMER		2

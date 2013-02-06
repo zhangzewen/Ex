@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
+#include "http.h"
+#include <string.h>
 char *create_http_head(const char *method,const char *version,const char *url,const char *host)
 {
 	char tmp[4096];

@@ -20,7 +20,7 @@ struct http_status_code my_status_code[] = {
 	{101, "Switching Protocols"},
 	{200, "OK"},
 	{201, "Created"},
-	{202, "Accepted"}
+	{202, "Accepted"},
 	{203, "Non-Authoritative Information"},
 	{204, "No Content"},
 	{205, "Reset Content"},
@@ -90,7 +90,7 @@ typedef struct {
 char *create_http_head(const char *method,const char *version,const char *url,const char *host);
 int send_http_request(int sockfd,const char *http_request);
 int get_http_response(int sockfd,char *data);
-int parse_http(const *char test_url,char *host,char *url,char *port);
+int parse_http(const char *test_url,char *host,char *url,char *port);
 int create_http_request();
 int 
 
