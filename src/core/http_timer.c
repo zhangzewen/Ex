@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-int Gettimeofday(strcut timeval *tv, struct timezone *tz)
+int Gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	if(gettimeofday(tv,tz) == -1)
 		error_sys("gettimeofday error");
@@ -22,6 +22,7 @@ void timer_reset(struct timeval *tv)
 	tv->tv_sec = 0;
 	tv->tv_usec = 0;
 }
+
 struct timeval timer_now()
 {
 	struct timeval current_time;	
@@ -32,12 +33,14 @@ struct timeval timer_now()
 	errno = old_errno;
 	return current_time;
 }
+
 #if 0
 struct timeval set_time_now()
 {
 	return 0;
 }
 #endif
+
 int timer_cmp(struct timeval time_a, struct timeval time_b)
 {
 	if (time_a.tv_sec > time_b.tv_sec)
