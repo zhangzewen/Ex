@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+
+struct timeval time_now = { tv_sec: 0, tv_usec: 0};
 int Gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	if(gettimeofday(tv,tz) == -1)
@@ -34,12 +36,15 @@ struct timeval timer_now()
 	return current_time;
 }
 
-#if 0
 struct timeval set_time_now()
 {
-	return 0;
+	int old_errno = errno;
+	
+	timer_reset(time_now);
+	Gettimeofday(&time_now, NULL);
+	errno = old_errno;
+	return time_now;
 }
-#endif
 
 int timer_cmp(struct timeval time_a, struct timeval time_b)
 {

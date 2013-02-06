@@ -5,7 +5,11 @@
 #include <unistd.h>
 #include "scheduler.h"
 #include "http_signal.h"
+#include "http_timer.h"
 #include <syslog.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* global vars */
 thread_master_t *master = NULL;
 
@@ -14,7 +18,7 @@ thread_master_t *thread_make_master(void)
 {
 	thread_master_t *new;
 
-	new = (thread_master_t *)MALLOC(sizeof(thread_master_t));
+	new = (thread_master_t *)malloc(sizeof(thread_master_t));
 	return new;
 }
 
@@ -93,7 +97,7 @@ static void thread_clean_unuse(thread_master_t *m)
 		thread_list_delete(&m->unuse, t);
 
 		/* free the thread */
-		FREE(t);
+		free(t);
 		m->alloc--;
 	}
 }
@@ -158,7 +162,7 @@ static void thread_cleanup_master(thread_master_t *m)
 void thread_destroy_master(thread_master_t *m)
 {
 	thread_cleanup_master(m);
-	FREE(m);
+	free(m);
 }
 
 /* Delete top of the list and return it. */
@@ -182,7 +186,7 @@ thread_t *thread_new(thread_master_t *m)
 		return new;
 	}
 
-	new = (thread_t *)MALLOC(sizeof(thread_t));
+	new = (thread_t *)malloc(sizeof(thread_t));
 	m->alloc++;
 	return new;
 }
@@ -427,7 +431,7 @@ static void thread_update_timer(thread_list_t *list, TIMEVAL *timer_min)
 /* Compute the wait timer. Take care of timeouted fd */
 static void thread_compute_timer(thread_master_t *m, TIMEVAL *timer_wait)
 {
-	TIMEVAL timer_min;
+	struct timeval timer_min;
 
 	/* Prepare timer */
 	TIMER_RESET(timer_min);
@@ -666,7 +670,7 @@ void thread_child_handler(void *v, int sig)
 		{
 			if (errno == ECHILD)
 				return;
-			DBG("waitpid error: %s", strerror(errno));
+			printf("waitpid error: %s", strerror(errno));
 			assert(0);
 		}
 		else
