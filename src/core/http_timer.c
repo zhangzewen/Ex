@@ -40,7 +40,7 @@ struct timeval set_time_now()
 {
 	int old_errno = errno;
 	
-	timer_reset(time_now);
+	timer_reset(&time_now);
 	Gettimeofday(&time_now, NULL);
 	errno = old_errno;
 	return time_now;
