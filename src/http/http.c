@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "http.h"
 #include <string.h>
+#include "Define_Macro.h"
 char *create_http_head(const char *method,const char *version,const char *url,const char *host)
 {
 	char tmp[4096];
@@ -106,10 +107,14 @@ int Get_content_length();
 int Get_connection();
 int Get_ETag();
 int Get_Last_modified();
-.....
 
 
-
+int Get_http_response(const char *src, struct response *response)
+{	
+	char buf[BUFFSIZE];
+	strcpy(buf, src);	
+	
+}
 
 
 char *text_position(const char * src)
