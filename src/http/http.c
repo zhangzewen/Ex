@@ -112,8 +112,24 @@ int Get_Last_modified();
 int Get_http_response(const char *src, struct response *response)
 {	
 	char buf[BUFFSIZE];
+	char *token;
 	strcpy(buf, src);	
 	
+	if((token = strtok(buf, "\r\n")) != NULL) {
+		token = strtok(NULL, "\r\n");
+	}
+	//just get the http response head such as :HTTP/1.1 / 200 OK	
+	while((token = strtok(buf, "\r\n")) != NULL) 
+	{
+		if(!strncasecmp(token, "", )) {
+		} else if(!strncasecmp(token, "", )){
+		} else if (!strncasecmp(token, "\r\n", 2)) {
+			//this means that goes to the "\r\n\r\n"  and next is the respons content ,hah
+			break;
+		}
+	}
+	
+	return 0;
 }
 
 
