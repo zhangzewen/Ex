@@ -94,10 +94,6 @@ int parse_http(const char *test_url,char *host,char *url,char *port);
 int create_http_request();
 int 
 
-#endif
-
-#ifndef _HTML_H
-#define _HTML_H
 
 /* HTTP header tag */
 #define CONTENT_LENGTH	"Content-Length:"
