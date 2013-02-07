@@ -9,8 +9,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <timer.h>
-
+#include <time.h>
+#include <sys/time.h>
 typedef struct _thread 
 {
 	unsigned long id;

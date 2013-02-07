@@ -410,11 +410,11 @@ void thread_cancel_event(thread_master_t *m, void *arg)
 }
 
 /* Update timer value */
-static void thread_update_timer(thread_list_t *list, TIMEVAL *timer_min)
+static void thread_update_timer(thread_list_t *list, struct timeval *timer_min)
 {
 	if (list->head)
 	{
-		if (!TIMER_ISNULL(*timer_min))
+		if (!timer_isnull(*timer_min))
 		{
 			if (timer_cmp(list->head->sands, *timer_min) <= 0)
 			{
@@ -429,19 +429,19 @@ static void thread_update_timer(thread_list_t *list, TIMEVAL *timer_min)
 }
 
 /* Compute the wait timer. Take care of timeouted fd */
-static void thread_compute_timer(thread_master_t *m, TIMEVAL *timer_wait)
+static void thread_compute_timer(thread_master_t *m, struct timeval *timer_wait)
 {
 	struct timeval timer_min;
 
 	/* Prepare timer */
-	TIMER_RESET(timer_min);
+	timer_reset(&timer_min);
 	thread_update_timer(&m->timer, &timer_min);
 	thread_update_timer(&m->write, &timer_min);
 	thread_update_timer(&m->read, &timer_min);
 	thread_update_timer(&m->child, &timer_min);
 
 	/* Take care about monothonic clock */
-	if (!TIMER_ISNULL(timer_min))
+	if (!timer_isnull(timer_min))
 	{
 		timer_min = timer_sub(timer_min, time_now);
 		if (timer_min.tv_sec < 0)

@@ -68,3 +68,42 @@ struct timeval timer_dup(struct timeval time_b)
 	return time_a;
 }
 
+int timer_isnull(struct timeval tv)
+{
+	if( tv.tv_sec == 0 && tv.tv_usec == 0) 
+	{
+		return 1;
+	}
+	return 0;
+}
+
+struct timeval timer_sub(struct timeval time_a, struct timeval time_b)
+{
+	struct timeval ret;
+	timer_reset(&ret);
+	ret.tv_usec = time_b.tv_usec - time_a.tv_usec;
+	ret.tv_sec = time_b.tv_sec - time_a.tv_sec;
+	
+	if(ret.tv_usec < 0)
+	{
+		ret.tv_usec += 1000000;
+		ret.tv_sec++;
+	}
+	return ret;
+}
+
+struct timeval timer_add_long(struct timeval time_a, long b)
+{
+	struct timeval ret;
+	timer_reset(&ret);
+
+	ret.tv_usec = time_a.tv_usec + b % 1000000;
+	ret.tv_sec = time_a.tv_sec + b / 1000000;
+
+	if (ret.tv_usec >= 1000000) 
+	{
+		ret.tv_usec -= 1000000;
+		ret.tv_sec++;
+	}
+	return ret;
+}

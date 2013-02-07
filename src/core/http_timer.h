@@ -11,5 +11,9 @@ int timer_cmp(struct timeval time_a, struct timeval time_b);
 struct timeval timer_dup(struct timeval time_b);
 struct timeval set_time_now(void);
 void timer_reset(struct timeval *tv);
+
+int timer_isnull(struct timeval tv);
+struct timeval timer_sub(struct timeval time_a, struct timeval time_b);
+struct timeval timer_add_long(struct timeval time_a, long b);
 #endif
 
