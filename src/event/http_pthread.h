@@ -12,13 +12,14 @@ struct pthread_pool_t{
 	struct list_head wait_pthread_head;
 };
 typedef struct pthread_pool_t *pthread_pool;
-struct pthread_head_t{
-	int pthread_id;
+struct pthread_task_t{
+	pthread_t *pthread_id
 	int status;
 	void *arg;
 	void *(*task_func)(void *arg);
+	struct list_head list;
 };
-
+typedef struct pthread_task_t *pthread_task;
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
 					   void * (*)(void *), void *);
 void	Pthread_join(pthread_t, void **);
@@ -51,7 +52,20 @@ void work_stop();//work--->stop
 void work_init();//work--->init
 void work_destory();//destory work pthread
 void work_run();//run pthread
-void add_task(); //添加任务
+
+pthread_task pthread_task_create(void)
+{
+	pthread_task task;
+	task = (struct pthread_task_t *)malloc(sizeof(struct pthread_task_t));
+	if (NULL == task)
+		error_quit("can not create task");
+	task->pthread_id = NULL;
+	task->status = 0;
+	task->arg = NULL;
+	task->task_func = NULL;
+	INIT_LIST_HEAD(list);
+}
+
 pthread_pool pool_create(int num)
 {
 	pthread_pool new_pool;
@@ -60,9 +74,16 @@ pthread_pool pool_create(int num)
 		error_quit("can not create a pthread pool !\n");
 	new_pool->limit_pthread_num = num;
 	new_pool->current_pthreads = 0;
-	pthread_mutex_init(&new_pool->pool_mutex);	
-	pthread_mutex_init(&new_pool->queue_mutex);	
-	pthread_cond_init(&new_pool->queue_cond_ready);
+	pthread_mutex_init(&new_pool->pool_mutex, NULL);	
+	pthread_mutex_init(&new_pool->queue_mutex, NULL);	
+	pthread_cond_init(&new_pool->queue_cond_ready, NULL);
+	INIT_LIST_HEAD(&new_pool->pthread_head);
+	INIT_LIST_HEAD(&new_pool->wait_head);
+	return new_pool;
 }
 
+void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ) //添加任务
+{
+	
+}
 #endif	
