@@ -2,6 +2,10 @@
 #define	__HTTP_PTHREAD_H_INCLUDED
 #include <pthread.h>
 
+#define HTTP_PTHREAD_UNKNOWN   0x000
+#define HTTP_PTHREAD_READY			0x001
+#define HTTP_PTHREAD_RUNNING		0x002
+#define HTTP_PTHREAD_STOP			0x003
 struct pthread_pool_t{
 	pthread_mutex_t pool_mutex;
 	pthread_mutex_t queue_mutex;
@@ -20,6 +24,8 @@ struct pthread_task_t{
 	struct list_head list;
 };
 typedef struct pthread_task_t *pthread_task;
+
+void start_routine(void *arg);
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
 					   void * (*)(void *), void *);
 void	Pthread_join(pthread_t, void **);
@@ -60,7 +66,7 @@ pthread_task pthread_task_create(void)
 	if (NULL == task)
 		error_quit("can not create task");
 	task->pthread_id = NULL;
-	task->status = 0;
+	task->status = HTTP_PTHREAD_UNKNOWN;
 	task->arg = NULL;
 	task->task_func = NULL;
 	INIT_LIST_HEAD(list);
@@ -84,6 +90,14 @@ pthread_pool pool_create(int num)
 
 void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ) //添加任务
 {
+	int ret;
+	pthread_task new
+	new = pthread_task_create();
 	
+	new->task_func = task_func;
+	new->arg = arg;
+	new->status = HTTP_PTHREAD_READY;
+	Pthread_create(new->pthread_id, NULL,start_routine, new->arg);	
+	list_add_tail(&new->list, &queue_pool->pthread_head);	
 }
 #endif	
