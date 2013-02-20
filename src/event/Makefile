@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Werror -I ../core/
+CFLAGS = -g -Wall -Werror -pthread -I ../core/
 
 
 _OBJS = $(shell ls *.c)

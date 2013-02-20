@@ -2,11 +2,21 @@
 #define	__HTTP_PTHREAD_H_INCLUDED
 #include <pthread.h>
 
-struct pthread_pool{
+struct pthread_pool_t{
 	pthread_mutex_t pool_mutex;
+	pthread_mutex_t queue_mutex;
+	pthread_cond_t queue_cond_ready;
 	unsigned int current_pthreads;
-	unsigned int current_free_pthreads;
-	unsigned int max_free_pthreads;
+	unsigned int limit_pthread_num;
+	struct list_head pthread_head;	
+	struct list_head wait_pthread_head;
+};
+typedef struct pthread_pool_t *pthread_pool;
+struct pthread_head_t{
+	int pthread_id;
+	int status;
+	void *arg;
+	void *(*task_func)(void *arg);
 };
 
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
@@ -41,6 +51,18 @@ void work_stop();//work--->stop
 void work_init();//work--->init
 void work_destory();//destory work pthread
 void work_run();//run pthread
-
+void add_task(); //添加任务
+pthread_pool pool_create(int num)
+{
+	pthread_pool new_pool;
+	new_pool = (struct pthread_pool_t *)malloc(sizeof(struct pthread_pool_t));
+	if (NULL == new_pool)
+		error_quit("can not create a pthread pool !\n");
+	new_pool->limit_pthread_num = num;
+	new_pool->current_pthreads = 0;
+	pthread_mutex_init(&new_pool->pool_mutex);	
+	pthread_mutex_init(&new_pool->queue_mutex);	
+	pthread_cond_init(&new_pool->queue_cond_ready);
+}
 
 #endif	
