@@ -1,12 +1,14 @@
 #ifndef	__HTTP_PTHREAD_H_INCLUDED
 #define	__HTTP_PTHREAD_H_INCLUDED
 #include <pthread.h>
-
+#include "list.h"
+#include "http_error.h"
 #define HTTP_PTHREAD_UNKNOWN   0x000
 #define HTTP_PTHREAD_READY			0x001
 #define HTTP_PTHREAD_RUNNING		0x002
 #define HTTP_PTHREAD_STOP			0x003
-struct pthread_pool_t{
+
+typedef struct pthread_pool_t{
 	pthread_mutex_t pool_mutex;
 	pthread_mutex_t queue_mutex;
 	pthread_cond_t queue_cond_ready;
@@ -14,18 +16,17 @@ struct pthread_pool_t{
 	unsigned int limit_pthread_num;
 	struct list_head pthread_head;	
 	struct list_head wait_pthread_head;
-};
-typedef struct pthread_pool_t *pthread_pool;
-struct pthread_task_t{
-	pthread_t *pthread_id
+} *pthread_pool;
+
+typedef struct pthread_task_t{
+	pthread_t *pthread_id;
 	int status;
 	void *arg;
 	void *(*task_func)(void *arg);
 	struct list_head list;
-};
-typedef struct pthread_task_t *pthread_task;
+}*pthread_task;
 
-void start_routine(void *arg);
+void *start_routine(void *arg);
 void	Pthread_create(pthread_t *, const pthread_attr_t *,
 					   void * (*)(void *), void *);
 void	Pthread_join(pthread_t, void **);
@@ -59,45 +60,11 @@ void work_init();//work--->init
 void work_destory();//destory work pthread
 void work_run();//run pthread
 
-pthread_task pthread_task_create(void)
-{
-	pthread_task task;
-	task = (struct pthread_task_t *)malloc(sizeof(struct pthread_task_t));
-	if (NULL == task)
-		error_quit("can not create task");
-	task->pthread_id = NULL;
-	task->status = HTTP_PTHREAD_UNKNOWN;
-	task->arg = NULL;
-	task->task_func = NULL;
-	INIT_LIST_HEAD(list);
-}
+void destroy_list(struct list_head &head);
 
-pthread_pool pool_create(int num)
-{
-	pthread_pool new_pool;
-	new_pool = (struct pthread_pool_t *)malloc(sizeof(struct pthread_pool_t));
-	if (NULL == new_pool)
-		error_quit("can not create a pthread pool !\n");
-	new_pool->limit_pthread_num = num;
-	new_pool->current_pthreads = 0;
-	pthread_mutex_init(&new_pool->pool_mutex, NULL);	
-	pthread_mutex_init(&new_pool->queue_mutex, NULL);	
-	pthread_cond_init(&new_pool->queue_cond_ready, NULL);
-	INIT_LIST_HEAD(&new_pool->pthread_head);
-	INIT_LIST_HEAD(&new_pool->wait_head);
-	return new_pool;
-}
+pthread_task pthread_task_create(void);
 
-void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ) //添加任务
-{
-	int ret;
-	pthread_task new
-	new = pthread_task_create();
-	
-	new->task_func = task_func;
-	new->arg = arg;
-	new->status = HTTP_PTHREAD_READY;
-	Pthread_create(new->pthread_id, NULL,start_routine, new->arg);	
-	list_add_tail(&new->list, &queue_pool->pthread_head);	
-}
+pthread_pool pool_create(int num);
+
+void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ); //添加任务
 #endif	
