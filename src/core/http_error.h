@@ -3,5 +3,6 @@
 
 int error_sys(const char *text);
 void error_quit(const char *text);
+void error_printf(const char *text);
 
 #endif

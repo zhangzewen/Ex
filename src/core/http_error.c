@@ -11,5 +11,10 @@ int error_sys(const char *text)
 void error_quit(const char *text)
 {
 	fprintf(stderr,"%s at %s:%d desc:%s\n, and the program will be exit!\n",strerror(errno), __FILE__, __LINE__, text);	
-	exit(-1);
+	exit(1);
+}
+
+void error_printf(const char *text)
+{
+	fprintf(stderr,"%s at %s:%d desc:%s\n, and the program will be exit!\n",strerror(errno), __FILE__, __LINE__, text);	
 }
