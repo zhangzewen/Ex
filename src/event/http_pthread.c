@@ -48,8 +48,8 @@ pthread_pool pool_create(int num)
 		error_quit("can not create a pthread pool !\n");
 	new_pool->limit_pthread_num = num;
 	new_pool->current_pthreads = 0;
-	Pthread_mutex_init(&new_pool->pool_mutex, NULL);	
-	Pthread_mutex_init(&new_pool->queue_mutex, NULL);	
+	pthread_mutex_init(&new_pool->pool_mutex, NULL);	
+	pthread_mutex_init(&new_pool->queue_mutex, NULL);	
 	pthread_cond_init(&new_pool->queue_cond_ready, NULL);
 	INIT_LIST_HEAD(&new_pool->pthread_head);
 	INIT_LIST_HEAD(&new_pool->wait_pthread_head);
@@ -64,7 +64,7 @@ void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ) /
 	new->task_func = task_func;
 	new->arg = arg;
 	new->status = HTTP_PTHREAD_READY;
-	Pthread_create(new->pthread_id, NULL,start_routine, new->arg);	
+	pthread_create(new->pthread_id, NULL,start_routine, new->arg);	
 	pthread_mutex_lock(&queue_pool->queue_mutex);
 	list_add_tail(&new->list, &queue_pool->pthread_head);	
 	pthread_mutex_unlock(&queue_pool->queue_mutex);
