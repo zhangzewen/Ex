@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 int tcp_connect(const char *host, const char *serv)
 {
 	int				sockfd, n;
@@ -33,7 +34,7 @@ int tcp_connect(const char *host, const char *serv)
 		if (connect(sockfd, res->ai_addr, res->ai_addrlen) == 0)
 			break;
 
-		Close(sockfd);
+		close(sockfd);
 	} while ( (res = res->ai_next) != NULL);
 
 	if (res == NULL)	
@@ -67,17 +68,17 @@ int tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 		if (listenfd < 0)
 			continue;
 
-		Setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+		setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 		if (bind(listenfd, res->ai_addr, res->ai_addrlen) == 0)
 			break;	
 
-		Close(listenfd);
+		close(listenfd);
 	} while ( (res = res->ai_next) != NULL);
 
 	if (res == NULL)
 		{}
 
-	Listen(listenfd, LISTENQ);
+	listen(listenfd, LISTENQ);
 
 	if (addrlenp)
 		*addrlenp = res->ai_addrlen;	
