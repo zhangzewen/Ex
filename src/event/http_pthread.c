@@ -14,13 +14,13 @@ void destroy_list(struct list_head *head)
 	}
 	
 	while(!list_empty(head)) {
-		list_del(&head->prev);	
-		free(/*total struct*/);
+		list_del(head->prev);	
+		//free();
 	}
 
-	list_del_int(head);
+	list_del_init(head);
 
-	free(/*total struct */);
+	//free(/*total struct */);
 
 	head = NULL;
 	
