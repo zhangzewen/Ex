@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 
-void destroy_list(struct list_head &head)
+void destroy_list(struct list_head *head)
 {
 	if(NULL == head) {
 		// doing nothing

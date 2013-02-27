@@ -39,7 +39,7 @@ void work_init();//work--->init
 void work_destory();//destory work pthread
 void work_run();//run pthread
 
-void destroy_list(struct list_head &head);
+void destroy_list(struct list_head *head);
 
 pthread_task pthread_task_create(void);
 
