@@ -104,11 +104,11 @@ typedef struct {
 
 
 typedef enum {
-    NGX_HTTP_POST_READ_PHASE = 0,
+    NGX_HTTP_POST_READ_PHASE = 0,//读取请求阶段
 
-    NGX_HTTP_SERVER_REWRITE_PHASE,
+    NGX_HTTP_SERVER_REWRITE_PHASE,// URL转换阶段
 
-    NGX_HTTP_FIND_CONFIG_PHASE,
+    NGX_HTTP_FIND_CONFIG_PHASE,//查找相应的配置来执行阶段
     NGX_HTTP_REWRITE_PHASE,
     NGX_HTTP_POST_REWRITE_PHASE,
 
@@ -118,9 +118,9 @@ typedef enum {
     NGX_HTTP_POST_ACCESS_PHASE,
 
     NGX_HTTP_TRY_FILES_PHASE,
-    NGX_HTTP_CONTENT_PHASE,
+    NGX_HTTP_CONTENT_PHASE, //处理生成返回数据阶段（有filter可以忽略）
 
-    NGX_HTTP_LOG_PHASE
+    NGX_HTTP_LOG_PHASE //记录日志处理阶段，具体说明应当是请求完成后，关闭请求时处理
 } ngx_http_phases;
 
 typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;
