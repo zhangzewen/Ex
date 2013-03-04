@@ -117,7 +117,7 @@ typedef enum {
     NGX_HTTP_ACCESS_PHASE,
     NGX_HTTP_POST_ACCESS_PHASE,
 
-    NGX_HTTP_TRY_FILES_PHASE,
+    NGX_HTTP_TRY_FILES_PHASE, //try_file模块，也就是对应配置文件中的try_file指令，可以接收多个路径作为参数，当前一个路径的资源无法找到，则自动查找下一个路径
     NGX_HTTP_CONTENT_PHASE, //处理生成返回数据阶段（有filter可以忽略）
 
     NGX_HTTP_LOG_PHASE //记录日志处理阶段，具体说明应当是请求完成后，关闭请求时处理
