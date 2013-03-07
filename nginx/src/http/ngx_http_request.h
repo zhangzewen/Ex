@@ -278,8 +278,8 @@ typedef void (*ngx_http_client_body_handler_pt)(ngx_http_request_t *r);
 
 typedef struct {
     ngx_temp_file_t                  *temp_file;
-    ngx_chain_t                      *bufs;
-    ngx_buf_t                        *buf;
+    ngx_chain_t                      *bufs;/*消息体都保存在这个chain里面*/
+    ngx_buf_t                        *buf;/*用作临时存储的buf，在ngx_http_read_client_request_body和ngx_http_do_read_client_request_body中用的到*/
     off_t                             rest;
     ngx_chain_t                      *to_write;
     ngx_http_client_body_handler_pt   post_handler;
@@ -355,12 +355,17 @@ struct ngx_http_request_s {
     uint32_t                          signature;         /* "HTTP" */
 
     ngx_connection_t                 *connection;
-
+/*一下四个保存的是模块对应的上下文结构体的指针
+*其中ctx 对应于自定义的上下文结构体指针
+*mian_conf 对应于main的上下文结构题指针
+*loc_conf对应于loc的上下文结构体指针
+*src_conf对应于srv的上下文结构体指针
+*/
     void                            **ctx;
     void                            **main_conf;
     void                            **srv_conf;
     void                            **loc_conf;
-
+/*读写事件的函数指针*/
     ngx_http_event_handler_pt         read_event_handler;
     ngx_http_event_handler_pt         write_event_handler;
 
@@ -368,22 +373,32 @@ struct ngx_http_request_s {
     ngx_http_cache_t                 *cache;
 #endif
 
-    ngx_http_upstream_t              *upstream;
-    ngx_array_t                      *upstream_states;
+    ngx_http_upstream_t              *upstream;/*用于upstream模块*/
+    ngx_array_t                      *upstream_states;/*与upstream模块相关*/
                                          /* of ngx_http_upstream_state_t */
 
-    ngx_pool_t                       *pool;
-    ngx_buf_t                        *header_in;
+    ngx_pool_t                       *pool;/*内存池*/
+    ngx_buf_t                        *header_in;/*会保存一些消息体的内容*/
 
-    ngx_http_headers_in_t             headers_in;
-    ngx_http_headers_out_t            headers_out;
+    ngx_http_headers_in_t             headers_in;/*代表请求头部//请求的header结构体*/
+    ngx_http_headers_out_t            headers_out;/*代表响应头部*/
 
-    ngx_http_request_body_t          *request_body;
-
+    ngx_http_request_body_t          *request_body;/*代表请求头部r->request_body->bufs中存放的请求体中的数据*/
+/*应该是请求相关的时间限制*/
     time_t                            lingering_time;
     time_t                            start_sec;
     ngx_msec_t                        start_msec;
-
+/*从method到http_protocol都是请求行中的信息*/
+/*
+HTTP/1.1 200 OK
+Date: Thu, 07 Mar 2013 07:30:09 GMT
+Server: BWS/1.0
+Content-Length: 10309
+Content-Type: text/html;charset=utf-8
+Cache-Control: private
+Expires: Thu, 07 Mar 2013 07:30:09 GMT
+Connection: Keep-Alive
+*/
     ngx_uint_t                        method;
     ngx_uint_t                        http_version;
 
@@ -396,7 +411,8 @@ struct ngx_http_request_s {
     ngx_str_t                         method_name;
     ngx_str_t                         http_protocol;
 
-    ngx_chain_t                      *out;
+    ngx_chain_t                      *out; /*这里要注意ngx_http_request_t 中有一个out的chain,这个chain保存的是上一次还没有被发完的buf，这样每次我们接收到新的chain的话，就需要将新的chain连接到老的out chain上，然后再发出去*/
+
     ngx_http_request_t               *main;
     ngx_http_request_t               *parent;
     ngx_http_postponed_request_t     *postponed;
@@ -405,8 +421,8 @@ struct ngx_http_request_s {
 
     ngx_http_virtual_names_t         *virtual_names;
 
-    ngx_int_t                         phase_handler;
-    ngx_http_handler_pt               content_handler;
+    ngx_int_t                         phase_handler;/*应该是在请求处理的多个阶段中，利用phase_handler依次执行多个阶段*/
+    ngx_http_handler_pt               content_handler;/*生成内容的处理函数，比如ngx_http_proxy_handler等*/
     ngx_uint_t                        access_code;
 
     ngx_http_variable_value_t        *variables;
@@ -452,14 +468,18 @@ struct ngx_http_request_s {
     /* URI with " " */
     unsigned                          space_in_uri:1;
 
-    unsigned                          invalid_header:1;
+    unsigned                          invalid_header:1;//一个标示位，标示header是否有效，不正常的结束视为无效
 
     unsigned                          add_uri_to_alias:1;
     unsigned                          valid_location:1;
     unsigned                          valid_unparsed_uri:1;
     unsigned                          uri_changed:1;
     unsigned                          uri_changes:4;
-
+/*
+	下面这两个参数就会设定为每个body都存放到临时文件里，并且这个临时文件在请求结束后不会被删除
+	r->request_body_in_persistent_file = 1
+	r->request_body_in_file_only = 1
+*/
     unsigned                          request_body_in_single_buf:1;
     unsigned                          request_body_in_file_only:1;
     unsigned                          request_body_in_persistent_file:1;
@@ -499,7 +519,7 @@ struct ngx_http_request_s {
     unsigned                          pipeline:1;
     unsigned                          plain_http:1;
     unsigned                          chunked:1;
-    unsigned                          header_only:1;
+    unsigned                          header_only:1;/*当请求方法为HEAD时，r->header_only =1，在ngx_http_header_filter函数中*/
     unsigned                          keepalive:1;
     unsigned                          lingering_close:1;
     unsigned                          discard_body:1;
@@ -545,7 +565,7 @@ struct ngx_http_request_s {
      * a memory that can be reused after parsing a request line
      * via ngx_http_ephemeral_t
      */
-
+/*定位request header中字段的起始和结束地址 */
     u_char                           *uri_start;
     u_char                           *uri_end;
     u_char                           *uri_ext;
