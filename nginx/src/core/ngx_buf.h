@@ -18,8 +18,8 @@ typedef void *            ngx_buf_tag_t;
 typedef struct ngx_buf_s  ngx_buf_t;
 
 struct ngx_buf_s {
-    u_char          *pos;
-    u_char          *last;
+    u_char          *pos; //当buf所指向的数据在内存里的时候，pos指向的是这段数据开始的位置
+    u_char          *last;//当buf所指向的数据在内存里的时候，last指向的这段数据结束的位置
     off_t            file_pos;
     off_t            file_last;
 
@@ -31,22 +31,22 @@ struct ngx_buf_s {
 
 
     /* the buf's content could be changed */
-    unsigned         temporary:1;
+    unsigned         temporary:1;//为1是表示该buf由用户创建，并且可以被在filter处理的过程中进行变更，而不会造成问题
 
     /*
      * the buf's content is in a memory cache or in a read only memory
      * and must not be changed
      */
-    unsigned         memory:1;
+    unsigned         memory:1;//为1时表示该buf所包含的内容是在内存中，但是这些内容不能被进行处理的filter进行变更
 
     /* the buf's content is mmap()ed and must not be changed */
-    unsigned         mmap:1;
+    unsigned         mmap:1;//当为1时表示该buf所包含的内容是在内存中，是通过mmap使用内存映射从文件中映射到内存中，这些内容不能被进行处理的filter进行变更
 
     unsigned         recycled:1;
     unsigned         in_file:1;
     unsigned         flush:1;
     unsigned         sync:1;
-    unsigned         last_buf:1;
+    unsigned         last_buf:1;//数据被以多个chain传递给了过滤器，此字段为1表明这是最后一个buf
     unsigned         last_in_chain:1;
 
     unsigned         last_shadow:1;
