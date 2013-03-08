@@ -33,7 +33,7 @@ char           **ngx_os_argv;
 ngx_int_t        ngx_process_slot;
 ngx_socket_t     ngx_channel;
 ngx_int_t        ngx_last_process;
-ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];
+ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];//全局的进程表，保存了存活的子进程
 
 
 ngx_signal_t  signals[] = {
@@ -89,18 +89,20 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 {
     u_long     on;
     ngx_pid_t  pid;
+		//表示将要fork的子进程在ngx_processes中的位置
     ngx_int_t  s;
-
+		//首先，如果传递进来的类型大于0，则就是已经确定这个进程已经退出，可以直接确定slot
     if (respawn >= 0) {
         s = respawn;
 
     } else {
+		//遍历ngx_processess，从而找到空闲的slot，从而灯会fork完毕后，将子进程信息放入全局进程信息表的相应的slot
         for (s = 0; s < ngx_last_process; s++) {
             if (ngx_processes[s].pid == -1) {
                 break;
             }
         }
-
+				//到达最大进程限制报错
         if (s == NGX_MAX_PROCESSES) {
             ngx_log_error(NGX_LOG_ALERT, cycle->log, 0,
                           "no more than %d processes can be spawned",

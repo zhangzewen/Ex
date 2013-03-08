@@ -1032,7 +1032,7 @@ ngx_conf_log_error(ngx_uint_t level, ngx_conf_t *cf, ngx_err_t err,
 
 
 char *
-ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) //读取NGX_CONF_FLAG类型的参数
 {
     char  *p = conf;
 
@@ -1072,7 +1072,7 @@ ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 char *
-ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) //读取字符串类型的参数
 {
     char  *p = conf;
 

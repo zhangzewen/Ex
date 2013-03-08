@@ -79,7 +79,7 @@ struct ngx_command_s {
     ngx_str_t             name;
     ngx_uint_t            type;
     char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-    ngx_uint_t            conf;
+    ngx_uint_t            conf;//该字段被NGX_HTTP_MODULE类型模块所用，该字段指定当前配置项存储的内存位置。实际上是使用哪个内存池的问题，因为http模块对所有http模块所要保存的配置信息，划分了main，server和location三个地方进行存储，每个地方都有一个内存池用来分配存储这些信息的内存。这里可能的值为NGX_HTTP_MAIN_CONF_OFFSET,NGX_HTTP_SRV_CONF_OFFSET或NGX_HTTP_LOC_CONF_OFFSET.当然也可以直接置为0，就是NGX_HTTP_MAIN_CONF_OFFSET
     ngx_uint_t            offset;
     void                 *post;
 };
@@ -105,12 +105,12 @@ struct ngx_open_file_s {
 };
 
 
-#define NGX_MODULE_V1          0, 0, 0, 0, 0, 0, 1
-#define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0
+#define NGX_MODULE_V1          0, 0, 0, 0, 0, 0, 1 //该宏用来初始化前7个字段
+#define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0//该宏用来初始化最后8个字段
 
 struct ngx_module_s {
-    ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
+    ngx_uint_t            ctx_index;//分类模块计数器
+    ngx_uint_t            index;    //模块计数器
 
     ngx_uint_t            spare0;
     ngx_uint_t            spare1;
@@ -119,20 +119,20 @@ struct ngx_module_s {
 
     ngx_uint_t            version;
 
-    void                 *ctx;
-    ngx_command_t        *commands;
-    ngx_uint_t            type;
+    void                 *ctx; //模块的上下文
+    ngx_command_t        *commands; //该模块的指令集，指向一个ngx_command_t 结构数组
+    ngx_uint_t            type; //该模块的种类，为/core/event/http/mail中的一种
 
-    ngx_int_t           (*init_master)(ngx_log_t *log);
+    ngx_int_t           (*init_master)(ngx_log_t *log);//初始化master
 
-    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);
+    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);//初始化模块
 
-    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);
-    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);
-    void                (*exit_thread)(ngx_cycle_t *cycle);
-    void                (*exit_process)(ngx_cycle_t *cycle);
+    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);//初始化工作进程
+    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);//初始化线程
+    void                (*exit_thread)(ngx_cycle_t *cycle);//退出线程
+    void                (*exit_process)(ngx_cycle_t *cycle);//退出工作进程
 
-    void                (*exit_master)(ngx_cycle_t *cycle);
+    void                (*exit_master)(ngx_cycle_t *cycle);//退出master
 
     uintptr_t             spare_hook0;
     uintptr_t             spare_hook1;

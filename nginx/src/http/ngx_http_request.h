@@ -23,7 +23,7 @@
 #define NGX_HTTP_VERSION_9                 9
 #define NGX_HTTP_VERSION_10                1000
 #define NGX_HTTP_VERSION_11                1001
-
+/*http 请求的方法 GET,HEAD,POST*/
 #define NGX_HTTP_UNKNOWN                   0x0001
 #define NGX_HTTP_GET                       0x0002
 #define NGX_HTTP_HEAD                      0x0004

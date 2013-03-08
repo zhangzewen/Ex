@@ -22,17 +22,17 @@ typedef struct {
 
 
 typedef struct {
-    ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);
-    ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);
+    ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);//在创建和读取该模块的配置信息之前被调用
+    ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);//在创建和读取该模块的配置信息之后被调用
 
-    void       *(*create_main_conf)(ngx_conf_t *cf);
-    char       *(*init_main_conf)(ngx_conf_t *cf, void *conf);
+    void       *(*create_main_conf)(ngx_conf_t *cf);//调用该函数创建本模块位于http block 的配置信息存储结构。该函数成功的时候，返回创建的配置对象。失败的话，返回NULL
+    char       *(*init_main_conf)(ngx_conf_t *cf, void *conf);//调用该函数初始化本模块位于http block的配置信息存储结构，该函数成功的时候，返回NGX_CONF_OK。失败的话，返回NGX_CONF_ERROR或者错误字符串
 
-    void       *(*create_srv_conf)(ngx_conf_t *cf);
-    char       *(*merge_srv_conf)(ngx_conf_t *cf, void *prev, void *conf);
+    void       *(*create_srv_conf)(ngx_conf_t *cf);//调用该函数创建本模块位于http block的配置信息存储结构，该函数成功的时候，返回创建的配置对象，失败的话，返回NULL
+    char       *(*merge_srv_conf)(ngx_conf_t *cf, void *prev, void *conf);//因为有些配置指令可以出现在http block，也可以出现在http server block中，在遇到此种情况，每个server都会有自己的存储机构来存储该server的配置，但是在这种情况下当在http block中的配置与server block中的配置信息冲突的时候，就需要调用此函数进行合并，该函数可以不必须提供，但安全起见，建议提供，该函数成功的时候，返回NGX_CONF_OK,失败返回NGX_CONF_ERROR或者错误字符串
 
-    void       *(*create_loc_conf)(ngx_conf_t *cf);
-    char       *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf);
+    void       *(*create_loc_conf)(ngx_conf_t *cf);//同 void *(*create_srv_conf)(ngx_conf_t *cf)的作用相同，只是创建模块位于location block的配置信息存储结构
+    char       *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf); //合并函数
 } ngx_http_module_t;
 
 
