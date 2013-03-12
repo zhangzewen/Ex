@@ -479,16 +479,16 @@ typedef struct {
 #if (NGX_DEBUG)
     ngx_array_t   debug_connection;
 #endif
-} ngx_event_conf_t;
+} ngx_event_conf_t;//nginx.conf的配置文件中event模块的信息
 
 
 typedef struct {
-    ngx_str_t              *name;
+    ngx_str_t              *name; //事件模型名称:select ,pselect ,poll ,epoll
 
-    void                 *(*create_conf)(ngx_cycle_t *cycle);
+    void                 *(*create_conf)(ngx_cycle_t *cycle); //创建事件
     char                 *(*init_conf)(ngx_cycle_t *cycle, void *conf);
 
-    ngx_event_actions_t     actions;
+    ngx_event_actions_t     actions;//事件处理函数
 } ngx_event_module_t;
 
 
