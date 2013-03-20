@@ -8,7 +8,9 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+/*
+*创建一个临时buf
+*/
 ngx_buf_t *
 ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
 {
@@ -19,7 +21,7 @@ ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
         return NULL;
     }
 
-    b->start = ngx_palloc(pool, size);
+    b->start = ngx_palloc(pool, size);/*buf的起始地址，有别于b->pos*/
     if (b->start == NULL) {
         return NULL;
     }
@@ -35,14 +37,16 @@ ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
      *     and flags
      */
 
-    b->pos = b->start;
+    b->pos = b->start; 
     b->last = b->start;
-    b->end = b->last + size;
+    b->end = b->last + size;/*整个buf结束的地址*/
     b->temporary = 1;
 
     return b;
 }
-
+/*
+*ngx_alloc_chain_link的作用是如果pool中有ngx_chain_t结构题buf，则把其链在新的ngx_chain_t后面，若是没有，则创建新的ngx_chain_t
+*/
 
 ngx_chain_t *
 ngx_alloc_chain_link(ngx_pool_t *pool)

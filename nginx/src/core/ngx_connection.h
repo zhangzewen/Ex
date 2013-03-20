@@ -146,7 +146,7 @@ struct ngx_connection_s {
 
     ngx_atomic_uint_t   number;
 
-    ngx_uint_t          requests;
+    ngx_uint_t          requests; //请求计数
 
     unsigned            buffered:8;
 
