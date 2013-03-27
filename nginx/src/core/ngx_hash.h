@@ -14,15 +14,15 @@
 
 
 typedef struct {
-    void             *value;
-    u_short           len;
-    u_char            name[1];
+    void             *value; //value,即某个key对应的值,即<key,value>中的value
+    u_short           len; //name长度
+    u_char            name[1];//某个要hash的数据（在ngxin中表现为字符串,即<key,value>中的key
 } ngx_hash_elt_t;
-
+//ngx_hash_elt_t结构中的name字段就是ngx_hash_key_t结构中的key,可以在ngx_hash_init()中看到
 
 typedef struct {
-    ngx_hash_elt_t  **buckets;
-    ngx_uint_t        size;
+    ngx_hash_elt_t  **buckets;//hash桶（有size个桶）
+    ngx_uint_t        size;//hash桶的个数
 } ngx_hash_t;
 
 
@@ -33,9 +33,9 @@ typedef struct {
 
 
 typedef struct {
-    ngx_str_t         key;
-    ngx_uint_t        key_hash;
-    void             *value;
+    ngx_str_t         key;//key,为nginx的字符串结构
+    ngx_uint_t        key_hash;//由key计算出的hash值（通过hash函数如ngx_hash_key_lc()）
+    void             *value;//该key对应的值，组成一个键-值对<key,value>
 } ngx_hash_key_t;
 
 
@@ -47,18 +47,19 @@ typedef struct {
     ngx_hash_wildcard_t  *wc_head;
     ngx_hash_wildcard_t  *wc_tail;
 } ngx_hash_combined_t;
-
-
+/*
+nginx的hash初始化结构是ngx_hash_init_t，用来将其相关数据封装起来作为参数传递给ngx_hash_init()或ngx_hash_wildcard_init()函数，这两个函数主要在http相关模块中使用，例如ngx_http_sever_names()函数（优化http server names）,ngx_http_merge_types()函数（合并httptype），ngx_http_fastcgi_merge_loc_conf()函数（合并FastCGI Location Configuration)等函数或过程用到的参数，局部对象/变量等
+*/
 typedef struct {
-    ngx_hash_t       *hash;
-    ngx_hash_key_pt   key;
+    ngx_hash_t       *hash; //待初始化的hash结构
+    ngx_hash_key_pt   key;//hash函数指针
 
-    ngx_uint_t        max_size;
-    ngx_uint_t        bucket_size;
+    ngx_uint_t        max_size;//bucket的最大个数
+    ngx_uint_t        bucket_size;//每个bucket的空间
 
-    char             *name;
-    ngx_pool_t       *pool;
-    ngx_pool_t       *temp_pool;
+    char             *name; //该hash结构的名字（仅在错误日志中使用）
+    ngx_pool_t       *pool; //该hash结构从pool指向的内存池中分配
+    ngx_pool_t       *temp_pool;//分配临时数据空间的内存池 
 } ngx_hash_init_t;
 
 

@@ -239,7 +239,7 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
             goto failed;
         }
 
-
+/*没有handler则调用默认的解析函数*/
         rc = ngx_conf_handler(cf, rc);
 
         if (rc == NGX_ERROR) {
@@ -335,9 +335,9 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             }
 
             /* is the directive's argument count right ? */
-
+/*如果设置了type*/
             if (!(cmd->type & NGX_CONF_ANY)) {
-
+/*首先判断参数是否合法*/
                 if (cmd->type & NGX_CONF_FLAG) {
 
                     if (cf->args->nelts != 2) {
@@ -374,16 +374,18 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                 conf = ((void **) cf->ctx)[ngx_modules[i]->index];
 
             } else if (cmd->type & NGX_MAIN_CONF) {
+/*如果不是DIRECT_CONF并且是MAIN，则说明我们需要在配置中创建自己的模块的上下文（也就是要进入二级模块）*/
                 conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);
 
             } else if (cf->ctx) {
+/*否则进入二级模块处理*/
                 confp = *(void **) ((char *) cf->ctx + cmd->conf);
 
                 if (confp) {
                     conf = confp[ngx_modules[i]->ctx_index];
                 }
             }
-
+/*调用命令的回调函数*/
             rv = cmd->set(cf, cmd, conf);
 
             if (rv == NGX_CONF_OK) {
