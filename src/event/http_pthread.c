@@ -56,7 +56,7 @@ pthread_pool pool_create(int num)
 	return new_pool;
 }
 
-void add_task(pthread_pool queue_pool, void *(*task_func)(void *), void *arg ) //添加任务
+void add_task(void *(*task_func)(void *), void *arg ) //添加任务
 {
 	pthread_task new;
 	new = pthread_task_create();
