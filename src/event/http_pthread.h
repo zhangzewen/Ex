@@ -21,7 +21,7 @@ struct pthread_pool{
 	struct list_head threads_head;	
 };
 
-typedef struct pthread_task_t{
+typedef struct pthread_task_s{
 	pthread_t *pthread_id;
 	int status;
 	void *arg;
@@ -29,13 +29,13 @@ typedef struct pthread_task_t{
 	struct list_head list;
 } *pthread_task;
 
-struct task_queue{
+typedef struct task_queue_s{
 	unsigned int current_tasks;
 	unsigned int max_tasks;
 	unsigned int increase_step;
 	unsigned int limit_task_num;
 	struct list_head task_queue_head;
-};
+}*task_queue;
 
 pthread_task pthread_task_create(void *arg, void *(*fun)(void *arg));
 

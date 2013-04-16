@@ -8,7 +8,7 @@
 pthread_task pthread_task_create(void *arg, void *(*fun)(void *arg))
 {
 	pthread_task task;
-	task = (pthread_task)malloc(sizeof(struct pthread_task_t));
+	task = (pthread_task)malloc(sizeof(struct pthread_task_s));
 	if(NULL == task) {
 		return (pthread_task)-1;
 	}
@@ -19,13 +19,13 @@ pthread_task pthread_task_create(void *arg, void *(*fun)(void *arg))
 	return task;
 }
 
-task_queue *http_task_queue_cretae(void)
+task_queue http_task_queue_cretae(void)
 {
-	task_queue *queue;
-	pthread_task *task;
+	task_queue queue;
+	pthread_task task;
 	int i = 0;
 	
-	queue = (struct task_queue *)malloc(sizeof(struct task_queue));
+	queue = (task_queue )malloc(sizeof(struct task_queue_s));
 
 	if (NULL == queue)
 		error_quit("can not create task queue!");
