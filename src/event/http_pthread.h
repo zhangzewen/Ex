@@ -14,20 +14,21 @@ typedef struct thread_s{
 	pthread_t *pthread_id;
 } *thread_t;
 
-struct pthread_pool{
-	unsigned int current_pthreads;
-	unsigned int max_pthreds;
+typedef struct thread_pool_s{
+	unsigned int current_threads;
+	unsigned int max_threads;
 	unsigned int increase_step;
+	unsigned int limit_theads_num;
 	struct list_head threads_head;	
-};
+}*thread_pool;
 
-typedef struct pthread_task_s{
-	pthread_t *pthread_id;
+typedef struct thread_task_s{
+	pthread_t *thread_id;
 	int status;
 	void *arg;
 	void *(*task_func)(void *arg);
 	struct list_head list;
-} *pthread_task;
+} *thread_task;
 
 typedef struct task_queue_s{
 	unsigned int current_tasks;
@@ -37,7 +38,16 @@ typedef struct task_queue_s{
 	struct list_head task_queue_head;
 }*task_queue;
 
-pthread_task pthread_task_create(void *arg, void *(*fun)(void *arg));
+thread_task pthread_task_create(void *arg, void *(*fun)(void *arg));
+
+task_queue http_task_queue_create(void);
+
+int add_task(task_queue queue, thread_task task);
+
+thread_pool pthread_pool_create(void);
+thread_t threads_create();
 
 
+int destory_thread(thread_t thead);
+int destory_task(thread_task task);
 #endif	
