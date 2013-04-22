@@ -19,7 +19,7 @@ thread_task thread_task_create(void *arg, void *(*fun)(void *arg))
 	return task;
 }
 
-task_queue http_task_queue_cretae(void)
+task_queue task_queue_cretae(void)
 {
 	task_queue queue;
 	thread_task task;
@@ -29,6 +29,8 @@ task_queue http_task_queue_cretae(void)
 
 	if (NULL == queue)
 		error_quit("can not create task queue!");
+	pthread_mutex_init(&queue->task_queue_mutex, NULL);
+	pthread_cond_init(&queue->task_queue_cond, NULL);
 	queue->current_tasks = 0;
 	queue->max_tasks = 1024;
 	queue->limit_task_num = 10;
@@ -92,6 +94,8 @@ thread_pool thread_pool_create(void)
 		return (thread_pool)-1;
 	}
 	
+	pthread_mutex_init(&pool->thread_pool_mutex, NULL);
+	pthread_cond_init(&pool->thread_pool_cond, NULL);
 	pool->current_threads = 0;
 	pool->max_threads = 1024;
 	pool->increase_step = 8;
@@ -129,4 +133,21 @@ int destory_task(thread_task task)
 	task = NULL;
 
 	return 0;
+}
+int get_current_threads_count(thread_pool *pool)
+{
+	pthread_mutex_lock(&pool->thread_pool_mutext);
+	int current_threads = 0;
+	current_threads = pool->current_threads;
+	pthread_mutex_unlock(&pool->thread_pool_mutext);
+	return current_threads;
+	
+}
+int get_current_tasks_count(task_queue *queue)
+{
+	pthread_mutex_lock(&queue->task_queue_mutex);
+	int current_tasks = 0;
+	current_tasks = queue->current_tasks;
+	pthread_mutex_unlock(&queue->task_queue_mutex);
+	return current_tasks;
 }
