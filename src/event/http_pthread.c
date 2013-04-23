@@ -4,7 +4,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void *start_routine(void *arg)
+{
+	thread_task queue = (thread_task)arg;
+	
+	thread_task tmp;
+	thread_task pos;
+	pthread_id pid ;
+	while(1){
+		pthread_mutex_lock(&queue->task_queue_mutex);
+		while(get_current_threads_count(queue) == 0) {
+			pthread_cont_wait(&queue->task_queue_cond, &queue->task_queue_mutex);
+		}
+		while(pos, tmp, queue->task_queue_head) {
+			if(pos->thread_id == NULL) {
+				break;
+			}
+		}
+		pid = pthread_self();
+		pos->thread_id = &pid;
+		pos-task_func(pos->arg);
+		pthread_mutex_unlock(&queue->task_queue_mutex);
+	}
 
+}
 int get_current_threads_count(thread_pool pool)
 {
 	pthread_mutex_lock(&pool->thread_pool_mutex);
