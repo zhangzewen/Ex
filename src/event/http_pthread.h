@@ -55,6 +55,6 @@ thread_t threads_create();
 int destory_thread(thread_t thead);
 int destory_task(thread_task task);
 
-int get_current_threads_count(thread_pool *pool);
-int get_current_tasks_count(task_queue *queue);
+int get_current_threads_count(thread_pool pool);
+int get_current_tasks_count(task_queue queue);
 #endif	

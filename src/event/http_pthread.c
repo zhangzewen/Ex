@@ -5,6 +5,24 @@
 #include <stdlib.h>
 
 
+int get_current_threads_count(thread_pool pool)
+{
+	pthread_mutex_lock(&pool->thread_pool_mutex);
+	int current_threads = 0;
+	current_threads = pool->current_threads;
+	pthread_mutex_unlock(&pool->thread_pool_mutex);
+	return current_threads;
+	
+}
+int get_current_tasks_count(task_queue queue)
+{
+	pthread_mutex_lock(&queue->task_queue_mutex);
+	int current_tasks = 0;
+	current_tasks = queue->current_tasks;
+	pthread_mutex_unlock(&queue->task_queue_mutex);
+	return current_tasks;
+}
+
 thread_task thread_task_create(void *arg, void *(*fun)(void *arg))
 {
 	thread_task task;
@@ -22,8 +40,6 @@ thread_task thread_task_create(void *arg, void *(*fun)(void *arg))
 task_queue task_queue_cretae(void)
 {
 	task_queue queue;
-	thread_task task;
-	int i = 0;
 	
 	queue = (task_queue )malloc(sizeof(struct task_queue_s));
 
@@ -37,10 +53,6 @@ task_queue task_queue_cretae(void)
 	queue->increase_step = 4;
 	INIT_LIST_HEAD(&queue->task_queue_head);
 	
-	for(i = 0; i < queue->limit_task_num; i++) {
-		task = thread_task_create(NULL, NULL);
-		list_add_tail(&task->list, &queue->task_queue_head);
-	}
 	return queue;
 }
 
@@ -56,7 +68,9 @@ int add_task(task_queue queue, thread_task task)
 		error_quit("the task to be added is empty!\n");
 		return -1;
 	}
-
+	if (get_current_tasks_count(queue) >= queue->max_tasks) {
+		return -1;
+	}
 	list_add_tail(&task->list, &queue->task_queue_head);
 	return 0;
 }
@@ -85,8 +99,6 @@ thread_t threads_create(const pthread_attr_t *attr, void *(*start_routine)(void 
 thread_pool thread_pool_create(void)
 {
 	thread_pool pool;
-	int  i = 0;
-	thread_t thread;
 	pool = (thread_pool)malloc(sizeof(struct thread_pool_s));
 	
 	if (NULL == pool) {
@@ -100,13 +112,27 @@ thread_pool thread_pool_create(void)
 	pool->max_threads = 1024;
 	pool->increase_step = 8;
 	pool->limit_theads_num = 10;
-	
-	for(i = 0; i < pool->limit_theads_num; i++) {
-		thread = threads_create(NULL, NULL, NULL);
-		list_add_tail(&thread->list, &pool->threads_head);
-	}	
+	INIT_LIST_HEAD(&pool->threads_head);	
 	
 	return pool;
+}
+
+int add_thread(thread_pool pool, thread_t thread)
+{
+	if (NULL == pool) {
+		error_quit("the pool is empty!\n");
+		return -1;
+	}
+	
+	if (NULL == thread) {
+		error_quit("the thread is illegal!\n");
+		return -1;
+	}
+	if (get_current_threads_count(pool) >= pool->max_threads) {
+		return -1;
+	}	
+	list_add_tail(&thread->list, &pool->threads_head);
+	return 0;
 }
 int destory_thead(thread_t thread)
 {
@@ -133,21 +159,4 @@ int destory_task(thread_task task)
 	task = NULL;
 
 	return 0;
-}
-int get_current_threads_count(thread_pool *pool)
-{
-	pthread_mutex_lock(&pool->thread_pool_mutext);
-	int current_threads = 0;
-	current_threads = pool->current_threads;
-	pthread_mutex_unlock(&pool->thread_pool_mutext);
-	return current_threads;
-	
-}
-int get_current_tasks_count(task_queue *queue)
-{
-	pthread_mutex_lock(&queue->task_queue_mutex);
-	int current_tasks = 0;
-	current_tasks = queue->current_tasks;
-	pthread_mutex_unlock(&queue->task_queue_mutex);
-	return current_tasks;
 }
