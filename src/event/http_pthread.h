@@ -23,6 +23,14 @@ typedef struct thread_pool_s{
 	unsigned int limit_theads_num;
 	struct list_head threads_head;	
 }*thread_pool;
+
+thread_pool thread_pool_create(void);
+thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), void *arg);
+int add_thread(thread_pool pool, thread_t thread);
+
+int destory_thread(thread_t thead);
+int get_current_threads_count(thread_pool pool);
+
 /*************task queue *******************/
 typedef struct thread_task_s{
 	pthread_t *thread_id;
@@ -42,19 +50,15 @@ typedef struct task_queue_s{
 	struct list_head task_queue_head;
 }*task_queue;
 
-thread_task pthread_task_create(void *arg, void *(*fun)(void *arg));
+thread_task thread_task_create(void *arg, void *(*fun)(void *arg));
 
 task_queue task_queue_create(void);
 
 int add_task(task_queue queue, thread_task task);
 
-thread_pool pthread_pool_create(void);
-thread_t threads_create();
 
 
-int destory_thread(thread_t thead);
 int destory_task(thread_task task);
 
-int get_current_threads_count(thread_pool pool);
 int get_current_tasks_count(task_queue queue);
 #endif	

@@ -4,39 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void *start_routine(void *arg)
-{
-	thread_task queue = (thread_task)arg;
-	
-	thread_task tmp;
-	thread_task pos;
-	pthread_id pid ;
-	while(1){
-		pthread_mutex_lock(&queue->task_queue_mutex);
-		while(get_current_threads_count(queue) == 0) {
-			pthread_cont_wait(&queue->task_queue_cond, &queue->task_queue_mutex);
-		}
-		while(pos, tmp, queue->task_queue_head) {
-			if(pos->thread_id == NULL) {
-				break;
-			}
-		}
-		pid = pthread_self();
-		pos->thread_id = &pid;
-		pos-task_func(pos->arg);
-		pthread_mutex_unlock(&queue->task_queue_mutex);
-	}
 
-}
-int get_current_threads_count(thread_pool pool)
-{
-	pthread_mutex_lock(&pool->thread_pool_mutex);
-	int current_threads = 0;
-	current_threads = pool->current_threads;
-	pthread_mutex_unlock(&pool->thread_pool_mutex);
-	return current_threads;
-	
-}
+/*****************task************************************/
 int get_current_tasks_count(task_queue queue)
 {
 	pthread_mutex_lock(&queue->task_queue_mutex);
@@ -45,7 +14,6 @@ int get_current_tasks_count(task_queue queue)
 	pthread_mutex_unlock(&queue->task_queue_mutex);
 	return current_tasks;
 }
-
 thread_task thread_task_create(void *arg, void *(*fun)(void *arg))
 {
 	thread_task task;
@@ -60,7 +28,7 @@ thread_task thread_task_create(void *arg, void *(*fun)(void *arg))
 	return task;
 }
 
-task_queue task_queue_cretae(void)
+task_queue task_queue_create(void)
 {
 	task_queue queue;
 	
@@ -97,8 +65,56 @@ int add_task(task_queue queue, thread_task task)
 	list_add_tail(&task->list, &queue->task_queue_head);
 	return 0;
 }
+int destory_task(thread_task task)
+{
+	if (NULL == task){
+		error_quit("the task to be deleted is empty!\n");
+		return -1;
+	}
 
-thread_t threads_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), void *arg)
+	list_del(&task->list);
+	free(task);
+	task = NULL;
+
+	return 0;
+}
+/********************thread***************************/
+int get_current_threads_count(thread_pool pool)
+{
+	pthread_mutex_lock(&pool->thread_pool_mutex);
+	int current_threads = 0;
+	current_threads = pool->current_threads;
+	pthread_mutex_unlock(&pool->thread_pool_mutex);
+	return current_threads;
+	
+}
+void *start_routine(void *arg)
+{
+	task_queue queue = (task_queue)arg;
+	
+	struct list_head *tmp;
+	struct list_head *pos;
+	pthread_t pid ;
+	while(1){
+		pthread_mutex_lock(&queue->task_queue_mutex);
+		while(get_current_tasks_count(queue) == 0) {
+			pthread_cond_wait(&queue->task_queue_cond, &queue->task_queue_mutex);
+		}
+		thread_task task;
+		list_for_each_safe(pos, tmp, &queue->task_queue_head) {
+			task = list_entry(pos, struct thread_task_s, list);
+			if(task->thread_id == NULL) {
+				break;
+			}
+		}
+		pid = pthread_self();
+		task->thread_id = &pid;
+		task->task_func(task->arg);
+		pthread_mutex_unlock(&queue->task_queue_mutex);
+	}
+
+}
+thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), void *arg)
 {
 	thread_t thread;
 	int ret = 0;	
@@ -170,16 +186,3 @@ int destory_thead(thread_t thread)
 	return 0;
 }
 
-int destory_task(thread_task task)
-{
-	if (NULL == task){
-		error_quit("the task to be deleted is empty!\n");
-		return -1;
-	}
-
-	list_del(&task->list);
-	free(task);
-	task = NULL;
-
-	return 0;
-}
