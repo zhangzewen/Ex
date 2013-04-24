@@ -61,4 +61,5 @@ int add_task(task_queue queue, thread_task task);
 int destory_task(thread_task task);
 
 int get_current_tasks_count(task_queue queue);
+void *start_routine(void *arg);
 #endif	
