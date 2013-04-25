@@ -124,6 +124,7 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 		error_quit("malloc thread error!\n");
 		return (thread_t)-1;
 	}
+	INIT_LIST_HEAD(&thread->list);	
 
 	ret = pthread_create(thread->pthread_id,attr, start_routine, arg );	
 	if (ret != 0){
@@ -131,7 +132,6 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 		thread->pthread_id = NULL;
 		error_quit("create pthreat error1\n");
 	}	
-	INIT_LIST_HEAD(&thread->list);	
 	return thread;	
 }
 

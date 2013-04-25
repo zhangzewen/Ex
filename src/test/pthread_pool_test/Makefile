@@ -12,3 +12,4 @@ pool.o: pool.c
 clean:
 	rm -fr *.o
 	rm -fr pool
+	rm -fr core.*
