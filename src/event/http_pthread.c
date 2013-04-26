@@ -186,3 +186,11 @@ int destory_thead(thread_t thread)
 	return 0;
 }
 
+int destory_threads_pool(thread_pool pool)
+{
+	pthread_mutex_lock(&pool->thread_pool_mutex);
+	while() {
+		pthread_cond_wait(&pool->thread_pool_cond, &pool->thread_pool_mutex);
+	}
+	pthread_mutex_unlock(&pool->thread_pool_mutex);
+}

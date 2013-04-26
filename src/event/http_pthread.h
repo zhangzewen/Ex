@@ -30,7 +30,7 @@ int add_thread(thread_pool pool, thread_t thread);
 
 int destory_thread(thread_t thead);
 int get_current_threads_count(thread_pool pool);
-
+int destory_threads_pool(thread_pool pool);
 /*************task queue *******************/
 typedef struct thread_task_s{
 	pthread_t *thread_id;
