@@ -124,7 +124,7 @@ void *start_routine(void *arg)
 		task->task_func(task->arg);
 		delete_task_from_queue(queue, task);
 		pthread_mutex_unlock(&queue->task_queue_mutex);
-		sleep(5);
+		sleep(1);
 	}
 
 }

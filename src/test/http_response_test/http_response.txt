@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Server: nginx/1.2.6
+Date: Sat, 27 Apr 2013 08:11:22 GMT
+Content-Type: text/html
+Content-Length: 257
+Last-Modified: Sat, 27 Apr 2013 08:09:00 GMT
+Connection: keep-alive
+Accept-Ranges: bytes
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+</body>
+</html>

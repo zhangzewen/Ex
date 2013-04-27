@@ -1,14 +1,5 @@
 #ifndef _HTTP_H__INCLUDED
 #define _HTTP_H__INCLUDED
-enum Method{
-	GET=1,
-	POST,
-	HEAD,
-	PUT,
-	TRACE,
-	OPTIONS,
-	DELETE
-};
 struct http_status_code{
 	unsigned int code;
 	char desc[64];
@@ -68,31 +59,23 @@ struct http_status_code my_status_code[] = {
 	{516, "Not Extended"}
 };
 
-typedef struct {
+typedef struct http_request_s{
 	char version[10];
 	char url[1024];
-	enum Method http_method;
+	char method[64];
 	char host[64];
-	unsigned int content_length;
-	char http_body[0];	
-}http_request;
+}*http_request;
 
 
-typedef struct {
+typedef struct http_response_s{
 	char version[10];
 	char status_code[256];
-	char host[64];
-	unsigned int content_length;
+	char Data[64];
+	
+	char server[64];
+	char content_length[10];
 	char http_body[0];	
-}http_response;
-
-
-char *create_http_head(const char *method,const char *version,const char *url,const char *host);
-int send_http_request(int sockfd,const char *http_request);
-int get_http_response(int sockfd,char *data);
-int parse_http(const char *test_url,char *host,char *url,char *port);
-int create_http_request();
-
+}*http_response;
 
 #define CONTENT_LENGTH	"Content-Length:"
 
