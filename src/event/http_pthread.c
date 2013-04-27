@@ -3,6 +3,7 @@
 #include "http_error.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 
 /*****************task************************************/
@@ -11,7 +12,6 @@ void *task_fun(void *arg)
 {
 	thread_task task;
 	task = (thread_task)arg;
-
 	printf("the task_id: %d is exe by thread: %ld\n",task->task_id, *task->thread_id );
 	return NULL;
 }
@@ -88,6 +88,12 @@ int destory_task(thread_task task)
 
 	return 0;
 }
+int delete_task_from_queue(task_queue queue, thread_task task)
+{
+	destory_task(task);
+	queue->current_tasks--;
+	return 0;
+}
 /********************thread***************************/
 int get_current_threads_count(thread_pool pool)
 {
@@ -99,14 +105,14 @@ void *start_routine(void *arg)
 	
 	struct list_head *tmp;
 	struct list_head *pos;
+	thread_task task;
 	pthread_t pid ;
 	while(1){
 		pthread_mutex_lock(&queue->task_queue_mutex);
-		while(get_current_tasks_count(queue) == 0) {
+		while(get_current_tasks_count(queue) == 0 || list_empty(&queue->task_queue_head)) {
 			
 			pthread_cond_wait(&queue->task_queue_ready, &queue->task_queue_mutex);
 		}
-		thread_task task;
 		list_for_each_safe(pos, tmp, &queue->task_queue_head) {
 			task = list_entry(pos, struct thread_task_s, list);
 			if(task->thread_id == NULL) {
@@ -116,7 +122,9 @@ void *start_routine(void *arg)
 		pid = pthread_self();
 		task->thread_id = &pid;
 		task->task_func(task->arg);
+		delete_task_from_queue(queue, task);
 		pthread_mutex_unlock(&queue->task_queue_mutex);
+		sleep(5);
 	}
 
 }
