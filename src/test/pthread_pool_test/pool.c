@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 		thread = thread_create(NULL, start_routine, (void *)queue);
 		add_thread(pool, thread);
 	}
+
 	while(1){
 	};
 }
