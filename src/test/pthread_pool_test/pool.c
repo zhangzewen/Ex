@@ -2,19 +2,32 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "http_pthread.h"
-void *do_something(void *arg) {
-    int n = *(int *)arg;
-    printf("task #%d started\n", n);
-    printf("task #%d finished\n", n);
-		return NULL;
-}
-
 int main(int argc, char *argv[])
 {
-	thread_t thread;
-	int a = 10;
-	thread = thread_create(NULL,do_something, (void *)(&a));
-	while(1){
+	thread_pool pool; // thread pool
+	task_queue queue; // task queue
+
+	thread_t thread; // a thread
+	thread_task task;	// a task
+	
+	int i = 0; // for threads
+	int j = 0; // for tasks
+
+
+	pool = thread_pool_create();
+	queue = task_queue_create();
+
+	//create tasks first
+
+	for (j = 0; j < 20; j++) {
+		task = thread_task_create(task_fun, j);
+		add_task(queue, task);	
+	}	
+
+	for (i = 0; i < 10; i++) {
+		thread = thread_create(NULL, start_routine, (void *)queue);
+		add_thread(pool, thread);
 	}
-	return 0;
+	while(1){
+	};
 }

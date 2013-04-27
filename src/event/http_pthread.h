@@ -14,13 +14,17 @@ typedef struct thread_s{
 	pthread_t *pthread_id;
 } *thread_t;
 
+
+/*
+*thread_pool_mutex and thread_pool_ready
+*both for current_threads
+*threads_mutex just for the threas
+*/
 typedef struct thread_pool_s{
 	pthread_mutex_t thread_pool_mutex;
-	pthread_cond_t thread_pool_cond;
+	pthread_cond_t thread_pool_ready;
 	unsigned int current_threads;
 	unsigned int max_threads;
-	unsigned int increase_step;
-	unsigned int limit_theads_num;
 	struct list_head threads_head;	
 }*thread_pool;
 
@@ -34,6 +38,7 @@ int destory_threads_pool(thread_pool pool);
 /*************task queue *******************/
 typedef struct thread_task_s{
 	pthread_t *thread_id;
+	unsigned int task_id;
 	int status;
 	void *arg;
 	void *(*task_func)(void *arg);
@@ -42,19 +47,18 @@ typedef struct thread_task_s{
 
 typedef struct task_queue_s{
 	pthread_mutex_t task_queue_mutex;
-	pthread_cond_t task_queue_cond;
+	pthread_cond_t task_queue_ready;
 	unsigned int current_tasks;
 	unsigned int max_tasks;
-	unsigned int increase_step;
-	unsigned int limit_task_num;
 	struct list_head task_queue_head;
 }*task_queue;
 
-thread_task thread_task_create(void *arg, void *(*fun)(void *arg));
+thread_task thread_task_create(void *(*fun)(void *arg), unsigned int num);
 
 task_queue task_queue_create(void);
 
 int add_task(task_queue queue, thread_task task);
+void *task_fun(void *arg);
 
 
 
