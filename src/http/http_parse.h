@@ -31,13 +31,13 @@ struct http_status_code my_status_code[] = {
 	{402, "Payment Required"},
 	{403, "Forbidden"},
 	{404, "Not Found"},
-	{405, "Method Not Allowed"},,
+	{405, "Method Not Allowed"},
 	{406, "Not Acceptable"},
 	{407, "Proxy Authentication Required"},
 	{408, "Request Time-out"},
 	{409, "Conflict"},
 	{410, "Gone"},
-	{411, "Length Required"},,
+	{411, "Length Required"},
 	{412, "Precondition Failed"},
 	{413, "Request Entity Too Large"},
 	{414, "Request-URI Too Large"},
@@ -49,7 +49,7 @@ struct http_status_code my_status_code[] = {
 	{425, "Unordered Collection"},
 	{426, "Upgrade Required"},
 	{500, "Internal Server Error"},
-	{501, "Not Implemented"},,
+	{501, "Not Implemented"},
 	{502, "Bad Geteway"},
 	{503, "Service Unavailable"},
 	{504, "Gateway Time-out"},
@@ -70,7 +70,7 @@ typedef struct http_request_s{
 typedef struct http_response_s{
 	char version[10];
 	char status_code[256];
-	char Data[64];
+	char date[64];
 	
 	char server[64];
 	char content_length[10];

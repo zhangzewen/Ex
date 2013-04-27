@@ -17,7 +17,7 @@ char *create_http_request(http_request request)
 	request_content = (char *)malloc(sizeof(char)*4096);
 	if(NULL == request_content)
 	{
-		return -1;
+		return NULL;
 	}
 	CREATE_HTTP_CONTENT(request_content,request->method);						
 	CREATE_HTTP_CONTENT(request_content," ");												//GET / HTTP/1.1\r\n	
@@ -38,7 +38,7 @@ char *create_http_response(http_response response)
 	response_content = (char *)malloc(sizeof(char)*4096);
 	if(NULL == response_content)
 	{
-		return -1;
+		return NULL;
 	}
 	CREATE_HTTP_CONTENT(response_content,response->version);						
 	CREATE_HTTP_CONTENT(response_content," ");												//GET / HTTP/1.1\r\n	
@@ -57,7 +57,6 @@ char *create_http_response(http_response response)
 }
 
 #undef CREATE_HTTP_CONTENT
-
 #if 0
 int parse(const char *src,const char *tag1,const char *tag2,char **position)
 {
@@ -81,7 +80,7 @@ int parse(const char *src,const char *tag1,const char *tag2,char **position)
 
 
 
-int Get_Version(const char *src,http_response response)
+int Get_Version(char *src,http_response response)
 {
 	char *ptr = NULL;
 	char *position = NULL;
@@ -140,18 +139,18 @@ int Get_http_response(const char *src, struct response *response)
 	return 0;
 }
 
-
+#endif
 char *text_position(const char * src)
 {
 	char *ptr;
 
 	if(NULL == src){
-		return -1;
+		return NULL;
 	}
 
 	if((ptr = strstr(src, "\r\n\r\n")) == NULL)
 	{
-		return -1;
+		return NULL;
 	}
 	return ptr;
 }
@@ -168,7 +167,7 @@ int extract_content_length(char *buffer, int size)
 	int i;
 
 	/* Allocate the room */
-	buf_len = (char *) MALLOC(40);
+	buf_len = (char *) malloc(40);
 
 	/* Pattern not found */
 	if (!clen)
@@ -182,7 +181,7 @@ int extract_content_length(char *buffer, int size)
 	for (i = 0; i < inc; i++)
 		strncat(buf_len, content_buffer + i, 1);
 	i = atoi(buf_len);
-	FREE(buf_len);
+	free(buf_len);
 	return i;
 }
 
@@ -195,7 +194,7 @@ int extract_status_code(char *buffer, int size)
 	int inc = 0;
 
 	/* Allocate the room */
-	buf_code = (char *) MALLOC(10);
+	buf_code = (char *) malloc(10);
 
 	/* Status-Code extraction */
 	while (buffer < end && *buffer++ != ' ') ;
@@ -204,7 +203,7 @@ int extract_status_code(char *buffer, int size)
 		inc++;
 	strncat(buf_code, begin, inc);
 	inc = atoi(buf_code);
-	FREE(buf_code);
+	free(buf_code);
 	return inc;
 }
 
@@ -220,4 +219,5 @@ char *extract_html(char *buffer, int size_buffer)
 	}
 	return NULL;
 }
+#undef CREATE_HTTP_CONTEN
 #endif
