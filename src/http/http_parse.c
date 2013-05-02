@@ -74,97 +74,84 @@ int parse(const char *src,const char *tag1,const char *tag2,char **position)
 	{
 		return -2;
 	}
-	*position = ptr_tag1;
+	*position = ptr_tag1 - strlen(tag1);
 	return ptr_tag2-ptr_tag1;
 }
+#endif
 
+/*
+* just for create struct http_request_s and struct http_respose_s 
+*/
+#define CREATE_HTTP_STRUCT(ptr, disc, attr, src)  do{ \
+	if(strncmp(ptr, disc, strlen(disc)) == 0){  \
+		strcpy(ptr->attr, src + strlen(disc));\
+	}\
+}while(0)
 
-
-int Get_Version(char *src,http_response response)
+int parse_http_request_core(const char *src, http_request request)
 {
-	char *ptr = NULL;
-	char *position = NULL;
-	int copy_count = 0;
-	if (NULL == src)
-	{
-		return -1;
-	}
-	copy_count = parse(src,"HTTP/1.0","\r\n",&position);
-	strncpy(src,position,copy_count);
-	return 0;
-}
-
-
-int Get_date(const char *src, struct response *response)
-{
-	char *ptr = NULL;
-	char *position = NULL;
-	int copy_count = 0;
-	if(NULL == src)
-	{
-		return -1;
-	}
-
-	copy_count = parse(src, "Date: ", "\r\n",&response);
-	strncpy(src,position,copy_count);
-	return 0;
-}
-int Get_Server();
-int Get_content_length();
-int Get_connection();
-int Get_ETag();
-int Get_Last_modified();
-
-
-int Get_http_response(const char *src, struct response *response)
-{	
-	char buf[BUFFSIZE];
-	char *token;
-	strcpy(buf, src);	
 	
-	if((token = strtok(buf, "\r\n")) != NULL) {
+	CREATE_HTTP_STRUCT(request, "Accept: ", accept, src);
+	CREATE_HTTP_STRUCT(request, "Accept-Language: ", accept_language, src);
+	CREATE_HTTP_STRUCT(request, "Accept-Encoding: ", accept_encoding, src);
+	CREATE_HTTP_STRUCT(request, "Connection: ", connection, src);
+	CREATE_HTTP_STRUCT(request, "Host: ", host, src);
+	CREATE_HTTP_STRUCT(request, "User-Agent: ", user_agent, src);
+	return 0;
+}
+
+
+int parse_http_response_core(const char *src, http_response response)
+{
+	
+	CREATE_HTTP_STRUCT(request, "Server: ", server, src);
+	CREATE_HTTP_STRUCT(request, "Date: ", date, src);
+	CREATE_HTTP_STRUCT(request, "Content-Length: ", content_length, src);
+	return 0;
+}
+
+int parse_http_request(const char *request, http_request request)
+{
+	
+	char buff[4086] = {0};
+	char *token;
+	strncpy(buff, request, strlen(request));
+	token = strtok(buff, "\r\n");
+	sscanf(token, "%s %s %s", request->method, request->url, request->version);
+	token = strtok(NULL, "\r\n");
+	while(token != NULL) {
+		puts(token);
+		parse_http_request_core(token, request)
 		token = strtok(NULL, "\r\n");
 	}
-	//just get the http response head such as :HTTP/1.1 / 200 OK	
-	while((token = strtok(buf, "\r\n")) != NULL) 
-	{
-		if(!strncasecmp(token, "", )) {
-		} else if(!strncasecmp(token, "", )){
-		} else if (!strncasecmp(token, "\r\n", 2)) {
-			//this means that goes to the "\r\n\r\n"  and next is the respons content ,hah
-			break;
-		}
-	}
-	
-	return 0;
 }
 
-#endif
-char *text_position(const char * src)
+
+int parse_http_response(const char *response, http_response response)
 {
-	char *ptr;
-
-	if(NULL == src){
-		return NULL;
+	
+	char buff[4086] = {0};
+	char *token;
+	strncpy(buff, request, strlen(response));
+	token = strtok(buff, "\r\n");
+	sscanf(token, "%s %s %s", response->version, request->status_code, request->status_code_desc);
+	token = strtok(NULL, "\r\n");
+	while(token != NULL) {
+		puts(token);
+		parse_http_response_core(token, request)
+		token = strtok(NULL, "\r\n");
 	}
-
-	if((ptr = strstr(src, "\r\n\r\n")) == NULL)
-	{
-		return NULL;
-	}
-	return ptr;
 }
 
 
-
-
+#if 0
 int extract_content_length(char *buffer, int size)
 {
 	char *clen = strstr(buffer, CONTENT_LENGTH);
 	char *content_buffer = NULL;
 	char *buf_len;
 	int inc = 0;
-	int i;
+	int i = 0;
 
 	/* Allocate the room */
 	buf_len = (char *) malloc(40);
@@ -219,5 +206,6 @@ char *extract_html(char *buffer, int size_buffer)
 	}
 	return NULL;
 }
+#endif
 #undef CREATE_HTTP_CONTEN
 #endif

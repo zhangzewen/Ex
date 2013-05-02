@@ -64,17 +64,20 @@ typedef struct http_request_s{
 	char url[1024];
 	char method[64];
 	char host[64];
+	char accept_encoding[512];
+	char accept[512];
+	char accept_control[512];
 }*http_request;
 
 
 typedef struct http_response_s{
 	char version[10];
-	char status_code[256];
+	char status_code[5];
+	char status_code_desc[128];
 	char date[64];
 	
 	char server[64];
 	char content_length[10];
-	char http_body[0];	
 }*http_response;
 
 #define CONTENT_LENGTH	"Content-Length:"
