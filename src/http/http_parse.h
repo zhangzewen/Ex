@@ -2,7 +2,7 @@
 #define _HTTP_H__INCLUDED
 struct http_status_code{
 	unsigned int code;
-	char desc[64];
+	char desc[128];
 };
 
 

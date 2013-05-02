@@ -57,27 +57,6 @@ char *create_http_response(http_response response)
 }
 
 #undef CREATE_HTTP_CONTENT
-#if 0
-int parse(const char *src,const char *tag1,const char *tag2,char **position)
-{
-	char *ptr_tag1 = NULL;
-	char *ptr_tag2 = NULL;
-	if(NULL == src) {
-		return 1;
-	}
-	if ((ptr_tag1 = strstr(src,tag1)) == NULL)
-	{
-		return -1;
-	}
-	
-	if((ptr_tag2 = strstr(ptr_tag1,tag2)) == NULL)
-	{
-		return -2;
-	}
-	*position = ptr_tag1 - strlen(tag1);
-	return ptr_tag2-ptr_tag1;
-}
-#endif
 
 /*
 * just for create struct http_request_s and struct http_respose_s 
@@ -143,69 +122,24 @@ int parse_http_response(const char *response, http_response response)
 	}
 }
 
-
-#if 0
-int extract_content_length(char *buffer, int size)
+#define ERROR_PAGE "<http><head></head><body><center><h1>Sorry, Page Error!</h1></center></body></http>"
+void error_page(int fd, int status_code)
 {
-	char *clen = strstr(buffer, CONTENT_LENGTH);
-	char *content_buffer = NULL;
-	char *buf_len;
-	int inc = 0;
-	int i = 0;
-
-	/* Allocate the room */
-	buf_len = (char *) malloc(40);
-
-	/* Pattern not found */
-	if (!clen)
-		return 0;
-
-	/* Content-Length extraction */
-	while (*(clen++) != ':') ;
-	content_buffer = clen;
-	while (*(clen++) != '\r' && *clen != '\n')
-		inc++;
-	for (i = 0; i < inc; i++)
-		strncat(buf_len, content_buffer + i, 1);
-	i = atoi(buf_len);
-	free(buf_len);
-	return i;
-}
-
-
-int extract_status_code(char *buffer, int size)
-{
-	char *buf_code;
-	char *begin;
-	char *end = buffer + size;
-	int inc = 0;
-
-	/* Allocate the room */
-	buf_code = (char *) malloc(10);
-
-	/* Status-Code extraction */
-	while (buffer < end && *buffer++ != ' ') ;
-	begin = buffer;
-	while (buffer < end && *buffer++ != ' ')
-		inc++;
-	strncat(buf_code, begin, inc);
-	inc = atoi(buf_code);
-	free(buf_code);
-	return inc;
-}
-
-char *extract_html(char *buffer, int size_buffer)
-{
-	char *end = buffer + size_buffer;
-	char *cur;
-
-	for (cur = buffer; cur + 3 < end; cur++)
-	{
-		if (*cur == '\r' && *(cur + 1) == '\n' && *(cur + 2) == '\r' && *(cur + 3) == '\n')
-			return cur + 4;
+	char buff[4096] = {0};
+	for (i = 0; i < 55; i++) {
+		if(my_status_code[i].code == status_code) {
+			break;
+		}
 	}
-	return NULL;
+	sprintf(buff, "HTTP/1.1 %d %s\r\nServer: %s\r\nDate: %s\r\n:Content-Length: %d\r\n\r\n%s", status_code, my_status_code[i].desc, response->server, response->date, strlen(ERROR_PAGE), ERROR_PAGE);
+	write(fd, buff, strlen(buff));
 }
-#endif
-#undef CREATE_HTTP_CONTEN
+
+
+int http_process(int fd, )
+{
+	/*parse http_request*/
+	
+	/*create http_response*/
+}
 #endif
