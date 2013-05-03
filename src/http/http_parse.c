@@ -7,6 +7,7 @@
 #include <string.h>
 #include "http_parse.h"
 #include "Define_Macro.h"
+#include <string.h>
 
 #ifndef CREATE_HTTP_CONTENT_
 #define CREATE_HTTP_CONTENT(src,attr) strncat(src,attr,strlen(attr))														
@@ -62,7 +63,7 @@ char *create_http_response(http_response response)
 * just for create struct http_request_s and struct http_respose_s 
 */
 #define CREATE_HTTP_STRUCT(ptr, disc, attr, src)  do{ \
-	if(strncmp(ptr, disc, strlen(disc)) == 0){  \
+	if(strncmp(ptr->attr, disc, strlen(disc)) == 0){  \
 		strcpy(ptr->attr, src + strlen(disc));\
 	}\
 }while(0)
@@ -83,49 +84,55 @@ int parse_http_request_core(const char *src, http_request request)
 int parse_http_response_core(const char *src, http_response response)
 {
 	
-	CREATE_HTTP_STRUCT(request, "Server: ", server, src);
-	CREATE_HTTP_STRUCT(request, "Date: ", date, src);
-	CREATE_HTTP_STRUCT(request, "Content-Length: ", content_length, src);
+	CREATE_HTTP_STRUCT(response, "Server: ", server, src);
+	CREATE_HTTP_STRUCT(response, "Date: ", date, src);
+	CREATE_HTTP_STRUCT(response, "Content-Length: ", content_length, src);
 	return 0;
 }
 
-int parse_http_request(const char *request, http_request request)
+int parse_http_request(const char *request_str, http_request request)
 {
 	
 	char buff[4086] = {0};
 	char *token;
-	strncpy(buff, request, strlen(request));
+	strncpy(buff, request_str, strlen(request_str));
 	token = strtok(buff, "\r\n");
 	sscanf(token, "%s %s %s", request->method, request->url, request->version);
 	token = strtok(NULL, "\r\n");
 	while(token != NULL) {
 		puts(token);
-		parse_http_request_core(token, request)
+		parse_http_request_core(token, request);
 		token = strtok(NULL, "\r\n");
 	}
+
+	return 0;
 }
 
 
-int parse_http_response(const char *response, http_response response)
+int parse_http_response(const char *response_str, http_response response)
 {
 	
 	char buff[4086] = {0};
 	char *token;
-	strncpy(buff, request, strlen(response));
+	strncpy(buff, response_str, strlen(response_str));
 	token = strtok(buff, "\r\n");
-	sscanf(token, "%s %s %s", response->version, request->status_code, request->status_code_desc);
+	sscanf(token, "%s %s %s", response->version, response->status_code, response->status_code_desc);
 	token = strtok(NULL, "\r\n");
 	while(token != NULL) {
 		puts(token);
-		parse_http_response_core(token, request)
+		parse_http_response_core(token, response);
 		token = strtok(NULL, "\r\n");
 	}
+
+	return 0;
 }
 
 #define ERROR_PAGE "<http><head></head><body><center><h1>Sorry, Page Error!</h1></center></body></http>"
+#if 0
 void error_page(int fd, int status_code)
 {
 	char buff[4096] = {0};
+	int i = 0;
 	for (i = 0; i < 55; i++) {
 		if(my_status_code[i].code == status_code) {
 			break;
@@ -142,4 +149,6 @@ int http_process(int fd, )
 	
 	/*create http_response*/
 }
+
+#endif
 #endif

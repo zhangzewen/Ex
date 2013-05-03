@@ -5,12 +5,16 @@ CFLAGS = -g -Wall -Werror -pthread -I ../../core/   \
 Objs = ../../core/http_error.o \
 			 ../../http/http_parse.o
 
-response: response.o ${Objs}
-	gcc ${CFLAGS} response.o ${Objs} -o response
+server: server.o ${Objs}
+	gcc ${CFLAGS} server.o ${Objs} -o server
 
-response.o: response.c
-	gcc -c ${CFLAGS} response.c -o response.o
+server.o: server.c
+	gcc -c ${CFLAGS} server.c -o server.o
 clean:
 	rm -fr *.o
 	rm -fr response
 	rm -fr core.*
+	rm -fr client
+	rm -fr server
+
+

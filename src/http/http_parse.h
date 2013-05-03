@@ -1,5 +1,6 @@
 #ifndef _HTTP_H__INCLUDED
 #define _HTTP_H__INCLUDED
+#if 0
 struct http_status_code{
 	unsigned int code;
 	char desc[128];
@@ -58,7 +59,7 @@ struct http_status_code my_status_code[] = {
 	{507 ,"Insufficient Storage"},
 	{516, "Not Extended"}
 };
-
+#endif
 typedef struct http_request_s{
 	char version[10];
 	char url[1024];
@@ -67,6 +68,9 @@ typedef struct http_request_s{
 	char accept_encoding[512];
 	char accept[512];
 	char accept_control[512];
+	char accept_language[512];
+	char connection[64];
+	char user_agent[512];
 }*http_request;
 
 
@@ -75,16 +79,15 @@ typedef struct http_response_s{
 	char status_code[5];
 	char status_code_desc[128];
 	char date[64];
-	
 	char server[64];
 	char content_length[10];
 }*http_response;
 
-#define CONTENT_LENGTH	"Content-Length:"
 
-/* Prototypes */
-extern int extract_content_length(char *buffer, int size);
-extern int extract_status_code(char *buffer, int size);
-extern char *extract_html(char *buffer, int size_buffer);
-
+char *create_http_request(http_request request);
+char *create_http_response(http_response response);
+int parse_http_request_core(const char *src, http_request request);
+int parse_http_response_core(const char *src, http_response response);
+int parse_http_request(const char *request_str, http_request request);
+int parse_http_response(const char *response_str, http_response response);
 #endif
