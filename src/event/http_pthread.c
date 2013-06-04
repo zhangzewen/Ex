@@ -10,24 +10,25 @@
 
 void *task_fun(void *arg)
 {
-	thread_task task;
-	task = (thread_task)arg;
-	printf("the task_id: %d is exe by thread: %ld\n",task->task_id, *task->thread_id );
+#if 0
+	thread_task_t task;
+	task = (thread_task_t)arg;
+	//printf("the task_id: %d is exe by thread: %ld\n",task->task_id, *task->thread_id );
+#endif
 	return NULL;
 }
-int get_current_tasks_count(task_queue queue)
+int get_current_tasks_count(task_queue_t queue)
 {
 	return  queue->current_tasks;
 }
-thread_task thread_task_create(void *(*fun)(void *arg), unsigned int num)
+thread_task_t thread_task_create(void *(*fun)(void *arg), unsigned int num)
 {
-	thread_task task;
-	task = (thread_task)malloc(sizeof(struct thread_task_s));
+	thread_task_t task;
+	task = (thread_task_t)malloc(sizeof(struct thread_task_st));
 	if(NULL == task) {
-		return (thread_task)-1;
+		return NULL;
 	}
 	task->task_id = num;
-	task->thread_id = NULL;
 	task->arg =	task; 
 	task->task_func =fun;
 	task->status = HTTP_PTHREAD_UNKNOWN;
@@ -35,11 +36,11 @@ thread_task thread_task_create(void *(*fun)(void *arg), unsigned int num)
 	return task;
 }
 
-task_queue task_queue_create(void)
+task_queue_t task_queue_create(void)
 {
-	task_queue queue;
+	task_queue_t queue;
 	
-	queue = (task_queue )malloc(sizeof(struct task_queue_s));
+	queue = (task_queue_t )malloc(sizeof(struct task_queue_st));
 
 	if (NULL == queue)
 		error_quit("can not create task queue!");
@@ -53,7 +54,7 @@ task_queue task_queue_create(void)
 }
 
 
-int add_task(task_queue queue, thread_task task)
+int add_task(task_queue_t queue, thread_task_t task)
 {
 	if (NULL == queue) {
 		error_quit("the task_queue is empty!\n");
@@ -75,7 +76,7 @@ int add_task(task_queue queue, thread_task task)
 	pthread_mutex_unlock(&queue->task_queue_mutex);
 	return 0;
 }
-int destory_task(thread_task task)
+int destory_task(thread_task_t task)
 {
 	if (NULL == task){
 		error_quit("the task to be deleted is empty!\n");
@@ -88,24 +89,24 @@ int destory_task(thread_task task)
 
 	return 0;
 }
-int delete_task_from_queue(task_queue queue, thread_task task)
+int delete_task_from_queue(task_queue_t queue, thread_task_t task)
 {
 	destory_task(task);
 	queue->current_tasks--;
 	return 0;
 }
 /********************thread***************************/
-int get_current_threads_count(thread_pool pool)
+int get_current_threads_count(thread_pool_t pool)
 {
 	return pool->current_threads;
 }
 void *start_routine(void *arg)
 {
-	task_queue queue = (task_queue)arg;
+	task_queue_t queue = (task_queue_t)arg;
 	
 	struct list_head *tmp;
 	struct list_head *pos;
-	thread_task task;
+	thread_task_t task;
 	pthread_t pid ;
 	while(1){
 		pthread_mutex_lock(&queue->task_queue_mutex);
@@ -114,7 +115,7 @@ void *start_routine(void *arg)
 			pthread_cond_wait(&queue->task_queue_ready, &queue->task_queue_mutex);
 		}
 		list_for_each_safe(pos, tmp, &queue->task_queue_head) {
-			task = list_entry(pos, struct thread_task_s, list);
+			task = list_entry(pos, struct thread_task_st, list);
 			if(task->thread_id == NULL) {
 				break;
 			}
@@ -128,21 +129,22 @@ void *start_routine(void *arg)
 	}
 
 }
-thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), void *arg)
+thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), task_queue_t queue, int i)
 {
 	thread_t thread;
 	int ret = 0;	
-	thread = (thread_t)malloc(sizeof(struct thread_s));
+	thread = (thread_t)malloc(sizeof(struct thread_st));
 	
 	if (NULL == thread) {
 		error_quit("malloc thread error!\n");
-		return (thread_t)-1;
+		return NULL;
 	}
 	thread->pthread_id = (pthread_t *)malloc(sizeof(pthread_t));
 	if (NULL == thread->pthread_id) {
 		error_quit("malloc error!\n");
 	}
 	INIT_LIST_HEAD(&thread->list);	
+	thread->num = i;
 
 	ret = pthread_create(thread->pthread_id,attr, start_routine, arg );	
 	if (ret != 0){
@@ -153,10 +155,10 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 	return thread;	
 }
 
-thread_pool thread_pool_create(void)
+thread_pool_t thread_pool_create(void)
 {
-	thread_pool pool;
-	pool = (thread_pool)malloc(sizeof(struct thread_pool_s));
+	thread_pool_t pool;
+	pool = (thread_pool_t)malloc(sizeof(struct thread_pool_st));
 	
 	if (NULL == pool) {
 		error_quit("malloc pool error1\n");

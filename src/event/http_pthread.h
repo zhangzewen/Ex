@@ -10,17 +10,19 @@
 #define HTTP_PTHREAD_STOP			0x003
 /***************thread pool***************/
 
-typedef struct thread_st *thread_t;
-typedef struct thread_pool_st *thread_pool;
+typedef struct thread_st* thread_t;
+typedef struct thread_pool_st* thread_pool_t;
 
-typedef struct thread_task_st *thread_task_t;
-typedef struct task_queue_st *task_queue_t;
+typedef struct thread_task_st* thread_task_t;
+typedef struct task_queue_st* task_queue_t;
 
-struct thread_st{
+typedef struct private_data_st* private_data_t; 
+
+typedef struct thread_st{
 	struct list_head list;
 	pthread_t *pid;
 	int num;
-};
+}*thread_t;
 
 
 /*
@@ -28,7 +30,7 @@ struct thread_st{
 *both for current_threads
 *threads_mutex just for the threas
 */
-struct thread_pool_s{
+struct thread_pool_st{
 	pthread_mutex_t thread_pool_mutex;
 	pthread_cond_t thread_pool_ready;
 	unsigned int current_threads;
@@ -40,7 +42,7 @@ struct thread_pool_s{
 
 
 /*************task queue *******************/
-struct thread_task_s{
+struct thread_task_st{
 	unsigned int task_id;
 	int status;
 	void *arg; //arg -------->private_data_st
@@ -48,7 +50,7 @@ struct thread_task_s{
 	struct list_head list;
 };
 
-struct task_queue_s{
+struct task_queue_st{
 	pthread_mutex_t task_queue_mutex;
 	pthread_cond_t task_queue_ready;
 	unsigned int current_tasks;
@@ -57,34 +59,37 @@ struct task_queue_s{
 };
 
 
-
+struct private_data_st{
+	thread_t thread;
+	task_t task;
+};
 
 
 
 /**********pool manage*****************************/
 
 
-thread_pool thread_pool_create(void);
-thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), void *arg);
-int add_thread(thread_pool pool, thread_t thread);
+thread_pool_t thread_pool_create(void);
+thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg),task_queue_t queue, int i );
+int add_thread(thread_pool_t pool, thread_t thread);
 
 int destory_thread(thread_t thead);
-int get_current_threads_count(thread_pool pool);
-int destory_threads_pool(thread_pool pool);
+int get_current_threads_count(thread_pool_t pool);
+int destory_threads_pool(thread_pool_t pool);
 
 
 /***********task manage******************************/
-thread_task thread_task_create(void *(*fun)(void *arg), unsigned int num);
+thread_task_t thread_task_create(void *(*fun)(void *arg), unsigned int num);
 
-task_queue task_queue_create(void);
+task_queue_t task_queue_create(void);
 
-int add_task(task_queue queue, thread_task task);
+int add_task(task_queue_t queue, thread_task_t task);
 void *task_fun(void *arg);
 
 
 
-int destory_task(thread_task task);
+int destory_task(thread_task_t task);
 
-int get_current_tasks_count(task_queue queue);
+int get_current_tasks_count(task_queue_t queue);
 void *start_routine(void *arg);
 #endif	
