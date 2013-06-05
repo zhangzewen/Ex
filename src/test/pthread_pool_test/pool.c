@@ -4,11 +4,11 @@
 #include "http_pthread.h"
 int main(int argc, char *argv[])
 {
-	thread_pool pool; // thread pool
-	task_queue queue; // task queue
+	thread_pool_t pool; // thread pool
+	task_queue_t queue; // task queue
 
 	thread_t thread; // a thread
-	thread_task task;	// a task
+	thread_task_t task;	// a task
 	
 	int i = 0; // for threads
 	int j = 0; // for tasks
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	}	
 
 	for (i = 0; i < 10; i++) {
-		thread = thread_create(NULL, start_routine, (void *)queue);
+		thread = thread_create(NULL, start_routine, queue, i);
 		add_thread(pool, thread);
 	}
 

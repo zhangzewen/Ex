@@ -15,6 +15,9 @@ void *task_fun(void *arg)
 	task = (thread_task_t)arg;
 	//printf("the task_id: %d is exe by thread: %ld\n",task->task_id, *task->thread_id );
 #endif
+	private_data_t data = (private_data_t)arg;
+	
+	printf("the task_id: %d is exe by thread: %d\n", data->task->task_id, data->thread->num);
 	return NULL;
 }
 int get_current_tasks_count(task_queue_t queue)
@@ -29,7 +32,7 @@ thread_task_t thread_task_create(void *(*fun)(void *arg), unsigned int num)
 		return NULL;
 	}
 	task->task_id = num;
-	task->arg =	task; 
+	task->data = NULL; 
 	task->task_func =fun;
 	task->status = HTTP_PTHREAD_UNKNOWN;
 	INIT_LIST_HEAD(&task->list);
@@ -102,29 +105,28 @@ int get_current_threads_count(thread_pool_t pool)
 }
 void *start_routine(void *arg)
 {
-	task_queue_t queue = (task_queue_t)arg;
-	
+	private_data_t data = (private_data_t) arg;
+
 	struct list_head *tmp;
 	struct list_head *pos;
 	thread_task_t task;
-	pthread_t pid ;
 	while(1){
-		pthread_mutex_lock(&queue->task_queue_mutex);
-		while(get_current_tasks_count(queue) == 0 || list_empty(&queue->task_queue_head)) {
+		pthread_mutex_lock(&data->queue->task_queue_mutex);
+		while(get_current_tasks_count(data->queue) == 0 || list_empty(&data->queue->task_queue_head)) {
 			
-			pthread_cond_wait(&queue->task_queue_ready, &queue->task_queue_mutex);
+			pthread_cond_wait(&data->queue->task_queue_ready, &data->queue->task_queue_mutex);
 		}
-		list_for_each_safe(pos, tmp, &queue->task_queue_head) {
+		list_for_each_safe(pos, tmp, &data->queue->task_queue_head) {
 			task = list_entry(pos, struct thread_task_st, list);
-			if(task->thread_id == NULL) {
+			if(task->data == NULL) {
 				break;
 			}
 		}
-		pid = pthread_self();
-		task->thread_id = &pid;
-		task->task_func(task->arg);
-		delete_task_from_queue(queue, task);
-		pthread_mutex_unlock(&queue->task_queue_mutex);
+		data->task = task;
+		task->data = (void *)data;
+		task->task_func(task->data);
+		delete_task_from_queue(data->queue, task);
+		pthread_mutex_unlock(&data->queue->task_queue_mutex);
 		sleep(1);
 	}
 
@@ -132,6 +134,7 @@ void *start_routine(void *arg)
 thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *arg), task_queue_t queue, int i)
 {
 	thread_t thread;
+	private_data_t data;
 	int ret = 0;	
 	thread = (thread_t)malloc(sizeof(struct thread_st));
 	
@@ -139,17 +142,28 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 		error_quit("malloc thread error!\n");
 		return NULL;
 	}
-	thread->pthread_id = (pthread_t *)malloc(sizeof(pthread_t));
-	if (NULL == thread->pthread_id) {
+
+	data = (private_data_t)malloc(sizeof(struct private_data_st));
+	
+	if(NULL == data) {
+		error_quit("malloc private_data_st error");
+		return NULL;
+	}
+
+	thread->pid = (pthread_t *)malloc(sizeof(pthread_t));
+	if (NULL == thread->pid) {
 		error_quit("malloc error!\n");
 	}
 	INIT_LIST_HEAD(&thread->list);	
 	thread->num = i;
+	
+	data->queue = queue;
+	data->thread = thread;
 
-	ret = pthread_create(thread->pthread_id,attr, start_routine, arg );	
+	ret = pthread_create(thread->pid,attr, start_routine, (void *)data );	
 	if (ret != 0){
-		free(thread->pthread_id);
-		thread->pthread_id = NULL;
+		free(thread->pid);
+		thread->pid = NULL;
 		error_quit("create pthreat error1\n");
 	}	
 	return thread;	
@@ -162,7 +176,7 @@ thread_pool_t thread_pool_create(void)
 	
 	if (NULL == pool) {
 		error_quit("malloc pool error1\n");
-		return (thread_pool)-1;
+		return NULL;
 	}
 	
 	pthread_mutex_init(&pool->thread_pool_mutex, NULL);
@@ -174,7 +188,7 @@ thread_pool_t thread_pool_create(void)
 	return pool;
 }
 
-int add_thread(thread_pool pool, thread_t thread)
+int add_thread(thread_pool_t pool, thread_t thread)
 {
 	if (NULL == pool) {
 		error_quit("the pool is empty!\n");
@@ -208,7 +222,7 @@ int destory_thead(thread_t thread)
 	return 0;
 }
 
-int destory_threads_pool(thread_pool pool)
+int destory_threads_pool(thread_pool_t pool)
 {
 	pthread_mutex_lock(&pool->thread_pool_mutex);
 	while(1) {

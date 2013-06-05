@@ -45,8 +45,8 @@ struct thread_pool_st{
 struct thread_task_st{
 	unsigned int task_id;
 	int status;
-	void *arg; //arg -------->private_data_st
-	void *(*task_func)(void *arg);
+	void *data; //arg -------->private_data_st
+	void *(*task_func)(void *data);
 	struct list_head list;
 };
 
@@ -60,6 +60,7 @@ struct task_queue_st{
 
 
 struct private_data_st{
+	task_queue_t queue;
 	thread_t thread;
 	thread_task_t task;
 };
