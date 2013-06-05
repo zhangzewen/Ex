@@ -18,11 +18,11 @@ typedef struct task_queue_st* task_queue_t;
 
 typedef struct private_data_st* private_data_t; 
 
-typedef struct thread_st{
+struct thread_st{
 	struct list_head list;
 	pthread_t *pid;
 	int num;
-}*thread_t;
+};
 
 
 /*
@@ -61,7 +61,7 @@ struct task_queue_st{
 
 struct private_data_st{
 	thread_t thread;
-	task_t task;
+	thread_task_t task;
 };
 
 
