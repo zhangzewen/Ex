@@ -16,5 +16,6 @@ clean:
 	rm -fr core.*
 	rm -fr client
 	rm -fr server
+	rm -fr epoll_ex
 
 

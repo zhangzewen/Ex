@@ -14,7 +14,7 @@
 
 #define SERVER_PORT	8088 
 #define BUFFER_SIZE 1024
-#define SERVER_ADDR	"192.168.10.65"
+#define SERVER_ADDR	"127.0.0.1"
 int main(int argc, char * argv[])
 {
 
