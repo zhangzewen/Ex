@@ -38,7 +38,7 @@ out:
 	return -1;
 }
 
-struct event * event_set(int epfd, int fd, uint32_t events, void (*callback)(int, int, struct event *))
+struct event * event_set(int epfd, int fd, uint32_t events, void (*callback)(int, int, struct event *), void *arg)
 {
 	struct event *e;
 
@@ -48,6 +48,7 @@ struct event * event_set(int epfd, int fd, uint32_t events, void (*callback)(int
 	e->event_epfd 	= epfd;
 	e->event_fd	= fd;
 	e->events	= events;
+	e->arg = arg;
 	e->callback	= callback;
 
 	return e;

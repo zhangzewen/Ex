@@ -1,11 +1,13 @@
 #ifndef __HTTP_EPOLL_INCLUDED_
 #define __HTTP_EPOLL_INCLUDED_
+#define EPOLL_WAIT_TIMEOUT 10000
 
 struct event {
 	int event_epfd;		/* epoll fd */
 	int event_fd;		/* unix domain socket for script4 communication */
 	unsigned int events;	/* current occurs events */
 	int closed;		/* indicate already closed */
+	void *arg;
 	void (*callback)(int epfd, int fd, struct event *e);
 };
 
