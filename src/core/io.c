@@ -10,12 +10,12 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#if 0
 void set_file_flag(int fd, int flags)
 {
 	int old_flag;
+	int val;
 	
-	if ((old_flag = fcntl(fd, F_GETFL, 0)) < 0) {
+	if ((old_flag = fcntl(fd, F_GETFL)) < 0) {
 		perror("fcntl GETFL error");
 	}
 	
@@ -29,9 +29,10 @@ void set_file_flag(int fd, int flags)
 void clear_file_flag(int fd, int flags)
 {
 	int old_flag;
-	int val;
 	
-	if ((val = fcntl(fd, F_GETFL, 0)) < 0) {
+	int val;
+
+	if ((old_flag = fcntl(fd, F_GETFL)) < 0) {
 		perror("fcntl GETFL error");
 	}
 	
@@ -42,4 +43,3 @@ void clear_file_flag(int fd, int flags)
 	}
 }
 
-#endif

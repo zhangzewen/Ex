@@ -1,6 +1,11 @@
 #include "file.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <errno.h>
+
 int lock_file(char *pathname) 
 {
   int fd;
@@ -31,6 +36,37 @@ err:
   close(fd);
 out:
   return -1;
+}
+
+int unlock_file(char *pathname)
+{
+	int fd;
+	struct flock lock;
+	char filename[1024] = {0};
+	
+	strncpy(filename, pathname, sizeof(filename) - 1);
+
+
+	if ((fd = open(filename, O_RDWR | O_EXCL, S_IRUSR | S_IWUSR)) == -1) {
+		goto out;
+	}
+
+	lock.l_type = F_UNLCK;
+	lock.l_whence = SEEK_SET;
+	lock.l_start = 0;
+	lock.l_len = 0;
+	
+
+	if (fcntl(fd, F_SETLKW, &lock) == -1) {
+		goto err;
+	}
+
+	return 0;
+
+err:
+	close(fd);
+out:
+	return -1;
 }
 
 
