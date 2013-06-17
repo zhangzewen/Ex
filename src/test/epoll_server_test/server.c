@@ -24,7 +24,7 @@ void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 	return;
 }
 
-void listen_callback(int epfd, int epoll_fd, struct event *ev, void *arg)
+void listen_callback(int epfd, int epoll_fd, struct event *ev)
 {
 	struct event *tmp;
 	int conn_fd;
@@ -68,9 +68,8 @@ int main(int argc, char *argv[])
 	}
 
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr =  
-	server_addr.sin_port = htons(argv[2]);
-	
+	server_addr.sin_port = htons(atoi(argv[2]));
+	inet_pton(AF_INET, argv[1], &server_addr.sin_addr);
 	len = sizeof(server_addr);
 
 	if(bind(listen_fd, (struct sockaddr *)&server_addr, len) < 0) {
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
 	
 	epfd = event_init();
 	
-	e = event_set(epfd, listen_fd, EPOLLIN, listen_callback);	
+	e = event_set(epfd, listen_fd, EPOLLIN, listen_callback, NULL);	
 	
 	event_dispatch_loop(epfd);
 	

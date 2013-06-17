@@ -1,6 +1,6 @@
 CFLAGS = -g -Wall -Werror -pthread -I ../../event/   
 
-Objs = ../../event/http_event.o
+Objs = ../../event/http_epoll.o
 
 server: server.o ${Objs}
 	gcc ${CFLAGS} server.o ${Objs} -o server
