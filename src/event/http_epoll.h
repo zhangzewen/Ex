@@ -14,7 +14,7 @@ struct event {
 
 extern int event_init(void);
 extern struct event * event_set(int epfd, int fd, uint32_t events, 
-				void (*callback)(int, int, struct event *));
+				void (*callback)(int, int, struct event *), void *arg);
 extern int event_add(struct event *e);
 extern int event_dispatch_loop(int epfd);
 extern void event_destroy(int epfd, int fd, struct event *e);

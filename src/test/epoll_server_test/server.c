@@ -14,8 +14,8 @@ void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 {
 	struct sockaddr_in *addr;
 	char buff[1024] = {0};
-	int n;
 	addr = (struct sockaddr_in *)ev->arg;
+	int n = 0;
 	char *ip;
 	ip = inet_ntoa(addr->sin_addr);
 	

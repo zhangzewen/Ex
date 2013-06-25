@@ -1,4 +1,4 @@
-CFLAGS = -g -Wall -Werror -pthread -I ../../event/   
+CFLAGS = -g -Wall  -pthread -I ../../event/   
 
 Objs = ../../event/http_epoll.o
 
