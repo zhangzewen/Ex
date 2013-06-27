@@ -20,6 +20,10 @@ void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 	ip = inet_ntoa(addr->sin_addr);
 	
 	n = read(epoll_fd, buff, 1024);
+	if(n < 0){
+		event_destroy(epfd, epoll_fd, ev);
+		return ;
+	}
 	printf("from ip:%s =========>%s", ip, buff);
 	return;
 }
@@ -43,6 +47,17 @@ void listen_callback(int epfd, int epoll_fd, struct event *ev)
 	}
 
 	tmp = event_set(epfd, conn_fd, EPOLLIN, connfd_callback, (void *)&client_addr);
+	
+	if(NULL == tmp) {
+		close(conn_fd);
+	}	
+	
+	if(event_add(tmp) == -1){
+		free(tmp);
+		close(conn_fd);
+	}
+		
+	return ;
 }
 
 
@@ -81,7 +96,19 @@ int main(int argc, char *argv[])
 	
 	e = event_set(epfd, listen_fd, EPOLLIN, listen_callback, NULL);	
 	
-	event_dispatch_loop(epfd);
+	if( NULL == e){
+		close(listen_fd);
+	}
+
+	if(event_add(e) == -1){
+		free(e);
+		close(listen_fd);
+	}
+	
+	
+	while(1){
+		event_dispatch_loop(epfd);
+	}
 	
 	return 0;
 }
