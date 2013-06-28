@@ -92,6 +92,13 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
+	
+
+	if(listen(listen_fd, 1024) < 0){
+		fprintf(stderr, "listen error!\n");
+		exit(1);
+	}
+	
 	epfd = event_init();
 	
 	e = event_set(epfd, listen_fd, EPOLLIN, listen_callback, NULL);	
