@@ -1,7 +1,11 @@
-#ifndef _HTTP_IO_H_INCLUDED_
-#define _HTTP_IO_H_INCLUDED_
+#ifndef __HTTP_IO_H__
+#define __HTTP_IO_H__
 
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+int set_file_flag(int fd, int flags);
+
+int clear_file_flag(int fd, int flags);
+
+int set_fd_nonblock(int fd);
+int set_fd_block(int fd);
 #endif

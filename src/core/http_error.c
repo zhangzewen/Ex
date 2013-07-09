@@ -9,14 +9,10 @@
 #include <errno.h>
 
 #define BUFSIZE 4096
-
-int error_sys(const char *text);
-void error_quit(const char *text);
-void error_printf(const char *text);
-
+#if 0
 static void log_message(int stauts, const char *mode, const char *fmt, va_list ap);
-static void error_message(int status, cons char *mode, const char *fmt, va_list ap);
-
+static void error_message(int status, const char *mode, const char *fmt, va_list ap);
+#endif
 void log_open(char *ident)
 {
 	openlog(ident, LOG_PID, LOG_DAEMON);
@@ -47,8 +43,8 @@ void log_message(int status, const char *mode, const char *fmt, va_list ap)
 
 	return;
 }
-
-void error_message(int status , const char *mode, const char *fmt, va_list ap)
+__attribute__((unused))
+static void error_message(int status , const char *mode, const char *fmt, va_list ap)
 {
 	char buf[BUFSIZ] = {0};
 	char msg[BUFSIZ] = {0};
@@ -57,7 +53,7 @@ void error_message(int status , const char *mode, const char *fmt, va_list ap)
 	
 	if(errno == 0 || errno == ENOSYS) {
 		snprintf(msg, sizeof(msg), "%s\n", buf);
-	｝else {
+	} else {
 		snprintf(msg, sizeof(msg), "%s: %s\n", buf, strerror(errno));
 	}
 

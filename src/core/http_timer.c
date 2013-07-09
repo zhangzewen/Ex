@@ -7,15 +7,15 @@
 struct timeval time_now = { tv_sec: 0, tv_usec: 0};
 int Gettimeofday(struct timeval *tv, struct timezone *tz)
 {
-	if(gettimeofday(tv,tz) == -1)
-		error_sys("gettimeofday error");
+	if(gettimeofday(tv,tz) == -1){
+	}
 	return  0;
 }
 
 int Settimeofday(const struct timeval *tv, const struct timezone *tz)
 {
-	if(settimeofday(tv, tz) == -1)	
-		error_sys("settimeofday error");
+	if(settimeofday(tv, tz) == -1) {
+	}
 	return 0;
 }
 
