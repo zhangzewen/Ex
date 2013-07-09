@@ -8,18 +8,19 @@
 #include <arpa/inet.h>
 
 #include "http_epoll.h"
+#include "file.h"
 
 
 void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 {
 	struct sockaddr_in *addr;
-	char buff[1024] = {0};
+	char buff[4096] = {0};
 	addr = (struct sockaddr_in *)ev->arg;
 	int n = 0;
 	char *ip;
 	ip = inet_ntoa(addr->sin_addr);
 	
-	n = read(epoll_fd, buff, 1024);
+	n = readn(epoll_fd, buff, 4096);
 	if(n < 0){
 		event_destroy(epfd, epoll_fd, ev);
 		return ;
