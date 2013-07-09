@@ -1,6 +1,9 @@
-CFLAGS = -g -Wall  -pthread -I ../../event/	../../core/
+CFLAGS = -g -Wall  -pthread -I ../../event/	\
+				-I ../../core/ \
+	
 
-Objs = -I ../../event/http_epoll.o ../../core/file.o
+Objs =../../event/http_epoll.o ../../core/file.o ../../core/io.o
+
 
 server: server.o ${Objs}
 	gcc ${CFLAGS} server.o ${Objs} -o server

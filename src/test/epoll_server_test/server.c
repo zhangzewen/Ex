@@ -9,18 +9,19 @@
 
 #include "http_epoll.h"
 #include "file.h"
+#include "io.h"
 
 
 void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 {
 	struct sockaddr_in *addr;
-	char buff[4096] = {0};
+	char buff[256] = {0};
 	addr = (struct sockaddr_in *)ev->arg;
 	int n = 0;
 	char *ip;
 	ip = inet_ntoa(addr->sin_addr);
 	
-	n = readn(epoll_fd, buff, 4096);
+	n = read(epoll_fd, buff, 256);
 	if(n < 0){
 		event_destroy(epfd, epoll_fd, ev);
 		return ;
@@ -46,7 +47,9 @@ void listen_callback(int epfd, int epoll_fd, struct event *ev)
 			fprintf(stderr, "accept error!");
 			return ;
 	}
-
+	
+	set_fd_nonblock(conn_fd);
+	
 	tmp = event_set(epfd, conn_fd, EPOLLIN, connfd_callback, (void *)&client_addr);
 	
 	if(NULL == tmp) {
