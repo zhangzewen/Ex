@@ -11,22 +11,24 @@
 #include "file.h"
 #include "io.h"
 
+#define RESPONSE_HTTP "HTTP/1.1 OK 200\r\nServer: zhangjie_v0.1\r\n\r\n zhangjie, welcome to UNIX !\n"
 
 void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 {
 	struct sockaddr_in *addr;
-	char buff[256] = {0};
+	char buff[10] = {0};
 	addr = (struct sockaddr_in *)ev->arg;
 	int n = 0;
 	char *ip;
 	ip = inet_ntoa(addr->sin_addr);
 	
-	n = read(epoll_fd, buff, 256);
+	n = read(epoll_fd, buff, 10);
 	if(n < 0){
 		event_destroy(epfd, epoll_fd, ev);
 		return ;
 	}
-	printf("from ip:%s =========>%s", ip, buff);
+	printf("\nfrom ip:%s =========>%s\r\n", ip, buff);
+	write(epoll_fd, RESPONSE_HTTP, strlen(RESPONSE_HTTP));
 	return;
 }
 
