@@ -4,10 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.6	//
-ALL_INCS	objs/Makefile	/^ALL_INCS = -I src\/core \\$/;"	m
 AO_REQUIRE_CAS	src/os/unix/ngx_atomic.h	18;"	d
-CC	objs/Makefile	/^CC =	gcc$/;"	m
-CFLAGS	objs/Makefile	/^CFLAGS =  -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g $/;"	m
 CLOCK_REALTIME	src/event/modules/ngx_eventport_module.c	19;"	d	file:
 CMSG_DATA	src/os/unix/ngx_freebsd_config.h	64;"	d
 CMSG_DATA	src/os/unix/ngx_freebsd_config.h	65;"	d
@@ -21,9 +18,6 @@ CMSG_SPACE	src/os/unix/ngx_freebsd_config.h	58;"	d
 CMSG_SPACE	src/os/unix/ngx_freebsd_config.h	59;"	d
 CMSG_SPACE	src/os/unix/ngx_posix_config.h	142;"	d
 CMSG_SPACE	src/os/unix/ngx_posix_config.h	143;"	d
-CORE_DEPS	objs/Makefile	/^CORE_DEPS = src\/core\/nginx.h \\$/;"	m
-CORE_INCS	objs/Makefile	/^CORE_INCS = -I src\/core \\$/;"	m
-CPP	objs/Makefile	/^CPP =	gcc -E$/;"	m
 CR	src/core/ngx_core.h	84;"	d
 CRLF	src/core/ngx_core.h	85;"	d
 DECLINED	src/http/modules/perl/nginx.pm	/^use constant DECLINED                       => -5;$/;"	c
@@ -58,11 +52,9 @@ HTTP_BAD_GATEWAY	src/http/modules/perl/nginx.pm	/^use constant HTTP_BAD_GATEWAY 
 HTTP_BAD_REQUEST	src/http/modules/perl/nginx.pm	/^use constant HTTP_BAD_REQUEST               => 400;$/;"	c
 HTTP_CONFLICT	src/http/modules/perl/nginx.pm	/^use constant HTTP_CONFLICT                  => 409;$/;"	c
 HTTP_CREATED	src/http/modules/perl/nginx.pm	/^use constant HTTP_CREATED                   => 201;$/;"	c
-HTTP_DEPS	objs/Makefile	/^HTTP_DEPS = src\/http\/ngx_http.h \\$/;"	m
 HTTP_FORBIDDEN	src/http/modules/perl/nginx.pm	/^use constant HTTP_FORBIDDEN                 => 403;$/;"	c
 HTTP_GATEWAY_TIME_OUT	src/http/modules/perl/nginx.pm	/^use constant HTTP_GATEWAY_TIME_OUT          => 504;$/;"	c
 HTTP_GONE	src/http/modules/perl/nginx.pm	/^use constant HTTP_GONE                      => 410;$/;"	c
-HTTP_INCS	objs/Makefile	/^HTTP_INCS = -I src\/http \\$/;"	m
 HTTP_INSUFFICIENT_STORAGE	src/http/modules/perl/nginx.pm	/^use constant HTTP_INSUFFICIENT_STORAGE      => 507;$/;"	c
 HTTP_INTERNAL_SERVER_ERROR	src/http/modules/perl/nginx.pm	/^use constant HTTP_INTERNAL_SERVER_ERROR     => 500;$/;"	c
 HTTP_LENGTH_REQUIRED	src/http/modules/perl/nginx.pm	/^use constant HTTP_LENGTH_REQUIRED           => 411;$/;"	c
@@ -97,7 +89,6 @@ KERNCALL	src/os/unix/rfork_thread.S	/^#define	KERNCALL	int $0x80$/;"	d
 KERN_RTSIGMAX	src/event/modules/ngx_rtsig_module.c	33;"	d	file:
 KERN_RTSIGNR	src/event/modules/ngx_rtsig_module.c	32;"	d	file:
 LF	src/core/ngx_core.h	83;"	d
-LINK	objs/Makefile	/^LINK =	$(CC)$/;"	m
 MAC_OS_X_VERSION_MIN_REQUIRED	src/os/unix/ngx_darwin_config.h	12;"	d
 NGINX_VAR	src/core/nginx.h	16;"	d
 NGINX_VER	src/core/nginx.h	14;"	d
@@ -141,8 +132,6 @@ NGX_CMD_OPEN_CHANNEL	src/os/unix/ngx_process_cycle.h	16;"	d
 NGX_CMD_QUIT	src/os/unix/ngx_process_cycle.h	18;"	d
 NGX_CMD_REOPEN	src/os/unix/ngx_process_cycle.h	20;"	d
 NGX_CMD_TERMINATE	src/os/unix/ngx_process_cycle.h	19;"	d
-NGX_COMPILER	objs/ngx_auto_config.h	4;"	d
-NGX_CONFIGURE	objs/ngx_auto_config.h	1;"	d
 NGX_CONF_1MORE	src/core/ngx_conf_file.h	46;"	d
 NGX_CONF_2MORE	src/core/ngx_conf_file.h	47;"	d
 NGX_CONF_ANY	src/core/ngx_conf_file.h	45;"	d
@@ -160,8 +149,6 @@ NGX_CONF_MODULE	src/core/ngx_conf_file.h	72;"	d
 NGX_CONF_MULTI	src/core/ngx_conf_file.h	48;"	d
 NGX_CONF_NOARGS	src/core/ngx_conf_file.h	22;"	d
 NGX_CONF_OK	src/core/ngx_conf_file.h	64;"	d
-NGX_CONF_PATH	objs/ngx_auto_config.h	332;"	d
-NGX_CONF_PREFIX	objs/ngx_auto_config.h	322;"	d
 NGX_CONF_TAKE1	src/core/ngx_conf_file.h	23;"	d
 NGX_CONF_TAKE12	src/core/ngx_conf_file.h	33;"	d
 NGX_CONF_TAKE123	src/core/ngx_conf_file.h	38;"	d
@@ -180,8 +167,6 @@ NGX_CONF_UNSET_PTR	src/core/ngx_conf_file.h	59;"	d
 NGX_CONF_UNSET_SIZE	src/core/ngx_conf_file.h	60;"	d
 NGX_CONF_UNSET_UINT	src/core/ngx_conf_file.h	58;"	d
 NGX_CORE_MODULE	src/core/ngx_conf_file.h	71;"	d
-NGX_CPU_CACHE_LINE	objs/ngx_auto_config.h	64;"	d
-NGX_CRYPT	objs/ngx_auto_config.h	257;"	d
 NGX_CV_SIGNAL	src/os/unix/ngx_freebsd_rfork_thread.h	35;"	d
 NGX_CYCLE_POOL_SIZE	src/core/ngx_cycle.h	17;"	d
 NGX_DEBUG_POINTS_ABORT	src/core/ngx_cycle.h	22;"	d
@@ -242,7 +227,6 @@ NGX_ERROR_ERR	src/core/ngx_connection.h	/^     NGX_ERROR_ERR,$/;"	e	enum:__anon4
 NGX_ERROR_IGNORE_ECONNRESET	src/core/ngx_connection.h	/^     NGX_ERROR_IGNORE_ECONNRESET,$/;"	e	enum:__anon41
 NGX_ERROR_IGNORE_EINVAL	src/core/ngx_connection.h	/^     NGX_ERROR_IGNORE_EINVAL$/;"	e	enum:__anon41
 NGX_ERROR_INFO	src/core/ngx_connection.h	/^     NGX_ERROR_INFO,$/;"	e	enum:__anon41
-NGX_ERROR_LOG_PATH	objs/ngx_auto_config.h	347;"	d
 NGX_ESCAPE_ARGS	src/core/ngx_string.h	194;"	d
 NGX_ESCAPE_HTML	src/core/ngx_string.h	196;"	d
 NGX_ESCAPE_MAIL_AUTH	src/core/ngx_string.h	199;"	d
@@ -275,15 +259,13 @@ NGX_FILE_WRONLY	src/os/unix/ngx_files.h	71;"	d
 NGX_FLUSH_EVENT	src/event/ngx_event.h	348;"	d
 NGX_FLUSH_EVENT	src/event/ngx_event.h	377;"	d
 NGX_FLUSH_EVENT	src/event/ngx_event.h	378;"	d
-NGX_GROUP	objs/ngx_auto_config.h	397;"	d
 NGX_HASH_ELT_SIZE	src/core/ngx_hash.c	248;"	d	file:
-NGX_HASH_LARGE	src/core/ngx_hash.h	66;"	d
-NGX_HASH_LARGE_ASIZE	src/core/ngx_hash.h	68;"	d
-NGX_HASH_LARGE_HSIZE	src/core/ngx_hash.h	69;"	d
-NGX_HASH_READONLY_KEY	src/core/ngx_hash.h	72;"	d
-NGX_HASH_SMALL	src/core/ngx_hash.h	65;"	d
-NGX_HASH_WILDCARD_KEY	src/core/ngx_hash.h	71;"	d
-NGX_HAVE_ALIGNED_DIRECTIO	objs/ngx_auto_config.h	82;"	d
+NGX_HASH_LARGE	src/core/ngx_hash.h	67;"	d
+NGX_HASH_LARGE_ASIZE	src/core/ngx_hash.h	69;"	d
+NGX_HASH_LARGE_HSIZE	src/core/ngx_hash.h	70;"	d
+NGX_HASH_READONLY_KEY	src/core/ngx_hash.h	73;"	d
+NGX_HASH_SMALL	src/core/ngx_hash.h	66;"	d
+NGX_HASH_WILDCARD_KEY	src/core/ngx_hash.h	72;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	134;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	158;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	175;"	d
@@ -295,74 +277,25 @@ NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	243;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	269;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	56;"	d
 NGX_HAVE_ATOMIC_OPS	src/os/unix/ngx_atomic.h	95;"	d
-NGX_HAVE_C99_VARIADIC_MACROS	objs/ngx_auto_config.h	14;"	d
 NGX_HAVE_CASELESS_FILESYSTEM	src/os/unix/ngx_darwin_config.h	86;"	d
 NGX_HAVE_CASELESS_FILESYSTEM	src/os/unix/ngx_files.h	56;"	d
-NGX_HAVE_CLEAR_EVENT	objs/ngx_auto_config.h	29;"	d
 NGX_HAVE_CPU_AFFINITY	src/os/unix/ngx_setaffinity.h	12;"	d
-NGX_HAVE_CRYPT_H	objs/ngx_auto_headers.h	34;"	d
 NGX_HAVE_DEBUG_MALLOC	src/os/unix/ngx_darwin_config.h	91;"	d
 NGX_HAVE_DEBUG_MALLOC	src/os/unix/ngx_freebsd_config.h	114;"	d
-NGX_HAVE_DEFERRED_ACCEPT	objs/ngx_auto_config.h	102;"	d
-NGX_HAVE_D_TYPE	objs/ngx_auto_config.h	227;"	d
-NGX_HAVE_EPOLL	objs/ngx_auto_config.h	24;"	d
-NGX_HAVE_FIONBIO	objs/ngx_auto_config.h	217;"	d
-NGX_HAVE_GCC_ATOMIC	objs/ngx_auto_config.h	9;"	d
-NGX_HAVE_GCC_VARIADIC_MACROS	objs/ngx_auto_config.h	19;"	d
-NGX_HAVE_GMTOFF	objs/ngx_auto_config.h	222;"	d
-NGX_HAVE_GNU_CRYPT_R	objs/ngx_auto_config.h	54;"	d
 NGX_HAVE_INHERITED_NONBLOCK	src/os/unix/ngx_darwin_config.h	81;"	d
 NGX_HAVE_INHERITED_NONBLOCK	src/os/unix/ngx_freebsd_config.h	109;"	d
 NGX_HAVE_INHERITED_NONBLOCK	src/os/unix/ngx_linux_config.h	107;"	d
 NGX_HAVE_INHERITED_NONBLOCK	src/os/unix/ngx_solaris_config.h	92;"	d
-NGX_HAVE_INTTYPES_H	objs/ngx_auto_headers.h	9;"	d
-NGX_HAVE_KEEPALIVE_TUNABLE	objs/ngx_auto_config.h	107;"	d
-NGX_HAVE_LIMITS_H	objs/ngx_auto_headers.h	14;"	d
-NGX_HAVE_LITTLE_ENDIAN	objs/ngx_auto_config.h	127;"	d
-NGX_HAVE_LOCALTIME_R	objs/ngx_auto_config.h	177;"	d
-NGX_HAVE_MAP_ANON	objs/ngx_auto_config.h	192;"	d
-NGX_HAVE_MAP_DEVZERO	objs/ngx_auto_config.h	197;"	d
 NGX_HAVE_MAX_PATH	src/os/unix/ngx_files.h	212;"	d
-NGX_HAVE_MD5	objs/ngx_auto_config.h	302;"	d
-NGX_HAVE_MEMALIGN	objs/ngx_auto_config.h	187;"	d
-NGX_HAVE_MSGHDR_MSG_CONTROL	objs/ngx_auto_config.h	212;"	d
-NGX_HAVE_NONALIGNED	objs/ngx_auto_config.h	59;"	d
-NGX_HAVE_OPENAT	objs/ngx_auto_config.h	237;"	d
-NGX_HAVE_OPENSSL_MD5_H	objs/ngx_auto_config.h	297;"	d
-NGX_HAVE_OPENSSL_SHA1_H	objs/ngx_auto_config.h	312;"	d
 NGX_HAVE_OS_SPECIFIC_INIT	src/os/unix/ngx_darwin_config.h	90;"	d
 NGX_HAVE_OS_SPECIFIC_INIT	src/os/unix/ngx_freebsd_config.h	113;"	d
 NGX_HAVE_OS_SPECIFIC_INIT	src/os/unix/ngx_linux_config.h	111;"	d
 NGX_HAVE_OS_SPECIFIC_INIT	src/os/unix/ngx_solaris_config.h	102;"	d
-NGX_HAVE_O_DIRECT	objs/ngx_auto_config.h	77;"	d
-NGX_HAVE_PCRE_JIT	objs/ngx_auto_config.h	287;"	d
-NGX_HAVE_POSIX_FADVISE	objs/ngx_auto_config.h	72;"	d
-NGX_HAVE_POSIX_MEMALIGN	objs/ngx_auto_config.h	182;"	d
-NGX_HAVE_POSIX_SEM	objs/ngx_auto_config.h	207;"	d
-NGX_HAVE_PREAD	objs/ngx_auto_config.h	162;"	d
-NGX_HAVE_PR_SET_DUMPABLE	objs/ngx_auto_config.h	44;"	d
-NGX_HAVE_PWRITE	objs/ngx_auto_config.h	167;"	d
 NGX_HAVE_READ_AHEAD	src/os/unix/ngx_files.h	312;"	d
 NGX_HAVE_READ_AHEAD	src/os/unix/ngx_files.h	319;"	d
-NGX_HAVE_SCHED_SETAFFINITY	objs/ngx_auto_config.h	49;"	d
-NGX_HAVE_SCHED_YIELD	objs/ngx_auto_config.h	97;"	d
-NGX_HAVE_SC_NPROCESSORS_ONLN	objs/ngx_auto_config.h	232;"	d
-NGX_HAVE_SENDFILE	objs/ngx_auto_config.h	34;"	d
-NGX_HAVE_SENDFILE64	objs/ngx_auto_config.h	39;"	d
-NGX_HAVE_SHA1	objs/ngx_auto_config.h	307;"	d
 NGX_HAVE_SO_SNDLOWAT	src/core/ngx_config.h	48;"	d
 NGX_HAVE_SO_SNDLOWAT	src/os/unix/ngx_linux_config.h	102;"	d
 NGX_HAVE_SO_SNDLOWAT	src/os/unix/ngx_solaris_config.h	98;"	d
-NGX_HAVE_STATFS	objs/ngx_auto_config.h	87;"	d
-NGX_HAVE_STATVFS	objs/ngx_auto_config.h	92;"	d
-NGX_HAVE_SYSVSHM	objs/ngx_auto_config.h	202;"	d
-NGX_HAVE_SYS_MOUNT_H	objs/ngx_auto_headers.h	24;"	d
-NGX_HAVE_SYS_PARAM_H	objs/ngx_auto_headers.h	19;"	d
-NGX_HAVE_SYS_PRCTL_H	objs/ngx_auto_headers.h	44;"	d
-NGX_HAVE_SYS_STATVFS_H	objs/ngx_auto_headers.h	29;"	d
-NGX_HAVE_SYS_VFS_H	objs/ngx_auto_headers.h	49;"	d
-NGX_HAVE_UNISTD_H	objs/ngx_auto_headers.h	4;"	d
-NGX_HAVE_UNIX_DOMAIN	objs/ngx_auto_config.h	112;"	d
 NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	106;"	d
 NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	74;"	d
 NGX_HAVE_VARIADIC_MACROS	src/core/ngx_log.h	90;"	d
@@ -386,7 +319,6 @@ NGX_HTTP_AUTOINDEX_NAME_LEN	src/http/modules/ngx_http_autoindex_module.c	48;"	d	
 NGX_HTTP_AUTOINDEX_PREALLOCATE	src/http/modules/ngx_http_autoindex_module.c	46;"	d	file:
 NGX_HTTP_BAD_GATEWAY	src/http/ngx_http_request.h	126;"	d
 NGX_HTTP_BAD_REQUEST	src/http/ngx_http_request.h	80;"	d
-NGX_HTTP_CACHE	objs/ngx_auto_config.h	242;"	d
 NGX_HTTP_CACHE_BYPASS	src/http/ngx_http_cache.h	18;"	d
 NGX_HTTP_CACHE_EXPIRED	src/http/ngx_http_cache.h	19;"	d
 NGX_HTTP_CACHE_HIT	src/http/ngx_http_cache.h	22;"	d
@@ -399,13 +331,12 @@ NGX_HTTP_CHARSET_OFF	src/http/modules/ngx_http_charset_filter_module.c	13;"	d	fi
 NGX_HTTP_CHARSET_VAR	src/http/modules/ngx_http_charset_filter_module.c	15;"	d	file:
 NGX_HTTP_CLIENT_CLOSED_REQUEST	src/http/ngx_http_request.h	121;"	d
 NGX_HTTP_CLIENT_ERROR	src/http/ngx_http_request.h	53;"	d
-NGX_HTTP_CLIENT_TEMP_PATH	objs/ngx_auto_config.h	357;"	d
 NGX_HTTP_CLOSE	src/http/ngx_http_request.h	98;"	d
 NGX_HTTP_CONFLICT	src/http/ngx_http_request.h	86;"	d
 NGX_HTTP_CONNECTION_CLOSE	src/http/ngx_http_request.h	44;"	d
 NGX_HTTP_CONNECTION_KEEP_ALIVE	src/http/ngx_http_request.h	45;"	d
 NGX_HTTP_CONNECT_UPSTREAM_STATE	src/http/ngx_http_request.h	/^    NGX_HTTP_CONNECT_UPSTREAM_STATE,$/;"	e	enum:__anon285
-NGX_HTTP_CONTENT_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_CONTENT_PHASE,$/;"	e	enum:__anon300
+NGX_HTTP_CONTENT_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_CONTENT_PHASE, \/\/处理生成返回数据阶段（有filter可以忽略）$/;"	e	enum:__anon300
 NGX_HTTP_COPY	src/http/ngx_http_request.h	34;"	d
 NGX_HTTP_COPY_BUFFERED	src/http/ngx_http_request.h	137;"	d
 NGX_HTTP_CREATED	src/http/ngx_http_request.h	68;"	d
@@ -434,14 +365,11 @@ NGX_HTTP_FASTCGI_RESPONDER	src/http/modules/ngx_http_fastcgi_module.c	81;"	d	fil
 NGX_HTTP_FASTCGI_STDERR	src/http/modules/ngx_http_fastcgi_module.c	91;"	d	file:
 NGX_HTTP_FASTCGI_STDIN	src/http/modules/ngx_http_fastcgi_module.c	89;"	d	file:
 NGX_HTTP_FASTCGI_STDOUT	src/http/modules/ngx_http_fastcgi_module.c	90;"	d	file:
-NGX_HTTP_FASTCGI_TEMP_PATH	objs/ngx_auto_config.h	367;"	d
-NGX_HTTP_FIND_CONFIG_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_FIND_CONFIG_PHASE,$/;"	e	enum:__anon300
+NGX_HTTP_FIND_CONFIG_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_FIND_CONFIG_PHASE,\/\/查找相应的配置来执行阶段$/;"	e	enum:__anon300
 NGX_HTTP_FLUSH	src/http/ngx_http.h	113;"	d
 NGX_HTTP_FORBIDDEN	src/http/ngx_http_request.h	82;"	d
 NGX_HTTP_GATEWAY_TIME_OUT	src/http/ngx_http_request.h	128;"	d
-NGX_HTTP_GEO	objs/ngx_auto_config.h	262;"	d
 NGX_HTTP_GET	src/http/ngx_http_request.h	28;"	d
-NGX_HTTP_GZIP	objs/ngx_auto_config.h	247;"	d
 NGX_HTTP_GZIP_BUFFERED	src/http/ngx_http_request.h	134;"	d
 NGX_HTTP_GZIP_PROXIED_ANY	src/http/ngx_http_core_module.h	25;"	d
 NGX_HTTP_GZIP_PROXIED_AUTH	src/http/ngx_http_core_module.h	24;"	d
@@ -500,8 +428,7 @@ NGX_HTTP_LMT_CONF	src/http/ngx_http_config.h	47;"	d
 NGX_HTTP_LOCK	src/http/ngx_http_request.h	39;"	d
 NGX_HTTP_LOC_CONF	src/http/ngx_http_config.h	43;"	d
 NGX_HTTP_LOC_CONF_OFFSET	src/http/ngx_http_config.h	52;"	d
-NGX_HTTP_LOG_PATH	objs/ngx_auto_config.h	352;"	d
-NGX_HTTP_LOG_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_LOG_PHASE$/;"	e	enum:__anon300
+NGX_HTTP_LOG_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_LOG_PHASE \/\/记录日志处理阶段，具体说明应当是请求完成后，关闭请求时处理$/;"	e	enum:__anon300
 NGX_HTTP_LOG_UNSAFE	src/http/ngx_http_request.h	64;"	d
 NGX_HTTP_LOWLEVEL_BUFFERED	src/http/ngx_http_request.h	132;"	d
 NGX_HTTP_MAIN_CONF	src/http/ngx_http_config.h	41;"	d
@@ -569,15 +496,13 @@ NGX_HTTP_PERL_SSI_ARG	src/http/modules/perl/ngx_http_perl_module.c	134;"	d	file:
 NGX_HTTP_PERL_SSI_SUB	src/http/modules/perl/ngx_http_perl_module.c	133;"	d	file:
 NGX_HTTP_POST	src/http/ngx_http_request.h	30;"	d
 NGX_HTTP_POST_ACCESS_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_POST_ACCESS_PHASE,$/;"	e	enum:__anon300
-NGX_HTTP_POST_READ_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_POST_READ_PHASE = 0,$/;"	e	enum:__anon300
+NGX_HTTP_POST_READ_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_POST_READ_PHASE = 0,\/\/读取请求阶段$/;"	e	enum:__anon300
 NGX_HTTP_POST_REWRITE_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_POST_REWRITE_PHASE,$/;"	e	enum:__anon300
 NGX_HTTP_PREACCESS_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_PREACCESS_PHASE,$/;"	e	enum:__anon300
 NGX_HTTP_PRECONDITION_FAILED	src/http/ngx_http_request.h	88;"	d
 NGX_HTTP_PROCESS_REQUEST_STATE	src/http/ngx_http_request.h	/^    NGX_HTTP_PROCESS_REQUEST_STATE,$/;"	e	enum:__anon285
 NGX_HTTP_PROPFIND	src/http/ngx_http_request.h	37;"	d
 NGX_HTTP_PROPPATCH	src/http/ngx_http_request.h	38;"	d
-NGX_HTTP_PROXY	objs/ngx_auto_config.h	272;"	d
-NGX_HTTP_PROXY_TEMP_PATH	objs/ngx_auto_config.h	362;"	d
 NGX_HTTP_PUT	src/http/ngx_http_request.h	31;"	d
 NGX_HTTP_RANDOM_INDEX_PREALLOCATE	src/http/modules/ngx_http_random_index_module.c	18;"	d	file:
 NGX_HTTP_RANGE_NOT_SATISFIABLE	src/http/ngx_http_request.h	92;"	d
@@ -597,15 +522,13 @@ NGX_HTTP_REQUEST_URI_TOO_LARGE	src/http/ngx_http_request.h	90;"	d
 NGX_HTTP_REWRITE_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_REWRITE_PHASE,$/;"	e	enum:__anon300
 NGX_HTTP_SATISFY_ALL	src/http/ngx_http_core_module.h	33;"	d
 NGX_HTTP_SATISFY_ANY	src/http/ngx_http_core_module.h	34;"	d
-NGX_HTTP_SCGI_TEMP_PATH	objs/ngx_auto_config.h	377;"	d
 NGX_HTTP_SEE_OTHER	src/http/ngx_http_request.h	76;"	d
-NGX_HTTP_SERVER_REWRITE_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_SERVER_REWRITE_PHASE,$/;"	e	enum:__anon300
+NGX_HTTP_SERVER_REWRITE_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_SERVER_REWRITE_PHASE,\/\/ URL转换阶段$/;"	e	enum:__anon300
 NGX_HTTP_SERVICE_UNAVAILABLE	src/http/ngx_http_request.h	127;"	d
 NGX_HTTP_SIF_CONF	src/http/ngx_http_config.h	45;"	d
 NGX_HTTP_SPECIAL_RESPONSE	src/http/ngx_http_request.h	73;"	d
 NGX_HTTP_SRV_CONF	src/http/ngx_http_config.h	42;"	d
 NGX_HTTP_SRV_CONF_OFFSET	src/http/ngx_http_config.h	51;"	d
-NGX_HTTP_SSI	objs/ngx_auto_config.h	252;"	d
 NGX_HTTP_SSI_ADD_PREFIX	src/http/modules/ngx_http_ssi_filter_module.c	16;"	d	file:
 NGX_HTTP_SSI_ADD_ZERO	src/http/modules/ngx_http_ssi_filter_module.c	17;"	d	file:
 NGX_HTTP_SSI_BLOCK_NAME	src/http/modules/ngx_http_ssi_filter_module.c	229;"	d	file:
@@ -640,7 +563,7 @@ NGX_HTTP_SUB_BUFFERED	src/http/ngx_http_request.h	136;"	d
 NGX_HTTP_TEMPORARY_REDIRECT	src/http/ngx_http_request.h	78;"	d
 NGX_HTTP_TO_HTTPS	src/http/ngx_http_request.h	111;"	d
 NGX_HTTP_TRACE	src/http/ngx_http_request.h	42;"	d
-NGX_HTTP_TRY_FILES_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_TRY_FILES_PHASE,$/;"	e	enum:__anon300
+NGX_HTTP_TRY_FILES_PHASE	src/http/ngx_http_core_module.h	/^    NGX_HTTP_TRY_FILES_PHASE, \/\/try_file模块，也就是对应配置文件中的try_file指令，可以接收多个路径作为参数，当前一个路径的资源无法找到，则自动查找下一个路径$/;"	e	enum:__anon300
 NGX_HTTP_UNAUTHORIZED	src/http/ngx_http_request.h	81;"	d
 NGX_HTTP_UNKNOWN	src/http/ngx_http_request.h	27;"	d
 NGX_HTTP_UNLOCK	src/http/ngx_http_request.h	40;"	d
@@ -680,7 +603,6 @@ NGX_HTTP_USERID_MAX_EXPIRES	src/http/modules/ngx_http_userid_filter_module.c	19;
 NGX_HTTP_USERID_OFF	src/http/modules/ngx_http_userid_filter_module.c	13;"	d	file:
 NGX_HTTP_USERID_ON	src/http/modules/ngx_http_userid_filter_module.c	16;"	d	file:
 NGX_HTTP_USERID_V1	src/http/modules/ngx_http_userid_filter_module.c	15;"	d	file:
-NGX_HTTP_UWSGI_TEMP_PATH	objs/ngx_auto_config.h	372;"	d
 NGX_HTTP_VAR_CHANGEABLE	src/http/ngx_http_variables.h	29;"	d
 NGX_HTTP_VAR_INDEXED	src/http/ngx_http_variables.h	31;"	d
 NGX_HTTP_VAR_NOCACHEABLE	src/http/ngx_http_variables.h	30;"	d
@@ -692,8 +614,6 @@ NGX_HTTP_WRITE_BUFFERED	src/http/ngx_http_request.h	133;"	d
 NGX_HTTP_WRITING_REQUEST_STATE	src/http/ngx_http_request.h	/^    NGX_HTTP_WRITING_REQUEST_STATE,$/;"	e	enum:__anon285
 NGX_HTTP_WRITING_UPSTREAM_STATE	src/http/ngx_http_request.h	/^    NGX_HTTP_WRITING_UPSTREAM_STATE,$/;"	e	enum:__anon285
 NGX_HTTP_XSLT_REUSE_DTD	src/http/modules/ngx_http_xslt_filter_module.c	26;"	d	file:
-NGX_HTTP_X_FORWARDED_FOR	objs/ngx_auto_config.h	267;"	d
-NGX_HTTP_X_FORWARDED_FOR	objs/ngx_auto_config.h	277;"	d
 NGX_HTTP_X_FORWARDED_FOR	src/http/ngx_http_request.h	142;"	d
 NGX_IMAP_AUTHENTICATE	src/mail/ngx_mail.h	283;"	d
 NGX_IMAP_CAPABILITY	src/mail/ngx_mail.h	277;"	d
@@ -720,7 +640,6 @@ NGX_IOVS	src/os/unix/ngx_readv_chain.c	13;"	d	file:
 NGX_IOVS	src/os/unix/ngx_writev_chain.c	14;"	d	file:
 NGX_IOVS	src/os/unix/ngx_writev_chain.c	16;"	d	file:
 NGX_IO_SENDFILE	src/os/unix/ngx_os.h	16;"	d
-NGX_KQUEUE_UDATA_T	objs/ngx_auto_config.h	68;"	d
 NGX_LEVEL_EVENT	src/event/ngx_event.h	380;"	d
 NGX_LEVEL_EVENT	src/event/ngx_event.h	393;"	d
 NGX_LEVEL_EVENT	src/event/ngx_event.h	402;"	d
@@ -728,13 +647,11 @@ NGX_LEVEL_EVENT	src/event/ngx_event.h	415;"	d
 NGX_LEVEL_EVENT	src/event/ngx_event.h	424;"	d
 NGX_LINEFEED	src/os/unix/ngx_files.h	153;"	d
 NGX_LINEFEED_SIZE	src/os/unix/ngx_files.h	152;"	d
-NGX_LINUX	objs/ngx_auto_headers.h	39;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_darwin_config.h	77;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_freebsd_config.h	94;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_linux_config.h	97;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_posix_config.h	129;"	d
 NGX_LISTEN_BACKLOG	src/os/unix/ngx_solaris_config.h	88;"	d
-NGX_LOCK_PATH	objs/ngx_auto_config.h	342;"	d
 NGX_LOG_ALERT	src/core/ngx_log.h	18;"	d
 NGX_LOG_CRIT	src/core/ngx_log.h	19;"	d
 NGX_LOG_DEBUG	src/core/ngx_log.h	24;"	d
@@ -789,12 +706,10 @@ NGX_MAX_ALLOC_FROM_POOL	src/core/ngx_palloc.h	20;"	d
 NGX_MAX_CONF_ERRSTR	src/core/ngx_conf_file.h	75;"	d
 NGX_MAX_ERROR_STR	src/core/ngx_log.h	67;"	d
 NGX_MAX_INT32_VALUE	src/core/ngx_config.h	131;"	d
-NGX_MAX_OFF_T_VALUE	objs/ngx_auto_config.h	142;"	d
 NGX_MAX_PATH	src/os/unix/ngx_files.h	213;"	d
 NGX_MAX_PATH	src/os/unix/ngx_files.h	217;"	d
 NGX_MAX_PATH_LEVEL	src/core/ngx_file.h	35;"	d
 NGX_MAX_PROCESSES	src/os/unix/ngx_process.h	47;"	d
-NGX_MAX_SIZE_T_VALUE	objs/ngx_auto_config.h	132;"	d
 NGX_MAX_THREADS	src/os/unix/ngx_thread.h	17;"	d
 NGX_MAX_UINT32_VALUE	src/core/ngx_config.h	126;"	d
 NGX_MAX_UINT32_VALUE	src/core/ngx_config.h	128;"	d
@@ -809,7 +724,6 @@ NGX_NOACCEPT_SIGNAL	src/core/ngx_config.h	62;"	d
 NGX_NONE	src/core/ngx_output_chain.c	27;"	d	file:
 NGX_NONE	src/http/ngx_http_request.h	48;"	d
 NGX_NO_RESOLVER	src/core/ngx_resolver.h	31;"	d
-NGX_OFF_T_LEN	objs/ngx_auto_config.h	147;"	d
 NGX_OK	src/core/ngx_core.h	30;"	d
 NGX_OLDPID_EXT	src/core/nginx.h	17;"	d
 NGX_ONESHOT_EVENT	src/event/ngx_event.h	381;"	d
@@ -817,13 +731,10 @@ NGX_ONESHOT_EVENT	src/event/ngx_event.h	394;"	d
 NGX_ONESHOT_EVENT	src/event/ngx_event.h	404;"	d
 NGX_ONESHOT_EVENT	src/event/ngx_event.h	416;"	d
 NGX_ONESHOT_EVENT	src/event/ngx_event.h	425;"	d
-NGX_OPENSSL_MD5	objs/ngx_auto_config.h	292;"	d
 NGX_OPEN_FILE_DIRECTIO_OFF	src/core/ngx_open_file_cache.h	16;"	d
-NGX_PCRE	objs/ngx_auto_config.h	282;"	d
 NGX_PEER_FAILED	src/event/ngx_event_connect.h	19;"	d
 NGX_PEER_KEEPALIVE	src/event/ngx_event_connect.h	17;"	d
 NGX_PEER_NEXT	src/event/ngx_event_connect.h	18;"	d
-NGX_PID_PATH	objs/ngx_auto_config.h	337;"	d
 NGX_POOL_ALIGNMENT	src/core/ngx_palloc.h	24;"	d
 NGX_POP3_APOP	src/mail/ngx_mail.h	264;"	d
 NGX_POP3_AUTH	src/mail/ngx_mail.h	265;"	d
@@ -842,7 +753,6 @@ NGX_POP3_UIDL	src/mail/ngx_mail.h	272;"	d
 NGX_POP3_USER	src/mail/ngx_mail.h	258;"	d
 NGX_POST_EVENTS	src/event/ngx_event.h	519;"	d
 NGX_POST_THREAD_EVENTS	src/event/ngx_event.h	520;"	d
-NGX_PREFIX	objs/ngx_auto_config.h	317;"	d
 NGX_PROCESS_DETACHED	src/os/unix/ngx_process.h	53;"	d
 NGX_PROCESS_HELPER	src/os/unix/ngx_process_cycle.h	27;"	d
 NGX_PROCESS_JUST_RESPAWN	src/os/unix/ngx_process.h	52;"	d
@@ -853,7 +763,6 @@ NGX_PROCESS_RESPAWN	src/os/unix/ngx_process.h	51;"	d
 NGX_PROCESS_SIGNALLER	src/os/unix/ngx_process_cycle.h	25;"	d
 NGX_PROCESS_SINGLE	src/os/unix/ngx_process_cycle.h	23;"	d
 NGX_PROCESS_WORKER	src/os/unix/ngx_process_cycle.h	26;"	d
-NGX_PTR_SIZE	objs/ngx_auto_config.h	117;"	d
 NGX_RADIX_NO_VALUE	src/core/ngx_radix_tree.h	16;"	d
 NGX_READ_EVENT	src/event/ngx_event.h	358;"	d
 NGX_READ_EVENT	src/event/ngx_event.h	390;"	d
@@ -879,7 +788,6 @@ NGX_RESOLVE_REFUSED	src/core/ngx_resolver.h	27;"	d
 NGX_RESOLVE_SERVFAIL	src/core/ngx_resolver.h	24;"	d
 NGX_RESOLVE_TIMEDOUT	src/core/ngx_resolver.h	28;"	d
 NGX_RESOLVE_TXT	src/core/ngx_resolver.h	20;"	d
-NGX_SBIN_PATH	objs/ngx_auto_config.h	327;"	d
 NGX_SENDFILEVECS	src/os/unix/ngx_solaris_sendfilev_chain.c	39;"	d	file:
 NGX_SENDFILEVECS	src/os/unix/ngx_solaris_sendfilev_chain.c	41;"	d	file:
 NGX_SENDFILE_LIMIT	src/os/unix/ngx_linux_config.h	76;"	d
@@ -889,8 +797,6 @@ NGX_SETPROCTITLE_PAD	src/os/unix/ngx_setproctitle.h	35;"	d
 NGX_SETPROCTITLE_USES_ENV	src/os/unix/ngx_setproctitle.h	26;"	d
 NGX_SETPROCTITLE_USES_ENV	src/os/unix/ngx_setproctitle.h	34;"	d
 NGX_SHUTDOWN_SIGNAL	src/core/ngx_config.h	60;"	d
-NGX_SIG_ATOMIC_T_SIZE	objs/ngx_auto_config.h	122;"	d
-NGX_SIZE_T_LEN	objs/ngx_auto_config.h	137;"	d
 NGX_SLAB_BIG	src/core/ngx_slab.c	13;"	d	file:
 NGX_SLAB_BUSY	src/core/ngx_slab.c	27;"	d	file:
 NGX_SLAB_BUSY	src/core/ngx_slab.c	39;"	d	file:
@@ -910,7 +816,6 @@ NGX_SLAB_PAGE_START	src/core/ngx_slab.c	33;"	d	file:
 NGX_SLAB_SHIFT_MASK	src/core/ngx_slab.c	23;"	d	file:
 NGX_SLAB_SHIFT_MASK	src/core/ngx_slab.c	35;"	d	file:
 NGX_SLAB_SMALL	src/core/ngx_slab.c	15;"	d	file:
-NGX_SMP	objs/ngx_auto_config.h	387;"	d
 NGX_SMP_LOCK	src/os/unix/ngx_gcc_atomic_amd64.h	11;"	d
 NGX_SMP_LOCK	src/os/unix/ngx_gcc_atomic_amd64.h	9;"	d
 NGX_SMP_LOCK	src/os/unix/ngx_gcc_atomic_x86.h	11;"	d
@@ -947,8 +852,6 @@ NGX_SSL_SSLv3	src/event/ngx_event_openssl.h	86;"	d
 NGX_SSL_TLSv1	src/event/ngx_event_openssl.h	87;"	d
 NGX_SSL_TLSv1_1	src/event/ngx_event_openssl.h	88;"	d
 NGX_SSL_TLSv1_2	src/event/ngx_event_openssl.h	89;"	d
-NGX_SUPPRESS_WARN	objs/ngx_auto_config.h	382;"	d
-NGX_SYS_NERR	objs/ngx_auto_config.h	172;"	d
 NGX_TCP_NODELAY_DISABLED	src/core/ngx_connection.h	/^     NGX_TCP_NODELAY_DISABLED$/;"	e	enum:__anon42
 NGX_TCP_NODELAY_SET	src/core/ngx_connection.h	/^     NGX_TCP_NODELAY_SET,$/;"	e	enum:__anon42
 NGX_TCP_NODELAY_UNSET	src/core/ngx_connection.h	/^     NGX_TCP_NODELAY_UNSET = 0,$/;"	e	enum:__anon42
@@ -968,8 +871,6 @@ NGX_TID_T_FMT	src/os/unix/ngx_thread.h	35;"	d
 NGX_TIMER_INFINITE	src/event/ngx_event_timer.h	17;"	d
 NGX_TIMER_LAZY_DELAY	src/event/ngx_event_timer.h	19;"	d
 NGX_TIME_SLOTS	src/core/ngx_times.c	21;"	d	file:
-NGX_TIME_T_LEN	objs/ngx_auto_config.h	157;"	d
-NGX_TIME_T_SIZE	objs/ngx_auto_config.h	152;"	d
 NGX_TRAILERS	src/os/unix/ngx_darwin_sendfile_chain.c	32;"	d	file:
 NGX_TRAILERS	src/os/unix/ngx_darwin_sendfile_chain.c	35;"	d	file:
 NGX_TRAILERS	src/os/unix/ngx_freebsd_sendfile_chain.c	34;"	d	file:
@@ -978,7 +879,6 @@ NGX_UNESCAPE_REDIRECT	src/core/ngx_string.h	202;"	d
 NGX_UNESCAPE_URI	src/core/ngx_string.h	201;"	d
 NGX_UNIX_ADDRSTRLEN	src/core/ngx_inet.h	27;"	d
 NGX_UPDATE_TIME	src/event/ngx_event.h	518;"	d
-NGX_USER	objs/ngx_auto_config.h	392;"	d
 NGX_USE_AIO_EVENT	src/event/ngx_event.h	295;"	d
 NGX_USE_CLEAR_EVENT	src/event/ngx_event.h	262;"	d
 NGX_USE_EPOLL_EVENT	src/event/ngx_event.h	284;"	d
@@ -1141,7 +1041,7 @@ access_code	src/http/ngx_http_request.h	/^    ngx_uint_t                        
 accessed	src/core/ngx_open_file_cache.h	/^    time_t                   accessed;$/;"	m	struct:ngx_cached_open_file_s
 accessed	src/http/ngx_http_upstream_round_robin.h	/^    time_t                          accessed;$/;"	m	struct:__anon283
 action	src/core/ngx_log.h	/^    char                *action;$/;"	m	struct:ngx_log_s
-actions	src/event/ngx_event.h	/^    ngx_event_actions_t     actions;$/;"	m	struct:__anon327
+actions	src/event/ngx_event.h	/^    ngx_event_actions_t     actions;\/\/事件处理函数$/;"	m	struct:__anon327
 active	src/event/ngx_event.h	/^    unsigned         active:1;$/;"	m	struct:ngx_event_s
 acv	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_http_complex_value_t    *acv;$/;"	m	struct:__anon189	file:
 add	src/event/ngx_event.h	/^    ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);$/;"	m	struct:__anon325
@@ -1217,7 +1117,7 @@ angle	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t          
 angle	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t                   angle;$/;"	m	struct:__anon190	file:
 arg_end	src/mail/ngx_mail.h	/^    u_char                 *arg_end;$/;"	m	struct:__anon34
 arg_start	src/mail/ngx_mail.h	/^    u_char                 *arg_start;$/;"	m	struct:__anon34
-args	src/core/ngx_conf_file.h	/^    ngx_array_t          *args;$/;"	m	struct:ngx_conf_s
+args	src/core/ngx_conf_file.h	/^    ngx_array_t          *args; \/*当前命令名的所有参数*\/$/;"	m	struct:ngx_conf_s
 args	src/http/ngx_http_core_module.h	/^    ngx_str_t                  args;$/;"	m	struct:__anon311
 args	src/http/ngx_http_request.h	/^    ngx_str_t                         args;$/;"	m	struct:ngx_http_request_s
 args	src/http/ngx_http_script.h	/^    u_char                     *args;$/;"	m	struct:__anon106
@@ -1271,15 +1171,15 @@ br	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_http_fastcgi_begin_reque
 break_cycle	src/http/ngx_http_script.h	/^    uintptr_t                   break_cycle:1;$/;"	m	struct:__anon114
 browser	src/http/modules/ngx_http_browser_module.c	/^    u_char                      browser[12];$/;"	m	struct:__anon218	file:
 bsize	src/http/ngx_http_cache.h	/^    size_t                           bsize;$/;"	m	struct:ngx_http_file_cache_s
-bucket_size	src/core/ngx_hash.h	/^    ngx_uint_t        bucket_size;$/;"	m	struct:__anon81
-buckets	src/core/ngx_hash.h	/^    ngx_hash_elt_t  **buckets;$/;"	m	struct:__anon77
+bucket_size	src/core/ngx_hash.h	/^    ngx_uint_t        bucket_size;\/\/每个bucket的空间$/;"	m	struct:__anon81
+buckets	src/core/ngx_hash.h	/^    ngx_hash_elt_t  **buckets;\/\/hash桶（有size个桶）$/;"	m	struct:__anon77
 buf	src/core/ngx_buf.h	/^    ngx_buf_t                   *buf;$/;"	m	struct:ngx_output_chain_ctx_s
 buf	src/core/ngx_buf.h	/^    ngx_buf_t    *buf;$/;"	m	struct:ngx_chain_s
 buf	src/event/ngx_event_openssl.h	/^    ngx_buf_t                  *buf;$/;"	m	struct:__anon330
 buf	src/http/modules/ngx_http_ssi_filter_module.h	/^    ngx_buf_t                *buf;$/;"	m	struct:__anon241
 buf	src/http/modules/ngx_http_sub_filter_module.c	/^    ngx_buf_t                 *buf;$/;"	m	struct:__anon151	file:
 buf	src/http/ngx_http_cache.h	/^    ngx_buf_t                       *buf;$/;"	m	struct:ngx_http_cache_s
-buf	src/http/ngx_http_request.h	/^    ngx_buf_t                        *buf;$/;"	m	struct:__anon290
+buf	src/http/ngx_http_request.h	/^    ngx_buf_t                        *buf;\/*用作临时存储的buf，在ngx_http_read_client_request_body和ngx_http_do_read_client_request_body中用的到*\/$/;"	m	struct:__anon290
 buf	src/http/ngx_http_script.h	/^    ngx_str_t                   buf;$/;"	m	struct:__anon106
 buf_size	src/core/ngx_file.h	/^    size_t                     buf_size;$/;"	m	struct:__anon98
 buf_to_file	src/event/ngx_event_pipe.h	/^    ngx_buf_t         *buf_to_file;$/;"	m	struct:ngx_event_pipe_s
@@ -1311,7 +1211,7 @@ bufs	src/http/modules/ngx_http_gzip_filter_module.c	/^    ngx_bufs_t           b
 bufs	src/http/modules/ngx_http_gzip_filter_module.c	/^    ngx_int_t            bufs;$/;"	m	struct:__anon247	file:
 bufs	src/http/modules/ngx_http_ssi_filter_module.c	/^    ngx_chain_t  *bufs;$/;"	m	struct:__anon202	file:
 bufs	src/http/ngx_http_copy_filter_module.c	/^    ngx_bufs_t  bufs;$/;"	m	struct:__anon297	file:
-bufs	src/http/ngx_http_request.h	/^    ngx_chain_t                      *bufs;$/;"	m	struct:__anon290
+bufs	src/http/ngx_http_request.h	/^    ngx_chain_t                      *bufs;\/*消息体都保存在这个chain里面*\/$/;"	m	struct:__anon290
 bufs	src/http/ngx_http_upstream.h	/^    ngx_bufs_t                       bufs;$/;"	m	struct:__anon129
 builtin_session_cache	src/http/modules/ngx_http_ssl_module.h	/^    ssize_t                         builtin_session_cache;$/;"	m	struct:__anon227
 builtin_session_cache	src/mail/ngx_mail_ssl_module.h	/^    ssize_t          builtin_session_cache;$/;"	m	struct:__anon39
@@ -1399,7 +1299,7 @@ change_list1	src/event/modules/ngx_kqueue_module.c	/^static struct kevent  *chan
 changes	src/event/modules/ngx_devpoll_module.c	/^    ngx_uint_t      changes;$/;"	m	struct:__anon321	file:
 changes	src/event/modules/ngx_kqueue_module.c	/^    ngx_uint_t  changes;$/;"	m	struct:__anon320	file:
 channel	src/event/ngx_event.h	/^    unsigned         channel:1;$/;"	m	struct:ngx_event_s
-channel	src/os/unix/ngx_process.h	/^    ngx_socket_t        channel[2];$/;"	m	struct:__anon13
+channel	src/os/unix/ngx_process.h	/^    ngx_socket_t        channel[2];\/\/进程channel（也就是通过socketpair创建的两个句柄）$/;"	m	struct:__anon13
 characters	src/http/modules/ngx_http_charset_filter_module.c	/^    ngx_uint_t                  characters;$/;"	m	struct:__anon210	file:
 charset	src/http/modules/ngx_http_charset_filter_module.c	/^    ngx_http_charset_t         *charset;$/;"	m	struct:__anon210	file:
 charset	src/http/modules/ngx_http_charset_filter_module.c	/^    ngx_int_t                   charset;$/;"	m	struct:__anon208	file:
@@ -1446,7 +1346,7 @@ close	src/core/ngx_connection.h	/^    unsigned            close:1;$/;"	m	struct:
 close	src/core/ngx_open_file_cache.h	/^    unsigned                 close:1;$/;"	m	struct:ngx_cached_open_file_s
 closed	src/event/ngx_event.h	/^    unsigned         closed:1;$/;"	m	struct:ngx_event_s
 cmd_start	src/mail/ngx_mail.h	/^    u_char                 *cmd_start;$/;"	m	struct:__anon34
-cmd_type	src/core/ngx_conf_file.h	/^    ngx_uint_t            cmd_type;$/;"	m	struct:ngx_conf_s
+cmd_type	src/core/ngx_conf_file.h	/^    ngx_uint_t            cmd_type;\/*命令类型*\/$/;"	m	struct:ngx_conf_s
 cname	src/core/ngx_resolver.h	/^        u_char               *cname;$/;"	m	union:__anon69::__anon70
 cnlen	src/core/ngx_resolver.h	/^    u_short                   cnlen;$/;"	m	struct:__anon69
 co64_atom_buf	src/http/modules/ngx_http_mp4_module.c	/^    ngx_buf_t             co64_atom_buf;$/;"	m	struct:__anon159	file:
@@ -1475,7 +1375,7 @@ combined_used	src/http/modules/ngx_http_log_module.c	/^    ngx_uint_t           
 command	src/http/modules/ngx_http_ssi_filter_module.h	/^    ngx_str_t                 command;$/;"	m	struct:__anon241
 command	src/mail/ngx_mail.h	/^    ngx_uint_t              command;$/;"	m	struct:__anon34
 command	src/os/unix/ngx_channel.h	/^     ngx_uint_t  command;$/;"	m	struct:__anon16
-commands	src/core/ngx_conf_file.h	/^    ngx_command_t        *commands;$/;"	m	struct:ngx_module_s
+commands	src/core/ngx_conf_file.h	/^    ngx_command_t        *commands; \/\/该模块的指令集，指向一个ngx_command_t 结构数组$/;"	m	struct:ngx_module_s
 commands	src/http/modules/ngx_http_ssi_filter_module.h	/^    ngx_hash_keys_arrays_t    commands;$/;"	m	struct:__anon240
 compile_args	src/http/ngx_http_script.h	/^    unsigned                    compile_args:1;$/;"	m	struct:__anon107
 complete	src/event/ngx_event.h	/^    unsigned         complete:1;$/;"	m	struct:ngx_event_s
@@ -1488,7 +1388,7 @@ composition_offset_entries	src/http/modules/ngx_http_mp4_module.c	/^    uint32_t
 cond	src/os/unix/ngx_thread.h	/^    pthread_cond_t    cond;$/;"	m	struct:__anon9
 conditional	src/http/modules/ngx_http_ssi_filter_module.h	/^    unsigned                  conditional:2;$/;"	m	struct:__anon241
 conditional	src/http/modules/ngx_http_ssi_filter_module.h	/^    unsigned                  conditional:2;$/;"	m	struct:__anon243
-conf	src/core/ngx_conf_file.h	/^    ngx_uint_t            conf;$/;"	m	struct:ngx_command_s
+conf	src/core/ngx_conf_file.h	/^    ngx_uint_t            conf;\/\/该字段被NGX_HTTP_MODULE类型模块所用，该字段指定当前配置项存储的内存位置。实际上是使用哪个内存池的问题，因为http模块对所有http模块所要保存的配置信息，划分了main，server和location三个地方进行存储，每个地方都有一个内存池用来分配存储这些信息的内存。这里可能的值为NGX_HTTP_MAIN_CONF_OFFSET,NGX_HTTP_SRV_CONF_OFFSET或NGX_HTTP_LOC_CONF_OFFSET.当然也可以直接置为0，就是NGX_HTTP_MAIN_CONF_OFFSET$/;"	m	struct:ngx_command_s
 conf	src/http/modules/ngx_http_upstream_keepalive_module.c	/^    ngx_http_upstream_keepalive_srv_conf_t  *conf;$/;"	m	struct:__anon225	file:
 conf	src/http/modules/ngx_http_upstream_keepalive_module.c	/^    ngx_http_upstream_keepalive_srv_conf_t  *conf;$/;"	m	struct:__anon226	file:
 conf	src/http/ngx_http_core_module.h	/^    ngx_http_addr_conf_t       conf;$/;"	m	struct:__anon306
@@ -1497,12 +1397,12 @@ conf	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_conf_t        *conf;$/
 conf	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       conf;$/;"	m	struct:__anon130
 conf	src/mail/ngx_mail.h	/^    ngx_mail_addr_conf_t    conf;$/;"	m	struct:__anon23
 conf	src/mail/ngx_mail.h	/^    ngx_mail_addr_conf_t    conf;$/;"	m	struct:__anon24
-conf_ctx	src/core/ngx_cycle.h	/^    void                  ****conf_ctx;$/;"	m	struct:ngx_cycle_s
-conf_file	src/core/ngx_conf_file.h	/^    ngx_conf_file_t      *conf_file;$/;"	m	struct:ngx_conf_s
-conf_file	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_file;$/;"	m	struct:ngx_cycle_s
+conf_ctx	src/core/ngx_cycle.h	/^    void                  ****conf_ctx; \/\/配置上下文数组（含所有模块）$/;"	m	struct:ngx_cycle_s
+conf_file	src/core/ngx_conf_file.h	/^    ngx_conf_file_t      *conf_file; \/*将要解析的配置文件*\/$/;"	m	struct:ngx_conf_s
+conf_file	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_file;\/\/ 配置文件$/;"	m	struct:ngx_cycle_s
 conf_file	src/core/ngx_file.h	/^    u_char                    *conf_file;$/;"	m	struct:__anon94
-conf_param	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_param;$/;"	m	struct:ngx_cycle_s
-conf_prefix	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_prefix;$/;"	m	struct:ngx_cycle_s
+conf_param	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_param;\/\/配置参数$/;"	m	struct:ngx_cycle_s
+conf_prefix	src/core/ngx_cycle.h	/^    ngx_str_t                 conf_prefix;\/\/配置前缀$/;"	m	struct:ngx_cycle_s
 conf_prefix	src/http/ngx_http_script.h	/^    uintptr_t                   conf_prefix;$/;"	m	struct:__anon116
 conf_prefix	src/http/ngx_http_script.h	/^    unsigned                    conf_prefix:1;$/;"	m	struct:__anon107
 conf_prefix	src/http/ngx_http_script.h	/^    unsigned                    conf_prefix:1;$/;"	m	struct:__anon109
@@ -1524,16 +1424,16 @@ connection	src/http/ngx_http_upstream.h	/^    ngx_table_elt_t                 *c
 connection	src/mail/ngx_mail.h	/^    ngx_connection_t       *connection;$/;"	m	struct:__anon34
 connection_close	src/http/ngx_http_upstream.h	/^    unsigned                         connection_close:1;$/;"	m	struct:__anon131
 connection_counter	src/event/ngx_event.c	/^static ngx_atomic_t   connection_counter = 1;$/;"	v	file:
-connection_n	src/core/ngx_cycle.h	/^    ngx_uint_t                connection_n;$/;"	m	struct:ngx_cycle_s
+connection_n	src/core/ngx_cycle.h	/^    ngx_uint_t                connection_n;\/\/连接个数$/;"	m	struct:ngx_cycle_s
 connection_pool_size	src/http/ngx_http_core_module.h	/^    size_t                      connection_pool_size;$/;"	m	struct:__anon304
 connection_type	src/http/ngx_http_request.h	/^    unsigned                          connection_type:2;$/;"	m	struct:__anon288
-connections	src/core/ngx_cycle.h	/^    ngx_connection_t         *connections;$/;"	m	struct:ngx_cycle_s
+connections	src/core/ngx_cycle.h	/^    ngx_connection_t         *connections;\/\/连接$/;"	m	struct:ngx_cycle_s
 connections	src/event/ngx_event.h	/^    ngx_uint_t    connections;$/;"	m	struct:__anon326
 conns	src/http/modules/ngx_http_upstream_least_conn_module.c	/^    ngx_uint_t                        *conns;$/;"	m	struct:__anon270	file:
 conns	src/http/modules/ngx_http_upstream_least_conn_module.c	/^    ngx_uint_t                        *conns;$/;"	m	struct:__anon271	file:
 content_encoding	src/http/ngx_http_request.h	/^    ngx_table_elt_t                  *content_encoding;$/;"	m	struct:__anon289
 content_encoding	src/http/ngx_http_upstream.h	/^    ngx_table_elt_t                 *content_encoding;$/;"	m	struct:__anon131
-content_handler	src/http/ngx_http_request.h	/^    ngx_http_handler_pt               content_handler;$/;"	m	struct:ngx_http_request_s
+content_handler	src/http/ngx_http_request.h	/^    ngx_http_handler_pt               content_handler;\/*生成内容的处理函数，比如ngx_http_proxy_handler等*\/$/;"	m	struct:ngx_http_request_s
 content_length	src/http/modules/ngx_http_mp4_module.c	/^    off_t                 content_length;$/;"	m	struct:__anon160	file:
 content_length	src/http/ngx_http_request.h	/^    ngx_table_elt_t                  *content_length;$/;"	m	struct:__anon288
 content_length	src/http/ngx_http_request.h	/^    ngx_table_elt_t                  *content_length;$/;"	m	struct:__anon289
@@ -1580,15 +1480,15 @@ crc32	src/http/modules/ngx_http_gzip_filter_module.c	/^    uint32_t  crc32;$/;"	
 crc32	src/http/ngx_http_cache.h	/^    uint32_t                         crc32;$/;"	m	struct:__anon104
 crc32	src/http/ngx_http_cache.h	/^    uint32_t                         crc32;$/;"	m	struct:ngx_http_cache_s
 create_conf	src/core/ngx_conf_file.h	/^    void               *(*create_conf)(ngx_cycle_t *cycle);$/;"	m	struct:__anon61
-create_conf	src/event/ngx_event.h	/^    void                 *(*create_conf)(ngx_cycle_t *cycle);$/;"	m	struct:__anon327
+create_conf	src/event/ngx_event.h	/^    void                 *(*create_conf)(ngx_cycle_t *cycle); \/\/创建事件$/;"	m	struct:__anon327
 create_full_put_path	src/http/modules/ngx_http_dav_module.c	/^    ngx_flag_t  create_full_put_path;$/;"	m	struct:__anon267	file:
 create_key	src/http/ngx_http_upstream.h	/^    ngx_int_t                      (*create_key)(ngx_http_request_t *r);$/;"	m	struct:ngx_http_upstream_s
-create_loc_conf	src/http/ngx_http_config.h	/^    void       *(*create_loc_conf)(ngx_conf_t *cf);$/;"	m	struct:__anon124
-create_main_conf	src/http/ngx_http_config.h	/^    void       *(*create_main_conf)(ngx_conf_t *cf);$/;"	m	struct:__anon124
+create_loc_conf	src/http/ngx_http_config.h	/^    void       *(*create_loc_conf)(ngx_conf_t *cf);\/\/同 void *(*create_srv_conf)(ngx_conf_t *cf)的作用相同，只是创建模块位于location block的配置信息存储结构$/;"	m	struct:__anon124
+create_main_conf	src/http/ngx_http_config.h	/^    void       *(*create_main_conf)(ngx_conf_t *cf);\/\/调用该函数创建本模块位于http block 的配置信息存储结构。该函数成功的时候，返回创建的配置对象。失败的话，返回NULL$/;"	m	struct:__anon124
 create_main_conf	src/mail/ngx_mail.h	/^    void                       *(*create_main_conf)(ngx_conf_t *cf);$/;"	m	struct:__anon36
 create_path	src/core/ngx_file.h	/^    unsigned                   create_path:1;$/;"	m	struct:__anon97
 create_request	src/http/ngx_http_upstream.h	/^    ngx_int_t                      (*create_request)(ngx_http_request_t *r);$/;"	m	struct:ngx_http_upstream_s
-create_srv_conf	src/http/ngx_http_config.h	/^    void       *(*create_srv_conf)(ngx_conf_t *cf);$/;"	m	struct:__anon124
+create_srv_conf	src/http/ngx_http_config.h	/^    void       *(*create_srv_conf)(ngx_conf_t *cf);\/\/调用该函数创建本模块位于http block的配置信息存储结构，该函数成功的时候，返回创建的配置对象，失败的话，返回NULL$/;"	m	struct:__anon124
 create_srv_conf	src/mail/ngx_mail.h	/^    void                       *(*create_srv_conf)(ngx_conf_t *cf);$/;"	m	struct:__anon36
 created	src/core/ngx_open_file_cache.h	/^    time_t                   created;$/;"	m	struct:ngx_cached_open_file_s
 creation_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    creation_time[4];$/;"	m	struct:__anon164	file:
@@ -1600,8 +1500,8 @@ creation_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    creation_ti
 crl	src/http/modules/ngx_http_ssl_module.h	/^    ngx_str_t                       crl;$/;"	m	struct:__anon227
 ctts_atom_buf	src/http/modules/ngx_http_mp4_module.c	/^    ngx_buf_t             ctts_atom_buf;$/;"	m	struct:__anon159	file:
 ctts_data_buf	src/http/modules/ngx_http_mp4_module.c	/^    ngx_buf_t             ctts_data_buf;$/;"	m	struct:__anon159	file:
-ctx	src/core/ngx_conf_file.h	/^    void                 *ctx;$/;"	m	struct:ngx_conf_s
-ctx	src/core/ngx_conf_file.h	/^    void                 *ctx;$/;"	m	struct:ngx_module_s
+ctx	src/core/ngx_conf_file.h	/^    void                 *ctx; \/*主要是为了提供模块的层次化*\/$/;"	m	struct:ngx_conf_s
+ctx	src/core/ngx_conf_file.h	/^    void                 *ctx; \/\/模块的上下文$/;"	m	struct:ngx_module_s
 ctx	src/event/ngx_event_openssl.h	/^    SSL_CTX                    *ctx;$/;"	m	struct:__anon329
 ctx	src/http/ngx_http_core_module.h	/^    ngx_http_conf_ctx_t        *ctx;$/;"	m	struct:__anon304
 ctx	src/http/ngx_http_request.h	/^    void                            **ctx;$/;"	m	struct:ngx_http_request_s
@@ -1611,7 +1511,7 @@ ctx	src/mail/ngx_mail.h	/^    ngx_mail_conf_ctx_t    *ctx;$/;"	m	struct:__anon22
 ctx	src/mail/ngx_mail.h	/^    ngx_mail_conf_ctx_t    *ctx;$/;"	m	struct:__anon27
 ctx	src/mail/ngx_mail.h	/^    ngx_mail_conf_ctx_t    *ctx;$/;"	m	struct:__anon29
 ctx	src/mail/ngx_mail.h	/^    void                  **ctx;$/;"	m	struct:__anon34
-ctx_index	src/core/ngx_conf_file.h	/^    ngx_uint_t            ctx_index;$/;"	m	struct:ngx_module_s
+ctx_index	src/core/ngx_conf_file.h	/^    ngx_uint_t            ctx_index;\/\/分类模块计数器$/;"	m	struct:ngx_module_s
 ctxt	src/http/modules/ngx_http_xslt_filter_module.c	/^    xmlParserCtxtPtr           ctxt;$/;"	m	struct:__anon140	file:
 current	src/core/ngx_open_file_cache.h	/^    ngx_uint_t               current;$/;"	m	struct:__anon51
 current	src/core/ngx_palloc.h	/^    ngx_pool_t           *current;$/;"	m	struct:ngx_pool_s
@@ -1621,7 +1521,7 @@ current_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    current_time
 current_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    current_time[4];$/;"	m	struct:__anon165	file:
 current_weight	src/http/ngx_http_upstream_round_robin.h	/^    ngx_int_t                       current_weight;$/;"	m	struct:__anon283
 cv	src/os/unix/ngx_thread.h	/^    ngx_cond_t  *cv;$/;"	m	struct:__anon10
-cycle	src/core/ngx_conf_file.h	/^    ngx_cycle_t          *cycle;$/;"	m	struct:ngx_conf_s
+cycle	src/core/ngx_conf_file.h	/^    ngx_cycle_t          *cycle; \/*使用的cycle*\/$/;"	m	struct:ngx_conf_s
 cyclic_temp_file	src/event/ngx_event_pipe.h	/^    unsigned           cyclic_temp_file:1;$/;"	m	struct:ngx_event_pipe_s
 cyclic_temp_file	src/http/ngx_http_upstream.h	/^    ngx_flag_t                       cyclic_temp_file;$/;"	m	struct:__anon129
 d	src/core/ngx_md5.h	/^    uint32_t  a, b, c, d;$/;"	m	struct:__anon87
@@ -1761,8 +1661,8 @@ dvpoll	src/event/modules/ngx_devpoll_module.c	/^struct dvpoll {$/;"	s	file:
 ecdh_curve	src/http/modules/ngx_http_ssl_module.h	/^    ngx_str_t                       ecdh_curve;$/;"	m	struct:__anon227
 ecdh_curve	src/mail/ngx_mail_ssl_module.h	/^    ngx_str_t        ecdh_curve;$/;"	m	struct:__anon39
 effective_weight	src/http/ngx_http_upstream_round_robin.h	/^    ngx_int_t                       effective_weight;$/;"	m	struct:__anon283
-elts	src/core/ngx_array.h	/^    void        *elts;$/;"	m	struct:ngx_array_s
-elts	src/core/ngx_list.h	/^    void             *elts;$/;"	m	struct:ngx_list_part_s
+elts	src/core/ngx_array.h	/^    void        *elts; \/\/数组数据区的起始位置$/;"	m	struct:ngx_array_s
+elts	src/core/ngx_list.h	/^    void             *elts;\/\/指向该节点实际的数据区$/;"	m	struct:ngx_list_part_s
 enable	src/event/ngx_event.h	/^    ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags);$/;"	m	struct:__anon325
 enable	src/http/modules/ngx_http_autoindex_module.c	/^    ngx_flag_t     enable;$/;"	m	struct:__anon273	file:
 enable	src/http/modules/ngx_http_gzip_filter_module.c	/^    ngx_flag_t           enable;$/;"	m	struct:__anon246	file:
@@ -1873,9 +1773,9 @@ exists	src/http/ngx_http_cache.h	/^    unsigned                         exists:1
 exists	src/os/unix/ngx_darwin_init.c	/^    ngx_uint_t   exists;$/;"	m	struct:__anon1	file:
 exists	src/os/unix/ngx_freebsd_init.c	/^    ngx_uint_t   exists;$/;"	m	struct:__anon17	file:
 exists	src/os/unix/ngx_shmem.h	/^    ngx_uint_t   exists;   \/* unsigned  exists:1;  *\/$/;"	m	struct:__anon15
-exit_master	src/core/ngx_conf_file.h	/^    void                (*exit_master)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
-exit_process	src/core/ngx_conf_file.h	/^    void                (*exit_process)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
-exit_thread	src/core/ngx_conf_file.h	/^    void                (*exit_thread)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
+exit_master	src/core/ngx_conf_file.h	/^    void                (*exit_master)(ngx_cycle_t *cycle);\/\/退出master$/;"	m	struct:ngx_module_s
+exit_process	src/core/ngx_conf_file.h	/^    void                (*exit_process)(ngx_cycle_t *cycle);\/\/退出工作进程$/;"	m	struct:ngx_module_s
+exit_thread	src/core/ngx_conf_file.h	/^    void                (*exit_thread)(ngx_cycle_t *cycle);\/\/退出线程$/;"	m	struct:ngx_module_s
 exited	src/os/unix/ngx_process.h	/^    unsigned            exited:1;$/;"	m	struct:__anon13
 exiting	src/os/unix/ngx_process.h	/^    unsigned            exiting:1;$/;"	m	struct:__anon13
 expect	src/http/ngx_http_request.h	/^    ngx_table_elt_t                  *expect;$/;"	m	struct:__anon288
@@ -1942,9 +1842,9 @@ file_name	src/http/ngx_http_upstream.h	/^    u_char                          *fi
 file_name	src/mail/ngx_mail.h	/^    u_char                 *file_name;$/;"	m	struct:__anon29
 file_pos	src/core/ngx_buf.h	/^    off_t            file_pos;$/;"	m	struct:ngx_buf_s
 filename	src/http/modules/perl/ngx_http_perl_module.h	/^    ngx_str_t                 filename;$/;"	m	struct:__anon231
-files	src/core/ngx_cycle.h	/^    ngx_connection_t        **files;$/;"	m	struct:ngx_cycle_s
+files	src/core/ngx_cycle.h	/^    ngx_connection_t        **files; \/\/连接文件$/;"	m	struct:ngx_cycle_s
 files	src/http/ngx_http_cache.h	/^    ngx_uint_t                       files;$/;"	m	struct:ngx_http_file_cache_s
-files_n	src/core/ngx_cycle.h	/^    ngx_uint_t                files_n;$/;"	m	struct:ngx_cycle_s
+files_n	src/core/ngx_cycle.h	/^    ngx_uint_t                files_n;\/\/打开文件个数$/;"	m	struct:ngx_cycle_s
 filter	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t                   filter;$/;"	m	struct:__anon189	file:
 filter_ctx	src/core/ngx_buf.h	/^    void                        *filter_ctx;$/;"	m	struct:ngx_output_chain_ctx_s
 filter_finalize	src/http/ngx_http_request.h	/^    unsigned                          filter_finalize:1;$/;"	m	struct:ngx_http_request_s
@@ -2000,8 +1900,8 @@ free_buffers	src/http/modules/ngx_http_charset_filter_module.c	/^    ngx_chain_t
 free_bufs	src/event/ngx_event_pipe.h	/^    unsigned           free_bufs:1;$/;"	m	struct:ngx_event_pipe_s
 free_bufs	src/http/modules/ngx_http_charset_filter_module.c	/^    ngx_chain_t                *free_bufs;$/;"	m	struct:__anon209	file:
 free_bufs	src/http/ngx_http_upstream.h	/^    ngx_chain_t                     *free_bufs;$/;"	m	struct:ngx_http_upstream_s
-free_connection_n	src/core/ngx_cycle.h	/^    ngx_uint_t                free_connection_n;$/;"	m	struct:ngx_cycle_s
-free_connections	src/core/ngx_cycle.h	/^    ngx_connection_t         *free_connections;$/;"	m	struct:ngx_cycle_s
+free_connection_n	src/core/ngx_cycle.h	/^    ngx_uint_t                free_connection_n;\/\/空闲连接个数$/;"	m	struct:ngx_cycle_s
+free_connections	src/core/ngx_cycle.h	/^    ngx_connection_t         *free_connections;\/\/空闲连接$/;"	m	struct:ngx_cycle_s
 free_mem	src/http/modules/ngx_http_gzip_filter_module.c	/^    char                *free_mem;$/;"	m	struct:__anon247	file:
 free_raw_bufs	src/event/ngx_event_pipe.h	/^    ngx_chain_t       *free_raw_bufs;$/;"	m	struct:ngx_event_pipe_s
 free_rr_peer	src/http/modules/ngx_http_upstream_least_conn_module.c	/^    ngx_event_free_peer_pt             free_rr_peer;$/;"	m	struct:__anon271	file:
@@ -2039,7 +1939,7 @@ gzip_vary	src/http/ngx_http_request.h	/^    unsigned                          gz
 gztrailer	src/http/modules/ngx_http_gzip_filter_module.c	/^struct gztrailer {$/;"	s	file:
 h0	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_http_fastcgi_header_t         h0;$/;"	m	struct:__anon198	file:
 h1	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_http_fastcgi_header_small_t   h1;$/;"	m	struct:__anon198	file:
-handler	src/core/ngx_conf_file.h	/^    ngx_conf_handler_pt   handler;$/;"	m	struct:ngx_conf_s
+handler	src/core/ngx_conf_file.h	/^    ngx_conf_handler_pt   handler;\/*模块自定义的handler*\/$/;"	m	struct:ngx_conf_s
 handler	src/core/ngx_connection.h	/^    ngx_connection_handler_pt   handler;$/;"	m	struct:ngx_listening_s
 handler	src/core/ngx_log.h	/^    ngx_log_handler_pt   handler;$/;"	m	struct:ngx_log_s
 handler	src/core/ngx_palloc.h	/^    ngx_pool_cleanup_pt   handler;$/;"	m	struct:ngx_pool_cleanup_s
@@ -2066,13 +1966,13 @@ handler	src/http/ngx_http_upstream.h	/^    ngx_http_header_handler_pt       hand
 handler	src/mail/ngx_mail_auth_http_module.c	/^    ngx_mail_auth_http_handler_pt   handler;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
 handler	src/os/unix/ngx_process.c	/^    void  (*handler)(int signo);$/;"	m	struct:__anon6	file:
 handler	src/os/unix/ngx_process_cycle.h	/^    ngx_event_handler_pt       handler;$/;"	m	struct:__anon2
-handler_conf	src/core/ngx_conf_file.h	/^    char                 *handler_conf;$/;"	m	struct:ngx_conf_s
+handler_conf	src/core/ngx_conf_file.h	/^    char                 *handler_conf;\/*自定义handler的conf*\/$/;"	m	struct:ngx_conf_s
 handlers	src/http/ngx_http_core_module.h	/^    ngx_array_t                handlers;$/;"	m	struct:__anon302
 handlers	src/http/ngx_http_core_module.h	/^    ngx_http_phase_handler_t  *handlers;$/;"	m	struct:__anon301
 handshaked	src/event/ngx_event_openssl.h	/^    unsigned                    handshaked:1;$/;"	m	struct:__anon330
 hash	src/core/ngx_hash.h	/^    ngx_hash_t            hash;$/;"	m	struct:__anon80
 hash	src/core/ngx_hash.h	/^    ngx_hash_t        hash;$/;"	m	struct:__anon78
-hash	src/core/ngx_hash.h	/^    ngx_hash_t       *hash;$/;"	m	struct:__anon81
+hash	src/core/ngx_hash.h	/^    ngx_hash_t       *hash; \/\/待初始化的hash结构$/;"	m	struct:__anon81
 hash	src/core/ngx_hash.h	/^    ngx_uint_t        hash;$/;"	m	struct:__anon83
 hash	src/http/modules/ngx_http_realip_module.c	/^    ngx_uint_t         hash;$/;"	m	struct:__anon183	file:
 hash	src/http/modules/ngx_http_referer_module.c	/^    ngx_hash_combined_t      hash;$/;"	m	struct:__anon276	file:
@@ -2093,12 +1993,12 @@ header	src/mail/ngx_mail_auth_http_module.c	/^    ngx_str_t                     
 header_end	src/http/ngx_http_request.h	/^    u_char                           *header_end;$/;"	m	struct:ngx_http_request_s
 header_end	src/mail/ngx_mail_auth_http_module.c	/^    u_char                         *header_end;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
 header_hash	src/http/ngx_http_request.h	/^    ngx_uint_t                        header_hash;$/;"	m	struct:ngx_http_request_s
-header_in	src/http/ngx_http_request.h	/^    ngx_buf_t                        *header_in;$/;"	m	struct:ngx_http_request_s
+header_in	src/http/ngx_http_request.h	/^    ngx_buf_t                        *header_in;\/*会保存一些消息体的内容*\/$/;"	m	struct:ngx_http_request_s
 header_name_end	src/http/ngx_http_request.h	/^    u_char                           *header_name_end;$/;"	m	struct:ngx_http_request_s
 header_name_end	src/mail/ngx_mail_auth_http_module.c	/^    u_char                         *header_name_end;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
 header_name_start	src/http/ngx_http_request.h	/^    u_char                           *header_name_start;$/;"	m	struct:ngx_http_request_s
 header_name_start	src/mail/ngx_mail_auth_http_module.c	/^    u_char                         *header_name_start;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
-header_only	src/http/ngx_http_request.h	/^    unsigned                          header_only:1;$/;"	m	struct:ngx_http_request_s
+header_only	src/http/ngx_http_request.h	/^    unsigned                          header_only:1;\/*当请求方法为HEAD时，r->header_only =1，在ngx_http_header_filter函数中*\/$/;"	m	struct:ngx_http_request_s
 header_params	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_uint_t                     header_params;$/;"	m	struct:__anon191	file:
 header_params	src/http/modules/ngx_http_scgi_module.c	/^    ngx_uint_t                 header_params;$/;"	m	struct:__anon275	file:
 header_params	src/http/modules/ngx_http_uwsgi_module.c	/^    ngx_uint_t                 header_params;$/;"	m	struct:__anon261	file:
@@ -2119,11 +2019,11 @@ headers_hash	src/http/modules/ngx_http_scgi_module.c	/^    ngx_hash_t           
 headers_hash	src/http/modules/ngx_http_uwsgi_module.c	/^    ngx_hash_t                 headers_hash;$/;"	m	struct:__anon261	file:
 headers_hash_bucket_size	src/http/modules/ngx_http_proxy_module.c	/^    ngx_uint_t                     headers_hash_bucket_size;$/;"	m	struct:__anon215	file:
 headers_hash_max_size	src/http/modules/ngx_http_proxy_module.c	/^    ngx_uint_t                     headers_hash_max_size;$/;"	m	struct:__anon215	file:
-headers_in	src/http/ngx_http_request.h	/^    ngx_http_headers_in_t             headers_in;$/;"	m	struct:ngx_http_request_s
+headers_in	src/http/ngx_http_request.h	/^    ngx_http_headers_in_t             headers_in;\/*代表请求头部\/\/请求的header结构体*\/$/;"	m	struct:ngx_http_request_s
 headers_in	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_headers_in_t   headers_in;$/;"	m	struct:ngx_http_upstream_s
 headers_in_hash	src/http/ngx_http_core_module.h	/^    ngx_hash_t                 headers_in_hash;$/;"	m	struct:__anon303
 headers_in_hash	src/http/ngx_http_upstream.h	/^    ngx_hash_t                       headers_in_hash;$/;"	m	struct:__anon126
-headers_out	src/http/ngx_http_request.h	/^    ngx_http_headers_out_t            headers_out;$/;"	m	struct:ngx_http_request_s
+headers_out	src/http/ngx_http_request.h	/^    ngx_http_headers_out_t            headers_out;\/*代表响应头部*\/$/;"	m	struct:ngx_http_request_s
 headers_set	src/http/modules/ngx_http_proxy_module.c	/^    ngx_array_t                   *headers_set;$/;"	m	struct:__anon215	file:
 headers_set_hash	src/http/modules/ngx_http_proxy_module.c	/^    ngx_hash_t                     headers_set_hash;$/;"	m	struct:__anon215	file:
 headers_set_len	src/http/modules/ngx_http_proxy_module.c	/^    ngx_array_t                   *headers_set_len;$/;"	m	struct:__anon215	file:
@@ -2146,7 +2046,7 @@ host_end	src/http/ngx_http_request.h	/^    u_char                           *hos
 host_header	src/http/modules/ngx_http_proxy_module.c	/^    ngx_str_t                      host_header;$/;"	m	struct:__anon214	file:
 host_header	src/mail/ngx_mail_auth_http_module.c	/^    ngx_str_t                       host_header;$/;"	m	struct:__anon37	file:
 host_start	src/http/ngx_http_request.h	/^    u_char                           *host_start;$/;"	m	struct:ngx_http_request_s
-hostname	src/core/ngx_cycle.h	/^    ngx_str_t                 hostname;$/;"	m	struct:ngx_cycle_s
+hostname	src/core/ngx_cycle.h	/^    ngx_str_t                 hostname;\/\/主机名$/;"	m	struct:ngx_cycle_s
 hostnames	src/http/modules/ngx_http_map_module.c	/^    ngx_uint_t                  hostnames;      \/* unsigned  hostnames:1 *\/$/;"	m	struct:__anon181	file:
 hostnames	src/http/modules/ngx_http_map_module.c	/^    ngx_uint_t                  hostnames;      \/* unsigned  hostnames:1 *\/$/;"	m	struct:__anon182	file:
 hsize	src/core/ngx_hash.h	/^    ngx_uint_t        hsize;$/;"	m	struct:__anon82
@@ -2200,7 +2100,7 @@ include_name	src/http/modules/ngx_http_geo_module.c	/^    ngx_str_t             
 includes	src/http/modules/ngx_http_geo_module.c	/^    ngx_uint_t                       includes;$/;"	m	struct:__anon254	file:
 inclusive	src/http/ngx_http_core_module.h	/^    ngx_http_core_loc_conf_t        *inclusive;$/;"	m	struct:__anon313
 inclusive	src/http/ngx_http_core_module.h	/^    ngx_http_core_loc_conf_t        *inclusive;$/;"	m	struct:ngx_http_location_tree_node_s
-index	src/core/ngx_conf_file.h	/^    ngx_uint_t            index;$/;"	m	struct:ngx_module_s
+index	src/core/ngx_conf_file.h	/^    ngx_uint_t            index;    \/\/模块计数器$/;"	m	struct:ngx_module_s
 index	src/event/ngx_event.h	/^    ngx_uint_t       index;$/;"	m	struct:ngx_event_s
 index	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_str_t                      index;$/;"	m	struct:__anon191	file:
 index	src/http/modules/ngx_http_geo_module.c	/^    ngx_int_t                        index;$/;"	m	struct:__anon255	file:
@@ -2221,14 +2121,14 @@ init	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_init_peer_pt   init;$/
 init_conf	src/core/ngx_conf_file.h	/^    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);$/;"	m	struct:__anon61
 init_conf	src/event/ngx_event.h	/^    char                 *(*init_conf)(ngx_cycle_t *cycle, void *conf);$/;"	m	struct:__anon327
 init_handler	src/core/ngx_file.h	/^    ngx_tree_init_handler_pt   init_handler;$/;"	m	struct:ngx_tree_ctx_s
-init_main_conf	src/http/ngx_http_config.h	/^    char       *(*init_main_conf)(ngx_conf_t *cf, void *conf);$/;"	m	struct:__anon124
+init_main_conf	src/http/ngx_http_config.h	/^    char       *(*init_main_conf)(ngx_conf_t *cf, void *conf);\/\/调用该函数初始化本模块位于http block的配置信息存储结构，该函数成功的时候，返回NGX_CONF_OK。失败的话，返回NGX_CONF_ERROR或者错误字符串$/;"	m	struct:__anon124
 init_main_conf	src/mail/ngx_mail.h	/^    char                       *(*init_main_conf)(ngx_conf_t *cf, void *conf);$/;"	m	struct:__anon36
-init_master	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_master)(ngx_log_t *log);$/;"	m	struct:ngx_module_s
-init_module	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
-init_process	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
+init_master	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_master)(ngx_log_t *log);\/\/初始化master$/;"	m	struct:ngx_module_s
+init_module	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_module)(ngx_cycle_t *cycle);\/\/初始化模块$/;"	m	struct:ngx_module_s
+init_process	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_process)(ngx_cycle_t *cycle);\/\/初始化工作进程$/;"	m	struct:ngx_module_s
 init_protocol	src/mail/ngx_mail.h	/^    ngx_mail_init_protocol_pt   init_protocol;$/;"	m	struct:ngx_mail_protocol_s
 init_session	src/mail/ngx_mail.h	/^    ngx_mail_init_session_pt    init_session;$/;"	m	struct:ngx_mail_protocol_s
-init_thread	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);$/;"	m	struct:ngx_module_s
+init_thread	src/core/ngx_conf_file.h	/^    ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);\/\/初始化线程$/;"	m	struct:ngx_module_s
 init_upstream	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_init_pt        init_upstream;$/;"	m	struct:__anon127
 input_ctx	src/event/ngx_event_pipe.h	/^    void                             *input_ctx;$/;"	m	struct:ngx_event_pipe_s
 input_filter	src/event/ngx_event_pipe.h	/^    ngx_event_pipe_input_filter_pt    input_filter;$/;"	m	struct:ngx_event_pipe_s
@@ -2243,7 +2143,7 @@ internal	src/http/ngx_http_core_module.h	/^    ngx_flag_t    internal;          
 internal	src/http/ngx_http_request.h	/^    unsigned                          internal:1;$/;"	m	struct:ngx_http_request_s
 internal_body_length	src/http/modules/ngx_http_proxy_module.c	/^    size_t                         internal_body_length;$/;"	m	struct:__anon216	file:
 internal_server_error	src/mail/ngx_mail.h	/^    ngx_str_t                   internal_server_error;$/;"	m	struct:ngx_mail_protocol_s
-invalid_header	src/http/ngx_http_request.h	/^    unsigned                          invalid_header:1;$/;"	m	struct:ngx_http_request_s
+invalid_header	src/http/ngx_http_request.h	/^    unsigned                          invalid_header:1;\/\/一个标示位，标示header是否有效，不正常的结束视为无效$/;"	m	struct:ngx_http_request_s
 io_destroy	src/event/modules/ngx_epoll_module.c	/^io_destroy(aio_context_t ctx)$/;"	f	file:
 io_event	src/event/modules/ngx_epoll_module.c	/^struct io_event {$/;"	s	file:
 io_getevents	src/event/modules/ngx_epoll_module.c	/^io_getevents(aio_context_t ctx, long min_nr, long nr, struct io_event *events,$/;"	f	file:
@@ -2286,9 +2186,9 @@ keepcnt	src/core/ngx_connection.h	/^    int                 keepcnt;$/;"	m	struc
 keepidle	src/core/ngx_connection.h	/^    int                 keepidle;$/;"	m	struct:ngx_listening_s
 keepintvl	src/core/ngx_connection.h	/^    int                 keepintvl;$/;"	m	struct:ngx_listening_s
 kevent_mutex	src/event/modules/ngx_kqueue_module.c	/^static ngx_mutex_t    *kevent_mutex;$/;"	v	file:
-key	src/core/ngx_hash.h	/^    ngx_hash_key_pt   key;$/;"	m	struct:__anon81
-key	src/core/ngx_hash.h	/^    ngx_str_t         key;$/;"	m	struct:__anon79
+key	src/core/ngx_hash.h	/^    ngx_hash_key_pt   key;\/\/hash函数指针$/;"	m	struct:__anon81
 key	src/core/ngx_hash.h	/^    ngx_str_t         key;$/;"	m	struct:__anon83
+key	src/core/ngx_hash.h	/^    ngx_str_t         key;\/\/key,为nginx的字符串结构$/;"	m	struct:__anon79
 key	src/core/ngx_rbtree.h	/^    ngx_rbtree_key_t       key;$/;"	m	struct:ngx_rbtree_node_s
 key	src/core/ngx_string.h	/^    ngx_str_t   key;$/;"	m	struct:__anon73
 key	src/http/modules/ngx_http_headers_filter_module.c	/^    ngx_str_t                  key;$/;"	m	struct:ngx_http_header_val_s	file:
@@ -2298,7 +2198,7 @@ key	src/http/modules/ngx_http_ssi_filter_module.h	/^    ngx_uint_t              
 key	src/http/ngx_http_cache.h	/^    u_char                           key[NGX_HTTP_CACHE_KEY_LEN$/;"	m	struct:__anon103
 key	src/http/ngx_http_cache.h	/^    u_char                           key[NGX_HTTP_CACHE_KEY_LEN];$/;"	m	struct:ngx_http_cache_s
 key	src/http/ngx_http_upstream.h	/^    ngx_str_t   key;$/;"	m	struct:__anon134
-key_hash	src/core/ngx_hash.h	/^    ngx_uint_t        key_hash;$/;"	m	struct:__anon79
+key_hash	src/core/ngx_hash.h	/^    ngx_uint_t        key_hash;\/\/由key计算出的hash值（通过hash函数如ngx_hash_key_lc()）$/;"	m	struct:__anon79
 key_start	src/http/modules/ngx_http_proxy_module.c	/^    ngx_str_t                      key_start;$/;"	m	struct:__anon214	file:
 keys	src/core/ngx_hash.h	/^    ngx_array_t       keys;$/;"	m	struct:__anon82
 keys	src/http/modules/ngx_http_map_module.c	/^    ngx_hash_keys_arrays_t      keys;$/;"	m	struct:__anon181	file:
@@ -2316,9 +2216,9 @@ large	src/core/ngx_palloc.h	/^    ngx_pool_large_t     *large;$/;"	m	struct:ngx_
 large_client_header_buffers	src/http/ngx_http_core_module.h	/^    ngx_bufs_t                  large_client_header_buffers;$/;"	m	struct:__anon304
 large_stderr	src/http/modules/ngx_http_fastcgi_module.c	/^    unsigned                       large_stderr:1;$/;"	m	struct:__anon194	file:
 last	src/core/ngx_buf.h	/^    ngx_chain_t                **last;$/;"	m	struct:__anon85
-last	src/core/ngx_buf.h	/^    u_char          *last;$/;"	m	struct:ngx_buf_s
+last	src/core/ngx_buf.h	/^    u_char          *last;\/\/当buf所指向的数据在内存里的时候，last指向的这段数据结束的位置$/;"	m	struct:ngx_buf_s
 last	src/core/ngx_conf_file.h	/^    u_char               *last;$/;"	m	struct:ngx_open_file_s
-last	src/core/ngx_list.h	/^    ngx_list_part_t  *last;$/;"	m	struct:__anon101
+last	src/core/ngx_list.h	/^    ngx_list_part_t  *last;\/\/指向链表最后一个节点$/;"	m	struct:__anon101
 last	src/core/ngx_palloc.h	/^    u_char               *last;$/;"	m	struct:__anon89
 last	src/event/ngx_event.h	/^    ngx_event_t     *last;$/;"	m	struct:__anon324
 last	src/event/ngx_event_busy_lock.h	/^    ngx_event_busy_lock_ctx_t  *last;$/;"	m	struct:__anon328
@@ -2327,7 +2227,7 @@ last	src/http/modules/ngx_http_fastcgi_module.c	/^    u_char                    
 last	src/http/modules/ngx_http_image_filter_module.c	/^    u_char                      *last;$/;"	m	struct:__anon190	file:
 last	src/http/modules/ngx_http_limit_req_module.c	/^    ngx_msec_t                   last;$/;"	m	struct:__anon152	file:
 last	src/http/ngx_http_cache.h	/^    ngx_msec_t                       last;$/;"	m	struct:ngx_http_file_cache_s
-last_buf	src/core/ngx_buf.h	/^    unsigned         last_buf:1;$/;"	m	struct:ngx_buf_s
+last_buf	src/core/ngx_buf.h	/^    unsigned         last_buf:1;\/\/数据被以多个chain传递给了过滤器，此字段为1表明这是最后一个buf$/;"	m	struct:ngx_buf_s
 last_cached	src/http/ngx_http_upstream_round_robin.h	/^    ngx_uint_t                      last_cached;$/;"	m	struct:ngx_http_upstream_rr_peers_s
 last_connection	src/core/ngx_resolver.h	/^    ngx_uint_t                last_connection;$/;"	m	struct:__anon71
 last_in	src/event/ngx_event_pipe.h	/^    ngx_chain_t      **last_in;$/;"	m	struct:ngx_event_pipe_s
@@ -2349,7 +2249,7 @@ left	src/core/ngx_radix_tree.h	/^    ngx_radix_node_t  *left;$/;"	m	struct:ngx_r
 left	src/core/ngx_rbtree.h	/^    ngx_rbtree_node_t     *left;$/;"	m	struct:ngx_rbtree_node_s
 left	src/http/ngx_http_core_module.h	/^    ngx_http_location_tree_node_t   *left;$/;"	m	struct:ngx_http_location_tree_node_s
 len	src/core/ngx_file.h	/^    size_t                     len;$/;"	m	struct:__anon94
-len	src/core/ngx_hash.h	/^    u_short           len;$/;"	m	struct:__anon76
+len	src/core/ngx_hash.h	/^    u_short           len; \/\/name长度$/;"	m	struct:__anon76
 len	src/core/ngx_string.h	/^    size_t      len;$/;"	m	struct:__anon72
 len	src/core/ngx_string.h	/^    unsigned    len:28;$/;"	m	struct:__anon74
 len	src/event/ngx_event_openssl.h	/^    size_t                      len;$/;"	m	struct:ngx_ssl_sess_id_s
@@ -2412,7 +2312,7 @@ listen	src/core/ngx_inet.h	/^    unsigned                  listen:1;$/;"	m	struc
 listen	src/http/ngx_http_core_module.h	/^    unsigned                    listen:1;$/;"	m	struct:__anon304
 listen	src/mail/ngx_mail.h	/^    ngx_array_t             listen;      \/* ngx_mail_listen_t *\/$/;"	m	struct:__anon28
 listening	src/core/ngx_connection.h	/^    ngx_listening_t    *listening;$/;"	m	struct:ngx_connection_s
-listening	src/core/ngx_cycle.h	/^    ngx_array_t               listening;$/;"	m	struct:ngx_cycle_s
+listening	src/core/ngx_cycle.h	/^    ngx_array_t               listening;\/\/监听数组$/;"	m	struct:ngx_cycle_s
 literal_len	src/mail/ngx_mail.h	/^    ngx_uint_t              literal_len;$/;"	m	struct:__anon34
 lmt_excpt	src/http/ngx_http_core_module.h	/^    unsigned      lmt_excpt:1;$/;"	m	struct:ngx_http_core_loc_conf_s
 loader	src/core/ngx_file.h	/^    ngx_path_loader_pt         loader;$/;"	m	struct:__anon94
@@ -2443,11 +2343,11 @@ lock	src/event/ngx_event_connect.h	/^    ngx_atomic_t                    *lock;$
 lock	src/http/ngx_http_cache.h	/^    unsigned                         lock:1;$/;"	m	struct:ngx_http_cache_s
 lock	src/os/unix/ngx_freebsd_rfork_thread.h	/^    ngx_atomic_t  lock;$/;"	m	struct:__anon11
 lock_file	src/core/ngx_cycle.h	/^     ngx_str_t                lock_file;$/;"	m	struct:__anon99
-lock_file	src/core/ngx_cycle.h	/^    ngx_str_t                 lock_file;$/;"	m	struct:ngx_cycle_s
+lock_file	src/core/ngx_cycle.h	/^    ngx_str_t                 lock_file;\/\/锁文件$/;"	m	struct:ngx_cycle_s
 lock_timeout	src/http/ngx_http_cache.h	/^    ngx_msec_t                       lock_timeout;$/;"	m	struct:ngx_http_cache_s
 locked	src/event/ngx_event.h	/^    unsigned         locked:1;$/;"	m	struct:ngx_event_s
 locked	src/event/ngx_event_busy_lock.h	/^    unsigned                    locked:1;$/;"	m	struct:ngx_event_busy_lock_ctx_s
-log	src/core/ngx_conf_file.h	/^    ngx_log_t            *log;$/;"	m	struct:ngx_conf_s
+log	src/core/ngx_conf_file.h	/^    ngx_log_t            *log; \/*配置log*\/$/;"	m	struct:ngx_conf_s
 log	src/core/ngx_connection.h	/^    ngx_log_t           log;$/;"	m	struct:ngx_listening_s
 log	src/core/ngx_connection.h	/^    ngx_log_t          *log;$/;"	m	struct:ngx_connection_s
 log	src/core/ngx_cycle.h	/^    ngx_log_t                *log;$/;"	m	struct:ngx_cycle_s
@@ -2542,7 +2442,7 @@ max_height	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t     
 max_index_len	src/http/modules/ngx_http_index_module.c	/^    size_t                   max_index_len;$/;"	m	struct:__anon266	file:
 max_ranges	src/http/ngx_http_core_module.h	/^    ngx_uint_t    max_ranges;              \/* max_ranges *\/$/;"	m	struct:ngx_http_core_loc_conf_s
 max_read	src/event/modules/ngx_win32_select_module.c	/^static ngx_uint_t     max_read;$/;"	v	file:
-max_size	src/core/ngx_hash.h	/^    ngx_uint_t        max_size;$/;"	m	struct:__anon81
+max_size	src/core/ngx_hash.h	/^    ngx_uint_t        max_size;\/\/bucket的最大个数$/;"	m	struct:__anon81
 max_size	src/http/ngx_http_cache.h	/^    off_t                            max_size;$/;"	m	struct:ngx_http_file_cache_s
 max_temp_file_size	src/event/ngx_event_pipe.h	/^    off_t              max_temp_file_size;$/;"	m	struct:ngx_event_pipe_s
 max_temp_file_size	src/http/ngx_http_upstream.h	/^    size_t                           max_temp_file_size;$/;"	m	struct:__anon129
@@ -2573,10 +2473,10 @@ media_name	src/http/modules/ngx_http_mp4_module.c	/^    u_char    media_name[4];
 media_size	src/http/modules/ngx_http_mp4_module.c	/^    u_char    media_size[4];$/;"	m	struct:__anon170	file:
 memlevel	src/http/modules/ngx_http_gzip_filter_module.c	/^    int                  memlevel;$/;"	m	struct:__anon247	file:
 memlevel	src/http/modules/ngx_http_gzip_filter_module.c	/^    size_t               memlevel;$/;"	m	struct:__anon246	file:
-memory	src/core/ngx_buf.h	/^    unsigned         memory:1;$/;"	m	struct:ngx_buf_s
-merge_loc_conf	src/http/ngx_http_config.h	/^    char       *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf);$/;"	m	struct:__anon124
+memory	src/core/ngx_buf.h	/^    unsigned         memory:1;\/\/为1时表示该buf所包含的内容是在内存中，但是这些内容不能被进行处理的filter进行变更$/;"	m	struct:ngx_buf_s
+merge_loc_conf	src/http/ngx_http_config.h	/^    char       *(*merge_loc_conf)(ngx_conf_t *cf, void *prev, void *conf); \/\/合并函数$/;"	m	struct:__anon124
 merge_slashes	src/http/ngx_http_core_module.h	/^    ngx_flag_t                  merge_slashes;$/;"	m	struct:__anon304
-merge_srv_conf	src/http/ngx_http_config.h	/^    char       *(*merge_srv_conf)(ngx_conf_t *cf, void *prev, void *conf);$/;"	m	struct:__anon124
+merge_srv_conf	src/http/ngx_http_config.h	/^    char       *(*merge_srv_conf)(ngx_conf_t *cf, void *prev, void *conf);\/\/因为有些配置指令可以出现在http block，也可以出现在http server block中，在遇到此种情况，每个server都会有自己的存储机构来存储该server的配置，但是在这种情况下当在http block中的配置与server block中的配置信息冲突的时候，就需要调用此函数进行合并，该函数可以不必须提供，但安全起见，建议提供，该函数成功的时候，返回NGX_CONF_OK,失败返回NGX_CONF_ERROR或者错误字符串$/;"	m	struct:__anon124
 merge_srv_conf	src/mail/ngx_mail.h	/^    char                       *(*merge_srv_conf)(ngx_conf_t *cf, void *prev,$/;"	m	struct:__anon36
 method	src/http/modules/ngx_http_proxy_module.c	/^    ngx_str_t                      method;$/;"	m	struct:__anon215	file:
 method	src/http/ngx_http_core_module.c	/^    uint32_t   method;$/;"	m	struct:__anon314	file:
@@ -2594,7 +2494,7 @@ min_uses	src/core/ngx_open_file_cache.h	/^    ngx_uint_t               min_uses;
 min_uses	src/core/ngx_open_file_cache.h	/^    ngx_uint_t               min_uses;$/;"	m	struct:__anon52
 min_uses	src/http/ngx_http_cache.h	/^    ngx_uint_t                       min_uses;$/;"	m	struct:ngx_http_cache_s
 minf_atom_buf	src/http/modules/ngx_http_mp4_module.c	/^    ngx_buf_t             minf_atom_buf;$/;"	m	struct:__anon159	file:
-mmap	src/core/ngx_buf.h	/^    unsigned         mmap:1;$/;"	m	struct:ngx_buf_s
+mmap	src/core/ngx_buf.h	/^    unsigned         mmap:1;\/\/当为1时表示该buf所包含的内容是在内存中，是通过mmap使用内存映射从文件中映射到内存中，这些内容不能被进行处理的filter进行变更$/;"	m	struct:ngx_buf_s
 modern_browser_value	src/http/modules/ngx_http_browser_module.c	/^    ngx_http_variable_value_t  *modern_browser_value;$/;"	m	struct:__anon221	file:
 modern_browsers	src/http/modules/ngx_http_browser_module.c	/^    ngx_array_t                *modern_browsers;$/;"	m	struct:__anon221	file:
 modern_unlisted_browsers	src/http/modules/ngx_http_browser_module.c	/^    unsigned                    modern_unlisted_browsers:1;$/;"	m	struct:__anon221	file:
@@ -2607,7 +2507,7 @@ modification_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    modific
 modifier1	src/http/modules/ngx_http_uwsgi_module.c	/^    ngx_uint_t                 modifier1;$/;"	m	struct:__anon261	file:
 modifier2	src/http/modules/ngx_http_uwsgi_module.c	/^    ngx_uint_t                 modifier2;$/;"	m	struct:__anon261	file:
 module	src/http/ngx_http_upstream.h	/^    ngx_str_t                        module;$/;"	m	struct:__anon129
-module_type	src/core/ngx_conf_file.h	/^    ngx_uint_t            module_type;$/;"	m	struct:ngx_conf_s
+module_type	src/core/ngx_conf_file.h	/^    ngx_uint_t            module_type;\/*模块类型*\/$/;"	m	struct:ngx_conf_s
 modules	src/http/modules/perl/ngx_http_perl_module.c	/^    ngx_array_t       *modules;$/;"	m	struct:__anon228	file:
 months	src/core/ngx_times.c	/^static char  *months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",$/;"	v	file:
 moov_atom	src/http/modules/ngx_http_mp4_module.c	/^    ngx_chain_t           moov_atom;$/;"	m	struct:__anon160	file:
@@ -2640,9 +2540,9 @@ naddrs	src/http/ngx_http_core_module.h	/^    ngx_uint_t                 naddrs;$
 naddrs	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       naddrs;$/;"	m	struct:__anon128
 naddrs	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       naddrs;$/;"	m	struct:__anon132
 naddrs	src/mail/ngx_mail.h	/^    ngx_uint_t              naddrs;$/;"	m	struct:__anon25
-nalloc	src/core/ngx_array.h	/^    ngx_uint_t   nalloc;$/;"	m	struct:ngx_array_s
-nalloc	src/core/ngx_list.h	/^    ngx_uint_t        nalloc;$/;"	m	struct:__anon101
-name	src/core/ngx_conf_file.h	/^    char                 *name;$/;"	m	struct:ngx_conf_s
+nalloc	src/core/ngx_array.h	/^    ngx_uint_t   nalloc;\/\/数组所含空间个数，即实际分配的小空间的个数$/;"	m	struct:ngx_array_s
+nalloc	src/core/ngx_list.h	/^    ngx_uint_t        nalloc;\/\/链表所含空间的个数，即实际分配的小空间的个数$/;"	m	struct:__anon101
+name	src/core/ngx_conf_file.h	/^    char                 *name; \/*当前解析到的命令名*\/$/;"	m	struct:ngx_conf_s
 name	src/core/ngx_conf_file.h	/^    ngx_str_t                 name;$/;"	m	struct:__anon66
 name	src/core/ngx_conf_file.h	/^    ngx_str_t                 name;$/;"	m	struct:__anon67
 name	src/core/ngx_conf_file.h	/^    ngx_str_t             name;$/;"	m	struct:__anon61
@@ -2651,15 +2551,15 @@ name	src/core/ngx_conf_file.h	/^    ngx_str_t             name;$/;"	m	struct:ngx
 name	src/core/ngx_file.h	/^    ngx_str_t                  name;$/;"	m	struct:__anon94
 name	src/core/ngx_file.h	/^    ngx_str_t                  name;$/;"	m	struct:__anon95
 name	src/core/ngx_file.h	/^    ngx_str_t                  name;$/;"	m	struct:ngx_file_s
-name	src/core/ngx_hash.h	/^    char             *name;$/;"	m	struct:__anon81
-name	src/core/ngx_hash.h	/^    u_char            name[1];$/;"	m	struct:__anon76
+name	src/core/ngx_hash.h	/^    char             *name; \/\/该hash结构的名字（仅在错误日志中使用）$/;"	m	struct:__anon81
+name	src/core/ngx_hash.h	/^    u_char            name[1];\/\/某个要hash的数据（在ngxin中表现为字符串,即<key,value>中的key$/;"	m	struct:__anon76
 name	src/core/ngx_inet.h	/^    ngx_str_t                 name;$/;"	m	struct:__anon48
 name	src/core/ngx_open_file_cache.h	/^    u_char                  *name;$/;"	m	struct:ngx_cached_open_file_s
 name	src/core/ngx_palloc.h	/^    u_char               *name;$/;"	m	struct:__anon90
 name	src/core/ngx_regex.h	/^    u_char       *name;$/;"	m	struct:__anon60
 name	src/core/ngx_resolver.h	/^    ngx_str_t                 name;$/;"	m	struct:ngx_resolver_ctx_s
 name	src/core/ngx_resolver.h	/^    u_char                   *name;$/;"	m	struct:__anon69
-name	src/event/ngx_event.h	/^    ngx_str_t              *name;$/;"	m	struct:__anon327
+name	src/event/ngx_event.h	/^    ngx_str_t              *name; \/\/事件模型名称:select ,pselect ,poll ,epoll$/;"	m	struct:__anon327
 name	src/event/ngx_event.h	/^    u_char       *name;$/;"	m	struct:__anon326
 name	src/event/ngx_event_connect.h	/^    ngx_str_t                       *name;$/;"	m	struct:ngx_peer_connection_s
 name	src/http/modules/ngx_http_autoindex_module.c	/^    ngx_str_t      name;$/;"	m	struct:__anon272	file:
@@ -2746,8 +2646,8 @@ nchanges	src/event/modules/ngx_kqueue_module.c	/^static ngx_uint_t      max_chan
 need_in_memory	src/core/ngx_buf.h	/^    unsigned                     need_in_memory:1;$/;"	m	struct:ngx_output_chain_ctx_s
 need_in_temp	src/core/ngx_buf.h	/^    unsigned                     need_in_temp:1;$/;"	m	struct:ngx_output_chain_ctx_s
 negative_test	src/http/ngx_http_script.h	/^    uintptr_t                   negative_test:1;$/;"	m	struct:__anon114
-nelts	src/core/ngx_array.h	/^    ngx_uint_t   nelts;$/;"	m	struct:ngx_array_s
-nelts	src/core/ngx_list.h	/^    ngx_uint_t        nelts;$/;"	m	struct:ngx_list_part_s
+nelts	src/core/ngx_array.h	/^    ngx_uint_t   nelts;\/\/实际存放的元素个数$/;"	m	struct:ngx_array_s
+nelts	src/core/ngx_list.h	/^    ngx_uint_t        nelts;\/\/实际存放的元素个数$/;"	m	struct:ngx_list_part_s
 net	src/http/modules/ngx_http_geo_module.c	/^    ngx_str_t                       *net;$/;"	m	struct:__anon254	file:
 netscape4	src/http/modules/ngx_http_browser_module.c	/^    unsigned                    netscape4:1;$/;"	m	struct:__anon221	file:
 nevents	src/event/modules/ngx_devpoll_module.c	/^static ngx_uint_t       nchanges, max_changes, nevents;$/;"	v	file:
@@ -2760,7 +2660,7 @@ nevents	src/event/modules/ngx_win32_select_module.c	/^static ngx_uint_t     neve
 new_log	src/core/ngx_cycle.h	/^    ngx_log_t                 new_log;$/;"	m	struct:ngx_cycle_s
 new_name	src/core/ngx_conf_file.h	/^    char                     *new_name;$/;"	m	struct:__anon64
 next	src/core/ngx_buf.h	/^    ngx_chain_t  *next;$/;"	m	struct:ngx_chain_s
-next	src/core/ngx_list.h	/^    ngx_list_part_t  *next;$/;"	m	struct:ngx_list_part_s
+next	src/core/ngx_list.h	/^    ngx_list_part_t  *next;\/\/指向下一个节点$/;"	m	struct:ngx_list_part_s
 next	src/core/ngx_palloc.h	/^    ngx_pool_cleanup_t   *next;$/;"	m	struct:ngx_pool_cleanup_s
 next	src/core/ngx_palloc.h	/^    ngx_pool_large_t     *next;$/;"	m	struct:ngx_pool_large_s
 next	src/core/ngx_palloc.h	/^    ngx_pool_t           *next;$/;"	m	struct:__anon89
@@ -2990,7 +2890,7 @@ ngx_conf_set_access_slot	src/core/ngx_file.c	/^ngx_conf_set_access_slot(ngx_conf
 ngx_conf_set_bitmask_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_bitmask_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_bufs_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_bufs_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_enum_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_enum_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
-ngx_conf_set_flag_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
+ngx_conf_set_flag_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_flag_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) \/\/读取NGX_CONF_FLAG类型的参数$/;"	f
 ngx_conf_set_keyval_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_keyval_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_msec_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_msec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_num_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_num_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
@@ -2999,7 +2899,7 @@ ngx_conf_set_path_slot	src/core/ngx_file.c	/^ngx_conf_set_path_slot(ngx_conf_t *
 ngx_conf_set_sec_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_sec_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_size_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_size_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
 ngx_conf_set_str_array_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_str_array_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
-ngx_conf_set_str_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f
+ngx_conf_set_str_slot	src/core/ngx_conf_file.c	/^ngx_conf_set_str_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf) \/\/读取字符串类型的参数$/;"	f
 ngx_conf_split_clients_block	src/http/modules/ngx_http_split_clients_module.c	/^ngx_conf_split_clients_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f	file:
 ngx_conf_t	src/core/ngx_core.h	/^typedef struct ngx_conf_s        ngx_conf_t;$/;"	t	typeref:struct:ngx_conf_s
 ngx_conf_test_full_name	src/core/ngx_conf_file.c	/^ngx_conf_test_full_name(ngx_str_t *name)$/;"	f	file:
@@ -3196,7 +3096,7 @@ ngx_event_busy_lock_look_cacheable	src/event/ngx_event_busy_lock.c	/^ngx_event_b
 ngx_event_busy_lock_posted_handler	src/event/ngx_event_busy_lock.c	/^ngx_event_busy_lock_posted_handler(ngx_event_t *ev)$/;"	f	file:
 ngx_event_busy_lock_t	src/event/ngx_event_busy_lock.h	/^} ngx_event_busy_lock_t;$/;"	t	typeref:struct:__anon328
 ngx_event_busy_unlock	src/event/ngx_event_busy_lock.c	/^ngx_event_busy_unlock(ngx_event_busy_lock_t *bl,$/;"	f
-ngx_event_conf_t	src/event/ngx_event.h	/^} ngx_event_conf_t;$/;"	t	typeref:struct:__anon326
+ngx_event_conf_t	src/event/ngx_event.h	/^} ngx_event_conf_t;\/\/nginx.conf的配置文件中event模块的信息$/;"	t	typeref:struct:__anon326
 ngx_event_connect_peer	src/event/ngx_event_connect.c	/^ngx_event_connect_peer(ngx_peer_connection_t *pc)$/;"	f
 ngx_event_connections	src/event/ngx_event.c	/^ngx_event_connections(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)$/;"	f	file:
 ngx_event_core_commands	src/event/ngx_event.c	/^static ngx_command_t  ngx_event_core_commands[] = {$/;"	v	file:
@@ -3341,7 +3241,7 @@ ngx_google_perftools_module_ctx	src/misc/ngx_google_perftools_module.c	/^static 
 ngx_google_perftools_worker	src/misc/ngx_google_perftools_module.c	/^ngx_google_perftools_worker(ngx_cycle_t *cycle)$/;"	f	file:
 ngx_handle_read_event	src/event/ngx_event.c	/^ngx_handle_read_event(ngx_event_t *rev, ngx_uint_t flags)$/;"	f
 ngx_handle_write_event	src/event/ngx_event.c	/^ngx_handle_write_event(ngx_event_t *wev, size_t lowat)$/;"	f
-ngx_hash	src/core/ngx_hash.h	111;"	d
+ngx_hash	src/core/ngx_hash.h	112;"	d
 ngx_hash_add_key	src/core/ngx_hash.c	/^ngx_hash_add_key(ngx_hash_keys_arrays_t *ha, ngx_str_t *key, void *value,$/;"	f
 ngx_hash_combined_t	src/core/ngx_hash.h	/^} ngx_hash_combined_t;$/;"	t	typeref:struct:__anon80
 ngx_hash_elt_t	src/core/ngx_hash.h	/^} ngx_hash_elt_t;$/;"	t	typeref:struct:__anon76
@@ -5328,7 +5228,6 @@ ngx_methods_names	src/http/ngx_http_core_module.c	/^static ngx_http_method_name_
 ngx_min	src/core/ngx_core.h	90;"	d
 ngx_module_s	src/core/ngx_conf_file.h	/^struct ngx_module_s {$/;"	s
 ngx_module_t	src/core/ngx_core.h	/^typedef struct ngx_module_s      ngx_module_t;$/;"	t	typeref:struct:ngx_module_s
-ngx_modules	objs/ngx_modules.c	/^ngx_module_t *ngx_modules[] = {$/;"	v
 ngx_movemem	src/core/ngx_string.h	140;"	d
 ngx_mp4_atom_data	src/http/modules/ngx_http_mp4_module.c	158;"	d	file:
 ngx_mp4_atom_data_size	src/http/modules/ngx_http_mp4_module.c	159;"	d	file:
@@ -5531,7 +5430,7 @@ ngx_process_get_status	src/os/unix/ngx_process.c	/^ngx_process_get_status(void)$
 ngx_process_options	src/core/nginx.c	/^ngx_process_options(ngx_cycle_t *cycle)$/;"	f	file:
 ngx_process_slot	src/os/unix/ngx_process.c	/^ngx_int_t        ngx_process_slot;$/;"	v
 ngx_process_t	src/os/unix/ngx_process.h	/^} ngx_process_t;$/;"	t	typeref:struct:__anon13
-ngx_processes	src/os/unix/ngx_process.c	/^ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];$/;"	v
+ngx_processes	src/os/unix/ngx_process.c	/^ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];\/\/全局的进程表，保存了存活的子进程$/;"	v
 ngx_pstrdup	src/core/ngx_string.c	/^ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src)$/;"	f
 ngx_ptocidr	src/core/ngx_inet.c	/^ngx_ptocidr(ngx_str_t *text, ngx_cidr_t *cidr)$/;"	f
 ngx_qsort	src/core/ngx_string.h	224;"	d
@@ -6126,7 +6025,7 @@ offset	src/http/modules/ngx_http_range_filter_module.c	/^    off_t        offset
 offset	src/http/ngx_http_request.h	/^    ngx_uint_t                        offset;$/;"	m	struct:__anon286
 offset	src/http/ngx_http_request.h	/^    ngx_uint_t                        offset;$/;"	m	struct:__anon287
 offset	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       offset;$/;"	m	struct:__anon130
-old_cycle	src/core/ngx_cycle.h	/^    ngx_cycle_t              *old_cycle;$/;"	m	struct:ngx_cycle_s
+old_cycle	src/core/ngx_cycle.h	/^    ngx_cycle_t              *old_cycle; \/\/old_cycle事件$/;"	m	struct:ngx_cycle_s
 old_name	src/core/ngx_conf_file.h	/^    char                     *old_name;$/;"	m	struct:__anon64
 oldpid	src/core/ngx_cycle.h	/^     ngx_str_t                oldpid;$/;"	m	struct:__anon99
 once	src/http/modules/ngx_http_sub_filter_module.c	/^    ngx_flag_t                 once;$/;"	m	struct:__anon149	file:
@@ -6143,7 +6042,7 @@ open_file_cache_min_uses	src/http/modules/ngx_http_log_module.c	/^    ngx_uint_t
 open_file_cache_min_uses	src/http/ngx_http_core_module.h	/^    ngx_uint_t    open_file_cache_min_uses;$/;"	m	struct:ngx_http_core_loc_conf_s
 open_file_cache_valid	src/http/modules/ngx_http_log_module.c	/^    time_t                      open_file_cache_valid;$/;"	m	struct:__anon145	file:
 open_file_cache_valid	src/http/ngx_http_core_module.h	/^    time_t        open_file_cache_valid;$/;"	m	struct:ngx_http_core_loc_conf_s
-open_files	src/core/ngx_cycle.h	/^    ngx_list_t                open_files;$/;"	m	struct:ngx_cycle_s
+open_files	src/core/ngx_cycle.h	/^    ngx_list_t                open_files;\/\/打开文件链表$/;"	m	struct:ngx_cycle_s
 opera	src/http/ngx_http_request.h	/^    unsigned                          opera:1;$/;"	m	struct:__anon288
 ops	src/http/modules/ngx_http_log_module.c	/^    ngx_array_t                *ops;        \/* array of ngx_http_log_op_t *\/$/;"	m	struct:__anon141	file:
 opt	src/http/ngx_http_core_module.h	/^    ngx_http_listen_opt_t      opt;$/;"	m	struct:__anon310
@@ -6162,8 +6061,8 @@ out	src/http/modules/ngx_http_mp4_module.c	/^    ngx_chain_t           out[NGX_H
 out	src/http/modules/ngx_http_mp4_module.c	/^    ngx_chain_t          *out;$/;"	m	struct:__anon160	file:
 out	src/http/modules/ngx_http_ssi_filter_module.h	/^    ngx_chain_t              *out;$/;"	m	struct:__anon241
 out	src/http/modules/ngx_http_sub_filter_module.c	/^    ngx_chain_t               *out;$/;"	m	struct:__anon151	file:
+out	src/http/ngx_http_request.h	/^    ngx_chain_t                      *out; \/*这里要注意ngx_http_request_t 中有一个out的chain,这个chain保存的是上一次还没有被发完的buf，这样每次我们接收到新的chain的话，就需要将新的chain连接到老的out chain上，然后再发出去*\/$/;"	m	struct:ngx_http_request_s
 out	src/http/ngx_http_request.h	/^    ngx_chain_t                      *out;$/;"	m	struct:ngx_http_postponed_request_s
-out	src/http/ngx_http_request.h	/^    ngx_chain_t                      *out;$/;"	m	struct:ngx_http_request_s
 out	src/mail/ngx_mail.h	/^    ngx_str_t               out;$/;"	m	struct:__anon34
 out_buf	src/http/modules/ngx_http_gzip_filter_module.c	/^    ngx_buf_t           *out_buf;$/;"	m	struct:__anon247	file:
 out_bufs	src/http/ngx_http_upstream.h	/^    ngx_chain_t                     *out_bufs;$/;"	m	struct:ngx_http_upstream_s
@@ -6212,7 +6111,7 @@ parent	src/core/ngx_rbtree.h	/^    ngx_rbtree_node_t     *parent;$/;"	m	struct:n
 parent	src/http/ngx_http_request.h	/^    ngx_http_request_t               *parent;$/;"	m	struct:ngx_http_request_s
 parent	src/os/unix/rfork_thread.S	/^parent:$/;"	l
 parse_command	src/mail/ngx_mail.h	/^    ngx_mail_parse_command_pt   parse_command;$/;"	m	struct:ngx_mail_protocol_s
-part	src/core/ngx_list.h	/^    ngx_list_part_t   part;$/;"	m	struct:__anon101
+part	src/core/ngx_list.h	/^    ngx_list_part_t   part;\/\/连表头中包含的第一个节点（part）$/;"	m	struct:__anon101
 parts	src/http/modules/ngx_http_split_clients_module.c	/^    ngx_array_t                 parts;$/;"	m	struct:__anon245	file:
 pass_error_message	src/mail/ngx_mail_proxy_module.c	/^    ngx_flag_t  pass_error_message;$/;"	m	struct:__anon40	file:
 pass_headers	src/http/ngx_http_upstream.h	/^    ngx_array_t                     *pass_headers;$/;"	m	struct:__anon129
@@ -6228,7 +6127,7 @@ path	src/http/ngx_http_cache.h	/^    ngx_path_t                      *path;$/;"	
 path	src/os/unix/ngx_process.h	/^    char         *path;$/;"	m	struct:__anon14
 path_access	src/core/ngx_file.h	/^    ngx_uint_t                 path_access;$/;"	m	struct:__anon97
 path_info	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_str_t                      path_info;$/;"	m	struct:__anon194	file:
-paths	src/core/ngx_cycle.h	/^    ngx_array_t               paths;$/;"	m	struct:ngx_cycle_s
+paths	src/core/ngx_cycle.h	/^    ngx_array_t               paths;\/\/路径数组$/;"	m	struct:ngx_cycle_s
 pattern	src/core/ngx_regex.h	/^    ngx_str_t     pattern;$/;"	m	struct:__anon59
 pattern	src/http/modules/ngx_http_proxy_module.c	/^    } pattern;$/;"	m	struct:ngx_http_proxy_rewrite_s	typeref:union:ngx_http_proxy_rewrite_s::__anon213	file:
 pattern	src/os/unix/ngx_files.h	/^    u_char                      *pattern;$/;"	m	struct:__anon5
@@ -6248,33 +6147,33 @@ persistent	src/core/ngx_file.h	/^    unsigned                   persistent:1;$/;
 pglob	src/os/unix/ngx_files.h	/^    glob_t                       pglob;$/;"	m	struct:__anon5
 phase	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t                   phase;$/;"	m	struct:__anon190	file:
 phase_engine	src/http/ngx_http_core_module.h	/^    ngx_http_phase_engine_t    phase_engine;$/;"	m	struct:__anon303
-phase_handler	src/http/ngx_http_request.h	/^    ngx_int_t                         phase_handler;$/;"	m	struct:ngx_http_request_s
+phase_handler	src/http/ngx_http_request.h	/^    ngx_int_t                         phase_handler;\/*应该是在请求处理的多个阶段中，利用phase_handler依次执行多个阶段*\/$/;"	m	struct:ngx_http_request_s
 phases	src/http/ngx_http_core_module.h	/^    ngx_http_phase_t           phases[NGX_HTTP_LOG_PHASE + 1];$/;"	m	struct:__anon303
 pid	src/core/ngx_cycle.h	/^     ngx_str_t                pid;$/;"	m	struct:__anon99
 pid	src/os/unix/ngx_channel.h	/^     ngx_pid_t   pid;$/;"	m	struct:__anon16
-pid	src/os/unix/ngx_process.h	/^    ngx_pid_t           pid;$/;"	m	struct:__anon13
+pid	src/os/unix/ngx_process.h	/^    ngx_pid_t           pid;\/\/进程id$/;"	m	struct:__anon13
 pipe	src/http/ngx_http_upstream.h	/^    ngx_event_pipe_t                *pipe;$/;"	m	struct:ngx_http_upstream_s
 pipeline	src/http/ngx_http_request.h	/^    ngx_uint_t                        pipeline;    \/* unsigned  pipeline:1; *\/$/;"	m	struct:__anon291
 pipeline	src/http/ngx_http_request.h	/^    unsigned                          pipeline:1;$/;"	m	struct:ngx_http_request_s
 plain_http	src/http/ngx_http_request.h	/^    unsigned                          plain_http:1;$/;"	m	struct:ngx_http_request_s
 plus_in_uri	src/http/ngx_http_request.h	/^    unsigned                          plus_in_uri:1;$/;"	m	struct:ngx_http_request_s
 poll_name	src/event/modules/ngx_poll_module.c	/^static ngx_str_t    poll_name = ngx_string("poll");$/;"	v	file:
-pool	src/core/ngx_array.h	/^    ngx_pool_t  *pool;$/;"	m	struct:ngx_array_s
+pool	src/core/ngx_array.h	/^    ngx_pool_t  *pool;\/\/该数组在此内存池中分配$/;"	m	struct:ngx_array_s
 pool	src/core/ngx_buf.h	/^    ngx_pool_t                  *pool;$/;"	m	struct:__anon85
 pool	src/core/ngx_buf.h	/^    ngx_pool_t                  *pool;$/;"	m	struct:ngx_output_chain_ctx_s
-pool	src/core/ngx_conf_file.h	/^    ngx_pool_t           *pool;$/;"	m	struct:ngx_conf_s
+pool	src/core/ngx_conf_file.h	/^    ngx_pool_t           *pool; \/*所使用的内存池*\/$/;"	m	struct:ngx_conf_s
 pool	src/core/ngx_connection.h	/^    ngx_pool_t         *pool;$/;"	m	struct:ngx_connection_s
 pool	src/core/ngx_cycle.h	/^     ngx_pool_t              *pool;   \/* pcre's malloc() pool *\/$/;"	m	struct:__anon100
 pool	src/core/ngx_cycle.h	/^    ngx_pool_t               *pool;$/;"	m	struct:ngx_cycle_s
 pool	src/core/ngx_file.h	/^    ngx_pool_t                *pool;$/;"	m	struct:__anon96
-pool	src/core/ngx_hash.h	/^    ngx_pool_t       *pool;$/;"	m	struct:__anon81
+pool	src/core/ngx_hash.h	/^    ngx_pool_t       *pool; \/\/该hash结构从pool指向的内存池中分配$/;"	m	struct:__anon81
 pool	src/core/ngx_hash.h	/^    ngx_pool_t       *pool;$/;"	m	struct:__anon82
-pool	src/core/ngx_list.h	/^    ngx_pool_t       *pool;$/;"	m	struct:__anon101
+pool	src/core/ngx_list.h	/^    ngx_pool_t       *pool;\/\/该链表节点空间在此内存池中分配$/;"	m	struct:__anon101
 pool	src/core/ngx_radix_tree.h	/^    ngx_pool_t        *pool;$/;"	m	struct:__anon88
 pool	src/core/ngx_regex.h	/^    ngx_pool_t   *pool;$/;"	m	struct:__anon59
 pool	src/event/ngx_event_pipe.h	/^    ngx_pool_t        *pool;$/;"	m	struct:ngx_event_pipe_s
 pool	src/http/modules/ngx_http_geo_module.c	/^    ngx_pool_t                      *pool;$/;"	m	struct:__anon254	file:
-pool	src/http/ngx_http_request.h	/^    ngx_pool_t                       *pool;$/;"	m	struct:ngx_http_request_s
+pool	src/http/ngx_http_request.h	/^    ngx_pool_t                       *pool;\/*内存池*\/$/;"	m	struct:ngx_http_request_s
 pool	src/mail/ngx_mail_auth_http_module.c	/^    ngx_pool_t                     *pool;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
 pool_size	src/core/ngx_connection.h	/^    size_t              pool_size;$/;"	m	struct:ngx_listening_s
 pop3_greeting	src/mail/ngx_mail_pop3_handler.c	/^static u_char  pop3_greeting[] = "+OK POP3 ready" CRLF;$/;"	v	file:
@@ -6310,7 +6209,7 @@ portev_user	src/event/modules/ngx_eventport_module.c	/^    void       *portev_us
 portnfy_port	src/event/modules/ngx_eventport_module.c	/^    int         portnfy_port;   \/* bind request(s) to port *\/$/;"	m	struct:port_notify	file:
 portnfy_user	src/event/modules/ngx_eventport_module.c	/^    void       *portnfy_user;   \/* user defined *\/$/;"	m	struct:port_notify	file:
 ports	src/http/ngx_http_core_module.h	/^    ngx_array_t               *ports;$/;"	m	struct:__anon303
-pos	src/core/ngx_buf.h	/^    u_char          *pos;$/;"	m	struct:ngx_buf_s
+pos	src/core/ngx_buf.h	/^    u_char          *pos; \/\/当buf所指向的数据在内存里的时候，pos指向的是这段数据开始的位置$/;"	m	struct:ngx_buf_s
 pos	src/core/ngx_conf_file.h	/^    u_char               *pos;$/;"	m	struct:ngx_open_file_s
 pos	src/http/modules/ngx_http_fastcgi_module.c	/^    u_char                        *pos;$/;"	m	struct:__anon194	file:
 pos	src/http/modules/ngx_http_ssi_filter_module.h	/^    u_char                   *pos;$/;"	m	struct:__anon241
@@ -6327,7 +6226,7 @@ post_handler	src/core/ngx_conf_file.h	/^    ngx_conf_post_handler_pt  post_handl
 post_handler	src/http/ngx_http_request.h	/^    ngx_http_client_body_handler_pt   post_handler;$/;"	m	struct:__anon290
 post_subrequest	src/http/ngx_http_request.h	/^    ngx_http_post_subrequest_t       *post_subrequest;$/;"	m	struct:ngx_http_request_s
 post_tree_handler	src/core/ngx_file.h	/^    ngx_tree_handler_pt        post_tree_handler;$/;"	m	struct:ngx_tree_ctx_s
-postconfiguration	src/http/ngx_http_config.h	/^    ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);$/;"	m	struct:__anon124
+postconfiguration	src/http/ngx_http_config.h	/^    ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);\/\/在创建和读取该模块的配置信息之后被调用$/;"	m	struct:__anon124
 posted_available	src/event/ngx_event.h	/^    int              posted_available;$/;"	m	struct:ngx_event_s
 posted_available	src/event/ngx_event.h	/^    unsigned         posted_available:1;$/;"	m	struct:ngx_event_s
 posted_eof	src/event/ngx_event.h	/^    unsigned         posted_eof:1;$/;"	m	struct:ngx_event_s
@@ -6342,10 +6241,10 @@ postpone_output	src/http/ngx_http_core_module.h	/^    size_t        postpone_out
 postponed	src/http/ngx_http_request.h	/^    ngx_http_postponed_request_t     *postponed;$/;"	m	struct:ngx_http_request_s
 pre_tree_handler	src/core/ngx_file.h	/^    ngx_tree_handler_pt        pre_tree_handler;$/;"	m	struct:ngx_tree_ctx_s
 preallocated	src/http/modules/ngx_http_gzip_filter_module.c	/^    void                *preallocated;$/;"	m	struct:__anon247	file:
-preconfiguration	src/http/ngx_http_config.h	/^    ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);$/;"	m	struct:__anon124
+preconfiguration	src/http/ngx_http_config.h	/^    ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);\/\/在创建和读取该模块的配置信息之前被调用$/;"	m	struct:__anon124
 prefer_server_ciphers	src/http/modules/ngx_http_ssl_module.h	/^    ngx_flag_t                      prefer_server_ciphers;$/;"	m	struct:__anon227
 prefer_server_ciphers	src/mail/ngx_mail_ssl_module.h	/^    ngx_flag_t       prefer_server_ciphers;$/;"	m	struct:__anon39
-prefix	src/core/ngx_cycle.h	/^    ngx_str_t                 prefix;$/;"	m	struct:ngx_cycle_s
+prefix	src/core/ngx_cycle.h	/^    ngx_str_t                 prefix;\/\/前缀$/;"	m	struct:ngx_cycle_s
 preread_bufs	src/event/ngx_event_pipe.h	/^    ngx_chain_t       *preread_bufs;$/;"	m	struct:ngx_event_pipe_s
 preread_size	src/event/ngx_event_pipe.h	/^    size_t             preread_size;$/;"	m	struct:ngx_event_pipe_s
 prev	src/core/ngx_queue.h	/^    ngx_queue_t  *prev;$/;"	m	struct:ngx_queue_s
@@ -6357,7 +6256,7 @@ preview_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    preview_time
 preview_time	src/http/modules/ngx_http_mp4_module.c	/^    u_char    preview_time[4];$/;"	m	struct:__anon165	file:
 previous	src/core/ngx_connection.h	/^    ngx_listening_t    *previous;$/;"	m	struct:ngx_listening_s
 priority	src/core/ngx_cycle.h	/^     int                      priority;$/;"	m	struct:__anon99
-proc	src/os/unix/ngx_process.h	/^    ngx_spawn_proc_pt   proc;$/;"	m	struct:__anon13
+proc	src/os/unix/ngx_process.h	/^    ngx_spawn_proc_pt   proc;\/\/进程的执行函数（也就是每次spawn，子进程所要执行的那个函数）$/;"	m	struct:__anon13
 process_changes	src/event/ngx_event.h	/^    ngx_int_t  (*process_changes)(ngx_cycle_t *cycle, ngx_uint_t nowait);$/;"	m	struct:__anon325
 process_events	src/event/ngx_event.h	/^    ngx_int_t  (*process_events)(ngx_cycle_t *cycle, ngx_msec_t timer,$/;"	m	struct:__anon325
 process_header	src/http/ngx_http_upstream.h	/^    ngx_int_t                      (*process_header)(ngx_http_request_t *r);$/;"	m	struct:ngx_http_upstream_s
@@ -6421,7 +6320,7 @@ read_ahead	src/http/ngx_http_core_module.h	/^    size_t        read_ahead;      
 read_discarded	src/event/ngx_event.h	/^    unsigned         read_discarded:1;$/;"	m	struct:ngx_event_s
 read_event_handler	src/http/ngx_http_request.h	/^    ngx_http_event_handler_pt         read_event_handler;$/;"	m	struct:ngx_http_request_s
 read_event_handler	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_handler_pt     read_event_handler;$/;"	m	struct:ngx_http_upstream_s
-read_events	src/core/ngx_cycle.h	/^    ngx_event_t              *read_events;$/;"	m	struct:ngx_cycle_s
+read_events	src/core/ngx_cycle.h	/^    ngx_event_t              *read_events;\/\/读事件$/;"	m	struct:ngx_cycle_s
 read_length	src/event/ngx_event_pipe.h	/^    off_t              read_length;$/;"	m	struct:ngx_event_pipe_s
 read_timeout	src/event/ngx_event_pipe.h	/^    ngx_msec_t         read_timeout;$/;"	m	struct:ngx_event_pipe_s
 read_timeout	src/http/ngx_http_upstream.h	/^    ngx_msec_t                       read_timeout;$/;"	m	struct:__anon129
@@ -6476,7 +6375,7 @@ request	src/http/ngx_http_request.h	/^    ngx_http_request_t               *requ
 request	src/http/ngx_http_request.h	/^    ngx_http_request_t               *request;$/;"	m	struct:ngx_http_postponed_request_s
 request	src/http/ngx_http_script.h	/^    ngx_http_request_t         *request;$/;"	m	struct:__anon106
 request	src/mail/ngx_mail_auth_http_module.c	/^    ngx_buf_t                      *request;$/;"	m	struct:ngx_mail_auth_http_ctx_s	file:
-request_body	src/http/ngx_http_request.h	/^    ngx_http_request_body_t          *request_body;$/;"	m	struct:ngx_http_request_s
+request_body	src/http/ngx_http_request.h	/^    ngx_http_request_body_t          *request_body;\/*代表请求头部r->request_body->bufs中存放的请求体中的数据*\/$/;"	m	struct:ngx_http_request_s
 request_body_file_group_access	src/http/ngx_http_request.h	/^    unsigned                          request_body_file_group_access:1;$/;"	m	struct:ngx_http_request_s
 request_body_file_log_level	src/http/ngx_http_request.h	/^    unsigned                          request_body_file_log_level:3;$/;"	m	struct:ngx_http_request_s
 request_body_in_clean_file	src/http/ngx_http_request.h	/^    unsigned                          request_body_in_clean_file:1;$/;"	m	struct:ngx_http_request_s
@@ -6496,7 +6395,7 @@ request_output	src/http/ngx_http_request.h	/^    unsigned                       
 request_pool_size	src/http/ngx_http_core_module.h	/^    size_t                      request_pool_size;$/;"	m	struct:__anon304
 request_sent	src/http/ngx_http_upstream.h	/^    unsigned                         request_sent:1;$/;"	m	struct:ngx_http_upstream_s
 request_start	src/http/ngx_http_request.h	/^    u_char                           *request_start;$/;"	m	struct:ngx_http_request_s
-requests	src/core/ngx_connection.h	/^    ngx_uint_t          requests;$/;"	m	struct:ngx_connection_s
+requests	src/core/ngx_connection.h	/^    ngx_uint_t          requests; \/\/请求计数$/;"	m	struct:ngx_connection_s
 requires	src/http/modules/perl/ngx_http_perl_module.c	/^    ngx_array_t       *requires;$/;"	m	struct:__anon228	file:
 res	src/event/modules/ngx_epoll_module.c	/^    int64_t   res;   \/* result code for this event *\/$/;"	m	struct:io_event	file:
 res	src/event/ngx_event.h	/^    int64_t                    res;$/;"	m	struct:ngx_event_aio_s
@@ -6528,7 +6427,7 @@ response_sec	src/http/ngx_http_upstream.h	/^    time_t                          
 rest	src/http/modules/ngx_http_memcached_module.c	/^    size_t                     rest;$/;"	m	struct:__anon212	file:
 rest	src/http/ngx_http_request.h	/^    off_t                             rest;$/;"	m	struct:__anon290
 reusable	src/core/ngx_connection.h	/^    unsigned            reusable:1;$/;"	m	struct:ngx_connection_s
-reusable_connections_queue	src/core/ngx_cycle.h	/^    ngx_queue_t               reusable_connections_queue;$/;"	m	struct:ngx_cycle_s
+reusable_connections_queue	src/core/ngx_cycle.h	/^    ngx_queue_t               reusable_connections_queue;\/\/再利用连接队列$/;"	m	struct:ngx_cycle_s
 reverved3	src/http/modules/ngx_http_mp4_module.c	/^    u_char    reverved3[2];$/;"	m	struct:__anon166	file:
 reverved3	src/http/modules/ngx_http_mp4_module.c	/^    u_char    reverved3[2];$/;"	m	struct:__anon167	file:
 rewrite_cookie	src/http/ngx_http_upstream.h	/^    ngx_int_t                      (*rewrite_cookie)(ngx_http_request_t *r,$/;"	m	struct:ngx_http_upstream_s
@@ -6660,7 +6559,7 @@ sh	src/http/modules/ngx_http_limit_req_module.c	/^    ngx_http_limit_req_shctx_t
 sh	src/http/ngx_http_cache.h	/^    ngx_http_file_cache_sh_t        *sh;$/;"	m	struct:ngx_http_file_cache_s
 shadow	src/core/ngx_buf.h	/^    ngx_buf_t       *shadow;$/;"	m	struct:ngx_buf_s
 shared	src/core/ngx_connection.h	/^    unsigned            shared:1;    \/* shared between threads or processes *\/$/;"	m	struct:ngx_listening_s
-shared_memory	src/core/ngx_cycle.h	/^    ngx_list_t                shared_memory;$/;"	m	struct:ngx_cycle_s
+shared_memory	src/core/ngx_cycle.h	/^    ngx_list_t                shared_memory;\/\/共享内存链表$/;"	m	struct:ngx_cycle_s
 sharpen	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_uint_t                   sharpen;$/;"	m	struct:__anon189	file:
 shcv	src/http/modules/ngx_http_image_filter_module.c	/^    ngx_http_complex_value_t    *shcv;$/;"	m	struct:__anon189	file:
 sheet_files	src/http/modules/ngx_http_xslt_filter_module.c	/^    ngx_array_t                sheet_files;  \/* ngx_http_xslt_file_t *\/$/;"	m	struct:__anon136	file:
@@ -6689,12 +6588,12 @@ silent_errors	src/http/modules/ngx_http_ssi_filter_module.c	/^    ngx_flag_t    
 single	src/http/ngx_http_upstream_round_robin.h	/^    unsigned                        single:1;$/;"	m	struct:ngx_http_upstream_rr_peers_s
 single_buf	src/event/ngx_event_pipe.h	/^    unsigned           single_buf:1;$/;"	m	struct:ngx_event_pipe_s
 single_connection	src/core/ngx_connection.h	/^    unsigned            single_connection:1;$/;"	m	struct:ngx_connection_s
-size	src/core/ngx_array.h	/^    size_t       size;$/;"	m	struct:ngx_array_s
+size	src/core/ngx_array.h	/^    size_t       size;\/\/ 每个元素的大小$/;"	m	struct:ngx_array_s
 size	src/core/ngx_buf.h	/^    size_t       size;$/;"	m	struct:__anon84
 size	src/core/ngx_file.h	/^    off_t                      size;$/;"	m	struct:__anon98
 size	src/core/ngx_file.h	/^    off_t                      size;$/;"	m	struct:ngx_tree_ctx_s
-size	src/core/ngx_hash.h	/^    ngx_uint_t        size;$/;"	m	struct:__anon77
-size	src/core/ngx_list.h	/^    size_t            size;$/;"	m	struct:__anon101
+size	src/core/ngx_hash.h	/^    ngx_uint_t        size;\/\/hash桶的个数$/;"	m	struct:__anon77
+size	src/core/ngx_list.h	/^    size_t            size;\/\/每个元素的大小$/;"	m	struct:__anon101
 size	src/core/ngx_open_file_cache.h	/^    off_t                    size;$/;"	m	struct:__anon50
 size	src/core/ngx_open_file_cache.h	/^    off_t                    size;$/;"	m	struct:ngx_cached_open_file_s
 size	src/core/ngx_radix_tree.h	/^    size_t             size;$/;"	m	struct:__anon88
@@ -6900,7 +6799,7 @@ status	src/http/ngx_http_script.h	/^    uintptr_t                   status;$/;"	
 status	src/http/ngx_http_upstream.h	/^    ngx_table_elt_t                 *status;$/;"	m	struct:__anon131
 status	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       status;$/;"	m	struct:__anon125
 status	src/http/ngx_http_upstream.h	/^    ngx_uint_t                      status;$/;"	m	struct:__anon133
-status	src/os/unix/ngx_process.h	/^    int                 status;$/;"	m	struct:__anon13
+status	src/os/unix/ngx_process.h	/^    int                 status;\/\/进程的退出状态（主要在waitpid中进行处理）$/;"	m	struct:__anon13
 status_line	src/http/ngx_http_request.h	/^    ngx_str_t                         status_line;$/;"	m	struct:__anon289
 status_line	src/http/ngx_http_upstream.h	/^    ngx_str_t                        status_line;$/;"	m	struct:__anon131
 status_n	src/http/ngx_http_upstream.h	/^    ngx_uint_t                       status_n;$/;"	m	struct:__anon131
@@ -6973,11 +6872,11 @@ temp_file_write_size	src/http/ngx_http_upstream.h	/^    size_t                  
 temp_file_write_size_conf	src/http/ngx_http_upstream.h	/^    size_t                           temp_file_write_size_conf;$/;"	m	struct:__anon129
 temp_number	src/core/ngx_file.c	/^static ngx_atomic_t   temp_number = 0;$/;"	v	file:
 temp_path	src/http/ngx_http_upstream.h	/^    ngx_path_t                      *temp_path;$/;"	m	struct:__anon129
-temp_pool	src/core/ngx_conf_file.h	/^    ngx_pool_t           *temp_pool;$/;"	m	struct:ngx_conf_s
-temp_pool	src/core/ngx_hash.h	/^    ngx_pool_t       *temp_pool;$/;"	m	struct:__anon81
+temp_pool	src/core/ngx_conf_file.h	/^    ngx_pool_t           *temp_pool;\/*临时pool*\/$/;"	m	struct:ngx_conf_s
 temp_pool	src/core/ngx_hash.h	/^    ngx_pool_t       *temp_pool;$/;"	m	struct:__anon82
+temp_pool	src/core/ngx_hash.h	/^    ngx_pool_t       *temp_pool;\/\/分配临时数据空间的内存池 $/;"	m	struct:__anon81
 temp_pool	src/http/modules/ngx_http_geo_module.c	/^    ngx_pool_t                      *temp_pool;$/;"	m	struct:__anon254	file:
-temporary	src/core/ngx_buf.h	/^    unsigned         temporary:1;$/;"	m	struct:ngx_buf_s
+temporary	src/core/ngx_buf.h	/^    unsigned         temporary:1;\/\/为1是表示该buf由用户创建，并且可以被在filter处理的过程中进行变更，而不会造成问题$/;"	m	struct:ngx_buf_s
 terminal_posted_request	src/http/ngx_http_request.h	/^    ngx_http_posted_request_t         terminal_posted_request;$/;"	m	struct:__anon294
 test	src/http/ngx_http_script.h	/^    uintptr_t                   test:1;$/;"	m	struct:__anon114
 test	src/os/unix/ngx_files.h	/^    ngx_uint_t                   test;$/;"	m	struct:__anon5
@@ -7046,8 +6945,8 @@ tries	src/http/modules/ngx_http_upstream_ip_hash_module.c	/^    u_char          
 try_files	src/http/ngx_http_core_module.h	/^    ngx_http_try_file_t    *try_files;     \/* try_files *\/$/;"	m	struct:ngx_http_core_loc_conf_s
 try_files	src/http/ngx_http_core_module.h	/^    ngx_uint_t                 try_files;       \/* unsigned  try_files:1 *\/$/;"	m	struct:__anon303
 ttl	src/core/ngx_resolver.c	/^    u_char  ttl[4];$/;"	m	struct:__anon93	file:
+type	src/core/ngx_conf_file.h	/^    ngx_uint_t            type; \/\/该模块的种类，为\/core\/event\/http\/mail中的一种$/;"	m	struct:ngx_module_s
 type	src/core/ngx_conf_file.h	/^    ngx_uint_t            type;$/;"	m	struct:ngx_command_s
-type	src/core/ngx_conf_file.h	/^    ngx_uint_t            type;$/;"	m	struct:ngx_module_s
 type	src/core/ngx_connection.h	/^    int                 type;$/;"	m	struct:ngx_listening_s
 type	src/core/ngx_resolver.h	/^    ngx_int_t                 type;$/;"	m	struct:ngx_resolver_ctx_s
 type	src/http/modules/ngx_http_fastcgi_module.c	/^    ngx_uint_t                     type;$/;"	m	struct:__anon194	file:
@@ -7110,14 +7009,14 @@ upstream	src/http/modules/ngx_http_proxy_module.c	/^    ngx_http_upstream_conf_t
 upstream	src/http/modules/ngx_http_scgi_module.c	/^    ngx_http_upstream_conf_t   upstream;$/;"	m	struct:__anon275	file:
 upstream	src/http/modules/ngx_http_upstream_keepalive_module.c	/^    ngx_http_upstream_t               *upstream;$/;"	m	struct:__anon225	file:
 upstream	src/http/modules/ngx_http_uwsgi_module.c	/^    ngx_http_upstream_conf_t   upstream;$/;"	m	struct:__anon261	file:
-upstream	src/http/ngx_http_request.h	/^    ngx_http_upstream_t              *upstream;$/;"	m	struct:ngx_http_request_s
+upstream	src/http/ngx_http_request.h	/^    ngx_http_upstream_t              *upstream;\/*用于upstream模块*\/$/;"	m	struct:ngx_http_request_s
 upstream	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_srv_conf_t    *upstream;$/;"	m	struct:__anon129
 upstream	src/mail/ngx_mail.h	/^    ngx_peer_connection_t   upstream;$/;"	m	struct:__anon33
 upstream_blocked	src/event/ngx_event_pipe.h	/^    unsigned           upstream_blocked:1;$/;"	m	struct:ngx_event_pipe_s
 upstream_done	src/event/ngx_event_pipe.h	/^    unsigned           upstream_done:1;$/;"	m	struct:ngx_event_pipe_s
 upstream_eof	src/event/ngx_event_pipe.h	/^    unsigned           upstream_eof:1;$/;"	m	struct:ngx_event_pipe_s
 upstream_error	src/event/ngx_event_pipe.h	/^    unsigned           upstream_error:1;$/;"	m	struct:ngx_event_pipe_s
-upstream_states	src/http/ngx_http_request.h	/^    ngx_array_t                      *upstream_states;$/;"	m	struct:ngx_http_request_s
+upstream_states	src/http/ngx_http_request.h	/^    ngx_array_t                      *upstream_states;\/*与upstream模块相关*\/$/;"	m	struct:ngx_http_request_s
 upstreams	src/http/ngx_http_upstream.h	/^    ngx_array_t                      upstreams;$/;"	m	struct:__anon126
 uri	src/core/ngx_inet.h	/^    ngx_str_t                 uri;$/;"	m	struct:__anon49
 uri	src/http/modules/ngx_http_proxy_module.c	/^    ngx_str_t                      uri;$/;"	m	struct:__anon214	file:
@@ -7168,9 +7067,9 @@ valid_sec	src/http/ngx_http_cache.h	/^    time_t                           valid
 valid_unparsed_uri	src/http/ngx_http_request.h	/^    unsigned                          valid_unparsed_uri:1;$/;"	m	struct:ngx_http_request_s
 value	src/core/ngx_conf_file.h	/^    ngx_uint_t                value;$/;"	m	struct:__anon66
 value	src/core/ngx_hash.h	/^    ngx_str_t         value;$/;"	m	struct:__anon83
-value	src/core/ngx_hash.h	/^    void             *value;$/;"	m	struct:__anon76
+value	src/core/ngx_hash.h	/^    void             *value; \/\/value,即某个key对应的值,即<key,value>中的value$/;"	m	struct:__anon76
 value	src/core/ngx_hash.h	/^    void             *value;$/;"	m	struct:__anon78
-value	src/core/ngx_hash.h	/^    void             *value;$/;"	m	struct:__anon79
+value	src/core/ngx_hash.h	/^    void             *value;\/\/该key对应的值，组成一个键-值对<key,value>$/;"	m	struct:__anon79
 value	src/core/ngx_radix_tree.h	/^    uintptr_t          value;$/;"	m	struct:ngx_radix_node_s
 value	src/core/ngx_string.h	/^    ngx_str_t   value;$/;"	m	struct:__anon73
 value	src/http/modules/ngx_http_geo_module.c	/^    ngx_http_variable_value_t       *value;$/;"	m	struct:__anon251	file:
@@ -7290,7 +7189,7 @@ write	src/core/ngx_open_file_cache.h	/^    ngx_event_t             *write;$/;"	m
 write	src/event/ngx_event.h	/^    unsigned         write:1;$/;"	m	struct:ngx_event_s
 write_event_handler	src/http/ngx_http_request.h	/^    ngx_http_event_handler_pt         write_event_handler;$/;"	m	struct:ngx_http_request_s
 write_event_handler	src/http/ngx_http_upstream.h	/^    ngx_http_upstream_handler_pt     write_event_handler;$/;"	m	struct:ngx_http_upstream_s
-write_events	src/core/ngx_cycle.h	/^    ngx_event_t              *write_events;$/;"	m	struct:ngx_cycle_s
+write_events	src/core/ngx_cycle.h	/^    ngx_event_t              *write_events;\/\/写事件$/;"	m	struct:ngx_cycle_s
 writer	src/http/ngx_http_upstream.h	/^    ngx_chain_writer_ctx_t           writer;$/;"	m	struct:ngx_http_upstream_s
 www_authenticate	src/http/ngx_http_request.h	/^    ngx_table_elt_t                  *www_authenticate;$/;"	m	struct:__anon289
 www_authenticate	src/http/ngx_http_upstream.h	/^    ngx_table_elt_t                 *www_authenticate;$/;"	m	struct:__anon131

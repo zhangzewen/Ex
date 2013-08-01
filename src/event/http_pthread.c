@@ -103,6 +103,7 @@ int get_current_threads_count(thread_pool_t pool)
 {
 	return pool->current_threads;
 }
+
 void *start_routine(void *arg)
 {
 	private_data_t data = (private_data_t) arg;

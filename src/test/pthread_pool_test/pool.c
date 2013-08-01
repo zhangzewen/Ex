@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 		add_task(queue, task);	
 	}	
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 3; i++) {
 		thread = thread_create(NULL, start_routine, queue, i);
 		add_thread(pool, thread);
 	}

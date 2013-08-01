@@ -65,6 +65,10 @@ struct private_data_st{
 	thread_task_t task;
 };
 
+typedef struct thread_task_st* thread_task_t;
+typedef struct task_queue_st* task_queue_t;
+
+
 
 
 /**********pool manage*****************************/
