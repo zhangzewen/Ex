@@ -260,6 +260,37 @@ ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
     u_short         *test;
     ngx_uint_t       i, n, key, size, start, bucket_size;
     ngx_hash_elt_t  *elt, **buckets;
+/* nginx hash结构大致是这样: 
+           hash结构中有N个桶, 每个桶存放N个元素(即<k,v>),在内存中, 
+        用一个指针数组记录N个桶的地址,每个桶又是一个 ngx_hash_elt_t 数组 
+        指针数组 和 ngx_hash_elt_t 数组 在一个连续的内存中. 
+        优点: 使用数组提高寻址速度 
+        缺点: hash表初始化后,只能查询,不能修改. 
+ 
+        当然hash结构本来就是数组形式,但对于冲突的元素大多是用链表形式存放,再挂载到hash数组上. 
+        nginx的hash结构过程: 
+        首先 每个桶的空间大小固定 通过 ngx_hash_init_t.bucket_size 指定; 
+        然后 根据元素的个数和桶的固定大小计算出需要多少个桶. 
+        然后 计算哪些元素存放到哪个桶中,方法就是 (元素的hash值 % 桶的个数) 
+        这时 需要多少个桶,这些桶需要多少内存空间,每个桶存放多少元素，需要多少内存空间就知道, 
+        申请所有桶的内存空间,即为 ngx_hash_init_t.hash.buckets 指针数组. 
+        申请每个桶存放元素的存储空间 = 该桶元素占用的内存空间 + void指针 
+        为了提高查询效率,申请一个连续内存空间存放 所有桶的元素. 
+        然后把这片连续的内存空间映射到 ngx_hash_init_t.hash.buckets 指针数组. 
+        然后为每个桶的元素赋值. 
+        最后将每个桶的"结束元素"置为NULL 
+ 
+        void指针的用途: 为桶的结束标记, 在 ngx_hash_find() 遍历桶是判断 etl->value 是否为NULL时用到. 
+        你可能有以为 "结束元素"只有一个void*指针的空间转换成 ngx_hash_elt_t 后会不会越界操作? 
+        答案是不会的, void*指针的空间转换成 ngx_hash_elt_t 后只操作 ngx_hash_elt_t.value , 
+        而 ngx_hash_elt_t.value 刚好只占 void指针空间大小. 
+ 
+        指定桶的大小的好处: 保证每个桶存放元素的个数不超过一定值,目的是为了提高查询效率. 
+         
+  
+    	 每个桶至少能存放一个元素 + 一个void指针, 
+       指针的目的是为了 
+*/
 
     for (n = 0; n < nelts; n++) {
         if (hinit->bucket_size < NGX_HASH_ELT_SIZE(&names[n]) + sizeof(void *))
