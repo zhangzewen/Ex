@@ -1,4 +1,5 @@
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -lm
+LDFLAGS= -lm
 
 
 _OBJS = $(shell ls *.c)
