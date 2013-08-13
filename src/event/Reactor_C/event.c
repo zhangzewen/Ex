@@ -143,5 +143,76 @@ static void event_process_active(struct event_base *base)
 			event_queue_remove(base, ev, EVLIST_ACTIVE);
 		else
 			event_del(ev);
+
+		ncalls = ev->ev_ncalls;
+		ev->ev_pncalls = &ncalls;
+		while(ncalls) {
+			ncalls--;
+			ev->ev_ncalls = ncalls;
+			(*ev->ev_callback)((int)ev->ev_fd, ev->ev_res, ev->ev_arg);
+			if (event_gotsig || base->event->break) {
+				return;
+			}
+		}
 	}
+}
+
+
+int event_dispatch(void)
+{
+	return (event_loop(0));
+}
+
+int event_base_dispatch(struct event_base *event_base)
+{
+	return (event_base_loop(event_base, 0));
+}
+
+const char *event_base_get_method(struct event_base *base)
+{
+	assert(base);
+	return (base->evsel->name);
+}
+
+static void event_loopexit_cb(int fd, short what, void *arg)
+{
+	struct event_base *base = arg;
+	base->event_gotterm = 1;
+}
+
+int event_loopexit(const struct timeval *tv)
+{
+	return (event_once(-1, EV_TIMEOUT, event_loopexit_cb, current_base, tv));
+}
+
+int event_loopbreak()
+{
+	return (event_base_loopbreak(current_base));
+}
+
+int event_base_loopbreak(struct event_base *event_base)
+{
+	if (event_base == NULL)
+		return -1;
+	
+	event_base->event_break = 1;
+	return 0;
+}
+
+int event_loop(int flags)
+{
+	return event_base_loop(current_base, flags);
+}
+
+
+int event_base_loop(struct event_base *base, int flags)
+{
+	const struct eventop *evsel = base->evsel;
+	void *evbase = base->evbase;
+	struct timeval tv;
+	struct timeval *tv_p;
+	int res;
+	int done;
+
+	
 }
