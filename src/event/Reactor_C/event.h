@@ -3,7 +3,7 @@
 
 struct event{
 	struct list_head ev_next;
-	struct ev_active_next;
+	struct list_head ev_active_next;
 
 	
 	struct event_base *ev_base;
@@ -13,14 +13,12 @@ struct event{
 	short ev_ncalls;
 	short *ev_pncalls;
 	
-	
-	int ev_pri;
-	
 	void (*ev_callback)(int, short, void *arg);
 	void *ev_arg;
 	
 	int ev_res;
 	int ev_flags;
+	struct list_head list;
 };
 
 struct event_base {
@@ -38,6 +36,15 @@ struct event_base {
 	struct list_head eventqueue;
 };
 
+struct eventop {
+	const char *name;
+	void *(*init)(struct event_base *);
+	int (*add)(void *, struct event *);
+	int (*del)(void *, struct event *);
+	int (*dispatch)(struct event_base *, void *, struct timeval *);
+	void (*dealloc)(struct event_base *, void *)'
+	int need_reinit;
+};
 
 struct event_base *event_base_new();
 
@@ -58,14 +65,8 @@ void event_base_free(struct event_base *);
 #define __EVENT_LOG_WARN	2
 #define __EVENT_LOG_ERR		3
 
-typedef void (*event_log_cb)(int severity, const char *msg);
-
-void event_set_log_callback(event_log_cb cb);
 
 int event_base_set(struct event_base *, struct event *）；
-
-#define EVLOOP_ONCE 0X01
-#define EVLOOP_NONBLOCK 0X02
 
 int event_loop(int);
 
@@ -80,10 +81,6 @@ int event_base_loopbreak(struct event_base *);
 
 void event_set(struct event *, int , short , void (*)(int, short, void *), void *);
 
-int event_once(int, short, void (*)(int, short, void *), void *, const struct timeval *);
-
-int event_base_once(struct event_base *base, int fd, short events, void (*callback)(int, short, void *), void *arg,
-	const struct timeval *timeout);
 
 int event_add(struct event *ev, const struct timeval *timeout);
 
@@ -91,15 +88,8 @@ int event_del(struct event *ev);
 
 void event_active(struct event *, int, short);
 
-int event_pending(struct event *ev, short event, struct timeval *tv);
 
 #define event_initialized(ev) ((ev)->ev_flags & EVLIST_INIT)
 
 const char *event_get_method(void);
-
-int event_priority_init(int);
-
-int event_base_priority_init(struct event_base *, int);
-
-int event_priority_set(struct event *, int);
 
