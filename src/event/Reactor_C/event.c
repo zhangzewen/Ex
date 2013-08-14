@@ -216,3 +216,105 @@ int event_base_loop(struct event_base *base, int flags)
 
 	
 }
+
+
+int event_add(struct event *ev, const struct timeval *tv)
+{
+	struct event_base *base = ev->ev_base;
+	const struct eventop *evsel = base->evsel;
+	void *evbase =  base->evbase;
+
+	int ret = 0;
+	
+	if ((ev->ev_events & (EV_READ | EV_WRITE)) &&
+		!(ev->flags & (EVLIST_INSERTED | EVLIST_ACTIVE))) {
+		res = evsel->add(evbase, ev);
+
+		if (res != -1) {
+			event_queue_insert(base, ev, EVLIST_INSERTED);
+		}
+	}
+	
+	return (res);
+}
+
+
+int event_del(struct event *ev)
+{
+	struct event_base *base;
+	
+	const struct eventop *evsel;
+	
+	void *evbase;
+	
+	if (ev->ev_base == NULL) {
+		return -1;
+	}
+
+	base = ev->ev_base;
+	evsel = base->evsel;
+	evbase = base->evbase;
+	
+	if (ev->ev_ncalls && ev->ev_pncalls) {
+		*ev->ev_pncalls = 0;
+	}
+
+
+	if (ev->ev_flags & EVLIST_ACTIVE) {
+		event_queue_remove(base, ev, EVLIST_ACTIVE);
+	}
+
+	if (ev->ev_flags & EVLIST_INSERTED) {
+		event_queue_remove(base, ev, EVLIST_INSERTED);
+		return (evsel->del(evbase, ev));
+	}
+
+	return 0;	
+}
+
+
+void event_active(struct event *ev, int res, short ncalls)
+{
+	if (ev->ev_flags & EVLIST_ACTIVE) {
+		ev->ev_res |= res;
+		return ;
+	}
+
+	ev->ev_res = res;
+	ev->ev_ncalls = ncalls;
+	ev->ev_pncalls = NULL;
+	event_queue_insert(ev->ev_base, ev, EVLIST_ACTIVE);
+}
+
+void event_queue_insert(struct event_base *base, struct event *ev)
+{
+	if (ev->ev_flags & queue) {
+		if (queue & EVLIST_ACTIVE) {
+			return ;
+		}
+	}
+	
+
+	if (~ev->ev_flags & EVLIST_INTERNAL) {
+		base->event_count++;
+	}
+	
+
+	ev->ev_flags |= queue;
+
+	switch(queue) {
+		case EVLIST_INSERTED:
+			TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next);
+			break;
+		case EVLIST_ACTIVE:
+			base->event_count_active++;
+			TAILQ_INSERT_TAIL(base->activequeues[ev->ev_pri],
+					ev, ev_active_next);
+			break;
+		default:
+			fprintf(stderr, "%s: unknown queue %x", __func_, queue);
+	}
+}
+
+
+

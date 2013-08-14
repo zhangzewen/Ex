@@ -4,9 +4,7 @@
 struct event{
 	struct list_head ev_next;
 	struct ev_active_next;
-	struct ev_signal_next;
 
-	unsigned int min_heap_idx;
 	
 	struct event_base *ev_base;
 	
@@ -15,7 +13,6 @@ struct event{
 	short ev_ncalls;
 	short *ev_pncalls;
 	
-	struct timval ev_timeout;
 	
 	int ev_pri;
 	
@@ -26,7 +23,20 @@ struct event{
 	int ev_flags;
 };
 
+struct event_base {
+	const struct eventop *evsel;
+	void *evbase;
+	int evetn_count;
+	int event_count_active;
+	
+	int event_gotterm;
+	int event_break;
 
+	struct list_head **activequeues;
+	int nactivequeues;
+	
+	struct list_head eventqueue;
+};
 
 
 struct event_base *event_base_new();
@@ -39,7 +49,6 @@ int event_dispatch();
 
 int event_base_dispatch(struct event_base *);
 
-const char *event_base_get_method(struct event_base *);
 
 void event_base_free(struct event_base *);
 
