@@ -40,13 +40,18 @@ static void * epoll_init(struct event_base *base)
 	struct epoll_loop *epoll_loop;
 	
 	if((epfd = epoll_create(32000)) == -1) {
-		if (errno != ENOSYS) {
-			
+		if (errno != ENFILE) {
+			fprintf(stderr, "The system limit on the total number of open files has been reached");
 		}
-		return (NULL);
+	
+		if (errno != ENOMEM) {
+			fprintf(stderr, "There was insufficient memory to create the kernel object");	
+		}
+
+		return NULL;
 	}
 
-	if (!(epoll_loop = calloc(sizeof(struct epoll_loop)))) {
+	if (!(epoll_loop = calloc(1, sizeof(struct epoll_loop)))) {
 		return (NULL);
 	}
 	
