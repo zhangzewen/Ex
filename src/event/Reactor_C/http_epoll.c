@@ -118,7 +118,7 @@ int epoll_dispatch(struct event_base *base, void *arg)
 			}
 			
 			if (what & EPOLLOUT) {
-				event_write = event_epoll->event_write;
+				event_write = event_epoll->write;
 			}
 		}
 		
@@ -172,13 +172,13 @@ int epoll_add(void *arg, struct event *ev)
 
 	event_epoll = &epoll_loop->fds[fd];
 
-	op = EPOLL_CLI_ADD;
+	op = EPOLL_CTL_ADD;
 	
 	events = 0;
 		
 	if (event_epoll->event_read != NULL) {
 		events |= EPOLLIN;
-		op = EPOLL_CLI_MOD;
+		op = EPOLL_CTL_MOD;
 	}
 
 	if (ev->ev_events & EV_READ) {
