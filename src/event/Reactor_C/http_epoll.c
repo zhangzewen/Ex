@@ -8,33 +8,7 @@
 #include <errno.h>
 #include <string.h>
 
-struct event_epoll{
-	struct event *read;
-	struct event *write;
-};
-
-struct epoll_loop{
-	struct event_epoll *fds;
-	int nfds;
-	struct epoll_event *events;
-	int nevents;
-	int epfd;
-};
-
-static void *epoll_init (struct event_base *);
-static int *epoll_add (void *, struct event *);
-static int epoll_del (void *, struct event *);
-static int epoll_dispatch (struct event_base *, void *, struct timeval *);
-static void epoll_deslloc (struct event_base *, void *);
-
-
-
-#define INITIAL_NFILES 32
-#define INITIAL_NEVENTS 32
-#define MAX_NEVENTS 4096
-
-
-static void * epoll_init(struct event_base *base)
+void *epoll_init(struct event_base *base)
 {
 	int epfd;
 	struct epoll_loop *epoll_loop;
@@ -75,11 +49,11 @@ static void * epoll_init(struct event_base *base)
 
 	epoll_loop->nfds = INITIAL_NFILES;
 	
-	return (epoll_loop);
+	return epoll_loop;
 }
 
 
-static int epoll_recalc(struct event_base *base, void *arg, int max)
+int epoll_recalc(struct event_base *base, void *arg, int max)
 {
 	struct epoll_loop *epoll_loop = arg;
 	
@@ -106,7 +80,7 @@ static int epoll_recalc(struct event_base *base, void *arg, int max)
 }
 
 
-static int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
+int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 {
 	struct epoll_loop *epoll_loop = arg;
 	struct epoll_event *events = epoll_loop->events;
@@ -176,7 +150,7 @@ static int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv
 }
 
 
-static int epoll_add(void *arg, struct event *ev)
+int epoll_add(void *arg, struct event *ev)
 {
 	struct epoll_loop *epoll_loop = arg;
 	struct epoll_event  epoll_event = {0, {0}};
@@ -234,7 +208,7 @@ static int epoll_add(void *arg, struct event *ev)
 }
 
 
-static int epoll_del(void *arg, struct event *ev)
+int epoll_del(void *arg, struct event *ev)
 {
 	struct epoll_loop *epoll_loop = arg;
 	struct epoll_event epoll_event = {0, {0}};
@@ -297,7 +271,7 @@ static int epoll_del(void *arg, struct event *ev)
 }
 
 
-static void epoll_dealloc(struct event_base *base, void *arg)
+void epoll_dealloc(struct event_base *base, void *arg)
 {
 	struct epoll_loop *epoll_loop = arg;
 	if (epoll_loop->fds) {
