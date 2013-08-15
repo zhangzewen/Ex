@@ -20,6 +20,7 @@
 #define EV_SIGNAL 0X08
 #define EV_PERSIST 0X10
 
+#define EVLOOP_NONBLOCK 0x02  /**< Do not block. */
 
 struct event_base;
 
@@ -44,7 +45,7 @@ struct eventop {
 	void *(*init)(struct event_base *);
 	int (*add)(void *, struct event *);
 	int (*del)(void *, struct event *);
-	int (*dispatch)(struct event_base *, void *, struct timeval *);
+	int (*dispatch)(struct event_base *, void *);
 	void (*dealloc)(struct event_base *, void *);
 };
 

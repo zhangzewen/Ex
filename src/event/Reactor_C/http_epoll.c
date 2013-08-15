@@ -1,4 +1,4 @@
-#include <stdin.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/epoll.h>
@@ -7,7 +7,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-
+#include "event_base.h"
+#include "http_epoll.h"
 void *epoll_init(struct event_base *base)
 {
 	int epfd;
@@ -80,7 +81,7 @@ int epoll_recalc(struct event_base *base, void *arg, int max)
 }
 
 
-int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
+int epoll_dispatch(struct event_base *base, void *arg)
 {
 	struct epoll_loop *epoll_loop = arg;
 	struct epoll_event *events = epoll_loop->events;
@@ -88,7 +89,7 @@ int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	int i;
 	int res;
 	
-	res = epoll_wait(epoll_loop->epfd, events, epoll_loop->nevents, timeout);
+	res = epoll_wait(epoll_loop->epfd, events, epoll_loop->nevents, 0);
 	
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -109,11 +110,11 @@ int epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 		event_epoll = &epoll_loop->fds[fd];
 	
 		if (what & (EPOLLHUP|EPOLLERR)) {
-			event_read = event_epoll->event_read;
-			event_write =  event_epoll->event_read;
+			event_read = event_epoll->read;
+			event_write =  event_epoll->read;
 		} else {
 			if (what & EPOLLIN) {
-				event_read = event_epoll->event_read;
+				event_read = event_epoll->read;
 			}
 			
 			if (what & EPOLLOUT) {

@@ -32,6 +32,6 @@ struct epoll_loop{
 void *epoll_init (struct event_base *);
 int epoll_add (void *, struct event *);
 int epoll_del (void *, struct event *);
-int epoll_dispatch (struct event_base *, void *, struct timeval *);
+int epoll_dispatch (struct event_base *, void *);
 void epoll_dealloc (struct event_base *, void *);
 #endif

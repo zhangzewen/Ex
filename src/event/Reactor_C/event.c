@@ -159,7 +159,7 @@ int event_loop(int flags)
 
 int event_base_loop(struct event_base *base, int flags)
 {
-	 struct eventop *evsel = base->evsel;
+	struct eventop evsel = base->evsel;
 	void *evbase = base->evbase;
 	struct timeval tv;
 	struct timeval *tv_p;
@@ -181,24 +181,44 @@ int event_base_loop(struct event_base *base, int flags)
 		}
 
 		
-		if (!base->event_count_active &&
+		if (!event_haveevents(base)) {
+			fprintf(stderr, "%s: no events registered.", __func__);
+			return 1;
+		}
+
+		res = evsel.dispatch(base, evbase);
+
+		if (res == -1) {
+			return -1;
+		}
+
+		if (base->event_count_active) {
+			event_process_active(base);
+			if (!base->event_count_active && flags) {
+				done = 1;
+			}else if(flags & EVLOOP_NONBLOCK) {
+				done = 1;
+			}
+		}
 	}
 
-	
+	fprinf(stderr, "%s: asked to terminate loop.", __func__);
+
+	return 0;
 }
 
 
 int event_add(struct event *ev, const struct timeval *tv)
 {
 	struct event_base *base = ev->ev_base;
-	const struct eventop *evsel = base->evsel;
+	struct eventop evsel = base->evsel;
 	void *evbase =  base->evbase;
 
-	int ret = 0;
+	int res = 0;
 	
 	if ((ev->ev_events & (EV_READ | EV_WRITE)) &&
-		!(ev->flags & (EVLIST_INSERTED | EVLIST_ACTIVE))) {
-		res = evsel->add(evbase, ev);
+		!(ev->ev_flags & (EVLIST_INSERTED | EVLIST_ACTIVE))) {
+		res = evsel.add(evbase, ev);
 
 		if (res != -1) {
 			event_queue_insert(base, ev, EVLIST_INSERTED);
@@ -213,7 +233,7 @@ int event_del(struct event *ev)
 {
 	struct event_base *base;
 	
-	const struct eventop *evsel;
+	struct eventop evsel;
 	
 	void *evbase;
 	
@@ -236,7 +256,7 @@ int event_del(struct event *ev)
 
 	if (ev->ev_flags & EVLIST_INSERTED) {
 		event_queue_remove(base, ev, EVLIST_INSERTED);
-		return (evsel->del(evbase, ev));
+		return (evsel.del(evbase, ev));
 	}
 
 	return 0;	
