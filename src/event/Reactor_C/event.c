@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "http_epoll.h"
 #include "event.h"
@@ -145,7 +146,6 @@ int event_base_dispatch(struct event_base *event_base)
 
 const char *event_base_get_method(struct event_base *base)
 {
-	assert(base);
 	return (base->evsel.name);
 }
 
@@ -202,7 +202,7 @@ int event_base_loop(struct event_base *base, int flags)
 		}
 	}
 
-	fprinf(stderr, "%s: asked to terminate loop.", __func__);
+	fprintf(stderr, "%s: asked to terminate loop.", __func__);
 
 	return 0;
 }
@@ -226,6 +226,20 @@ int event_add(struct event *ev, const struct timeval *tv)
 	}
 	
 	return (res);
+}
+
+
+void event_set(struct event *ev, int fd, short events, void (*callback)(int, short, void *), void *arg)
+{
+	ev->ev_base = current_base;
+	ev->ev_callback = callback;
+	ev->ev_arg = arg;
+	ev->ev_fd = fd;
+	ev->ev_events = events;
+	ev->ev_res = 0;
+	ev->ev_flags = EVLIST_INIT;
+	ev->ev_ncalls = 0;
+	ev->ev_pncalls = NULL;
 }
 
 
@@ -336,3 +350,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 
 
 
+int event_haveevents(struct event_base *base)
+{
+	return base->event_count > 0;
+}

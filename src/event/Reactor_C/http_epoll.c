@@ -9,6 +9,7 @@
 #include <string.h>
 #include "event_base.h"
 #include "http_epoll.h"
+#include "event.h"
 void *epoll_init(struct event_base *base)
 {
 	int epfd;
@@ -176,7 +177,7 @@ int epoll_add(void *arg, struct event *ev)
 	
 	events = 0;
 		
-	if (event_epoll->event_read != NULL) {
+	if (event_epoll->read != NULL) {
 		events |= EPOLLIN;
 		op = EPOLL_CTL_MOD;
 	}
@@ -198,11 +199,11 @@ int epoll_add(void *arg, struct event *ev)
 	}
 
 	if (ev->ev_events & EV_READ) {
-		event_epoll->event_read = ev;
+		event_epoll->read = ev;
 	}
 	
 	if (ev->ev_events & EV_WRITE) {
-		event_epoll->event_write = ev;
+		event_epoll->write = ev;
 	}
 
 	return (0);
@@ -211,9 +212,9 @@ int epoll_add(void *arg, struct event *ev)
 
 int epoll_del(void *arg, struct event *ev)
 {
-	struct epoll_loop *epoll_loop = arg;
+	struct epoll_loop *epoll_loop = (struct epoll_loop *)arg;
 	struct epoll_event epoll_event = {0, {0}};
-	struct even_epoll *event_epoll;
+	struct event_epoll *event_epoll;
 
 	int fd;
 	int events;
@@ -224,10 +225,10 @@ int epoll_del(void *arg, struct event *ev)
 	fd = ev->ev_fd;
 	
 	if (fd >= epoll_loop->nfds) {
-		return (0);
+		return 0;
 	}
 
-	event_epoll = &epoll_loop->fds[fd];
+	event_epoll = &(epoll_loop->fds[fd]);
 
 	op = EPOLL_CTL_DEL;
 
@@ -242,11 +243,11 @@ int epoll_del(void *arg, struct event *ev)
 	}
 
 	if ((events & (EPOLLIN|EPOLLOUT)) != (EPOLLIN|EPOLLOUT)) {
-		if ((events & EPOLLIN) && event_epoll->event_write != NULL) {
+		if ((events & EPOLLIN) && (event_epoll->write != NULL)) {
 			needwritedelete = 0;
-			events = EPOLLIN;
+			events = EPOLLOUT;
 			op = EPOLL_CTL_MOD;
-		} else if ((events & EPOLLOUT) && event_epoll->event_read != NULL) {
+		} else if ((events & EPOLLOUT) && (event_epoll->read != NULL)) {
 			needreaddelete = 0;
 			events = EPOLLIN;
 			op = EPOLL_CTL_MOD;
@@ -256,15 +257,15 @@ int epoll_del(void *arg, struct event *ev)
 	epoll_event.events = events;
 	epoll_event.data.fd = fd;
 	
-	if(needreaddelet) {
-		event_epoll->event_read = NULL;
+	if(needreaddelete) {
+		event_epoll->read = NULL;
 	}
 
 	if (needwritedelete) {
-		event_epoll->event_write = NULL;
+		event_epoll->write = NULL;
 	}
 
-	if (epoll_ctl(epoll_loop->epfd, op, fd. &epoll_event) == -1) {
+	if (epoll_ctl(epoll_loop->epfd, op, fd, &epoll_event) == -1) {
 		return (-1);
 	}
 	
@@ -279,7 +280,7 @@ void epoll_dealloc(struct event_base *base, void *arg)
 		free(epoll_loop->fds);
 	}
 
-	if (epll_loop->events) {
+	if (epoll_loop->events) {
 		free(epoll_loop->events);
 	}
 
