@@ -7,3 +7,4 @@ event.o: http_epoll.h event.h event.c list.h event_base.h http_epoll.h
 clean:
 	rm -fr *.o
 	rm -fr main
+	rm -fr core.*

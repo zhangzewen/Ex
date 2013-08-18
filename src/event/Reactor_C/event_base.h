@@ -21,8 +21,22 @@
 #define EV_PERSIST 0X10
 
 #define EVLOOP_NONBLOCK 0x02  /**< Do not block. */
+#include <sys/epoll.h>
 
 struct event_base;
+
+struct event_epoll{
+	struct event *read;
+	struct event *write;
+};
+
+struct epoll_loop{
+	struct event_epoll *fds;
+	int nfds;
+	struct epoll_event *events;
+	int nevents;
+	int epfd;
+};
 
 struct event{
   struct event_base *ev_base;
@@ -42,16 +56,16 @@ struct event{
 
 struct eventop {
 	const char *name;
-	void *(*init)(struct event_base *);
-	int (*add)(void *, struct event *);
-	int (*del)(void *, struct event *);
-	int (*dispatch)(struct event_base *, void *);
-	void (*dealloc)(struct event_base *, void *);
+	struct epoll_loop *(*init)(struct event_base *);
+	int (*add)(struct epoll_loop *loop, struct event *);
+	int (*del)(struct epoll_loop *loop, struct event *);
+	int (*dispatch)(struct event_base *, struct epoll_loop *loop);
+	void (*dealloc)(struct event_base *, struct epoll_loop *loop);
 };
 
 struct event_base {
 	struct eventop evsel;
-	void *evbase;
+	struct epoll_loop *evbase;
 	int event_count;
 	int event_count_active;
 	

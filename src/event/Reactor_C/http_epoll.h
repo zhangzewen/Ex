@@ -16,22 +16,9 @@
 
 #include "event_base.h"
 
-struct event_epoll{
-	struct event *read;
-	struct event *write;
-};
-
-struct epoll_loop{
-	struct event_epoll *fds;
-	int nfds;
-	struct epoll_event *events;
-	int nevents;
-	int epfd;
-};
-
-void *epoll_init (struct event_base *);
-int epoll_add (void *, struct event *);
-int epoll_del (void *, struct event *);
-int epoll_dispatch (struct event_base *, void *);
-void epoll_dealloc (struct event_base *, void *);
+struct epoll_loop *epoll_init (struct event_base *);
+int epoll_add (struct epoll_loop *loop, struct event *);
+int epoll_del (struct epoll_loop *loop, struct event *);
+int epoll_dispatch (struct event_base *, struct epoll_loop *loop);
+void epoll_dealloc (struct event_base *, struct epoll_loop *loop);
 #endif

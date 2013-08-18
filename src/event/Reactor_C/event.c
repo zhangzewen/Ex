@@ -212,7 +212,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 {
 	struct event_base *base = ev->ev_base;
 	struct eventop evsel = base->evsel;
-	void *evbase =  base->evbase;
+	struct epoll_loop *evbase =  base->evbase;
 
 	int res = 0;
 	
@@ -287,7 +287,6 @@ void event_active(struct event *ev, int res, short ncalls)
 	ev->ev_res = res;
 	ev->ev_ncalls = ncalls;
 	ev->ev_pncalls = NULL;
-	list_del(&ev->list);
 	event_queue_insert(ev->ev_base, ev, EVLIST_ACTIVE);
 }
 
@@ -309,6 +308,7 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 
 	switch(queue) {
 		case EVLIST_INSERTED:
+			base->event_count++;
 			list_add_tail(&ev->list, &base->eventqueue);
 			break;
 		case EVLIST_ACTIVE:

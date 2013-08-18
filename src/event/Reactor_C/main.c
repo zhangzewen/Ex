@@ -44,7 +44,7 @@ void ServerRead(int fd, short events, void *arg)
 	
 	write(fd ,HTTP_OK, sizeof(HTTP_OK));
 
-	event_del(&ev);
+//	event_del(&ev);
 }
 
 void ServerAccept(int fd, short events, void *arg)
