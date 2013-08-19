@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 	flags |= O_NONBLOCK;
 	fcntl(listen_fd, F_SETFL, flags);
 
-	event_set(&ev, listen_fd ,EV_READ | EV_PERSIST, ServerAccept, (void *)&ev);
+	event_set(&ev, listen_fd ,EV_READ /*| EV_PERSIST*/, ServerAccept, (void *)&ev);
 
 	event_add(&ev, NULL);
 

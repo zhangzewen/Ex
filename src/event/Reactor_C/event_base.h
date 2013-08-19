@@ -4,19 +4,19 @@
 #include <sys/time.h>
 
 #include "list.h"
-
-#define EVLIST_TIMOUT 0X01
-#define EVLIST_INSERTED 0X02
-#define EVLIST_SIGNAL 0X04
-#define EVLIST_ACTIVE 0X08
-#define EVLIST_INTERNAL 0X10
-#define EVLIST_INIT 0X80
+/*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
+#define EVLIST_TIMOUT 0X01 /*event在time堆中*/
+#define EVLIST_INSERTED 0X02/*event已经在注册事件链表中*/
+#define EVLIST_SIGNAL 0X04/*未见使用*/
+#define EVLIST_ACTIVE 0X08/*event在激活链表中*/
+#define EVLIST_INTERNAL 0X10/*内部使用标记*/
+#define EVLIST_INIT 0X80/*event已经被初始化*/
 
 #define EVLIST_ALL (0Xf000 | 0x9f)
 
 #define EV_TIMEOUT 0X01
 #define EV_READ 0X02
-#define EV_WRITE 0X03
+#define EV_WRITE 0X04
 #define EV_SIGNAL 0X08
 #define EV_PERSIST 0X10
 
@@ -64,7 +64,7 @@ struct eventop {
 };
 
 struct event_base {
-	struct eventop evsel;
+	struct eventop *evsel;
 	struct epoll_loop *evbase;
 	int event_count;
 	int event_count_active;

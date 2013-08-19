@@ -12,7 +12,7 @@
 struct epoll_loop  *epoll_init(struct event_base *base)
 {
 	int epfd;
-	struct epoll_loop *epoll_loop;
+	struct epoll_loop *loop;
 	
 	if((epfd = epoll_create(32000)) == -1) {
 		if (errno != ENFILE) {
@@ -26,31 +26,31 @@ struct epoll_loop  *epoll_init(struct event_base *base)
 		return NULL;
 	}
 
-	if (!(epoll_loop = calloc(1, sizeof(struct epoll_loop)))) {
+	if ((loop = (struct epoll_loop *)malloc(sizeof(struct epoll_loop))) == NULL) {
 		return (NULL);
 	}
 	
-	epoll_loop->epfd = epfd;
+	loop->epfd = epfd;
 
-	epoll_loop->events = malloc(INITIAL_NEVENTS * sizeof(struct epoll_event));
-	if (epoll_loop->events == NULL) {
-		free(epoll_loop);
+	loop->events = malloc(INITIAL_NEVENTS * sizeof(struct epoll_event));
+	if (loop->events == NULL) {
+		free(loop);
 		return (NULL);
 	}
 
-	epoll_loop->nevents = INITIAL_NEVENTS;
+	loop->nevents = INITIAL_NEVENTS;
 
-	epoll_loop->fds = calloc(INITIAL_NFILES, sizeof(struct event_epoll));
+	loop->fds = calloc(INITIAL_NFILES, sizeof(struct event_epoll));
 
-	if(epoll_loop->fds == NULL) {
-		free(epoll_loop->events);
-		free(epoll_loop);
+	if(loop->fds == NULL) {
+		free(loop->events);
+		free(loop);
 		return (NULL);
 	}
 
-	epoll_loop->nfds = INITIAL_NFILES;
+	loop->nfds = INITIAL_NFILES;
 	
-	return epoll_loop;
+	return loop;
 }
 
 
@@ -173,8 +173,13 @@ int epoll_add(struct epoll_loop *loop, struct event *ev)
 	
 	events = 0;
 		
-	if (event_epoll->read != NULL) { //是不是已经注册的事件
+	if (event_epoll->read != NULL) { //是不是已经注册的读事件
 		events |= EPOLLIN;
+		op = EPOLL_CTL_MOD;
+	}
+
+	if (event_epoll->read != NULL) { //是不是已经注册的写事件
+		events |= EPOLLOUT;
 		op = EPOLL_CTL_MOD;
 	}
 

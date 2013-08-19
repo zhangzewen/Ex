@@ -51,8 +51,8 @@ struct event_base *event_base_new(void)
 	INIT_LIST_HEAD(&base->activequeue);
 
 	base->evbase = NULL;
-	base->evsel = epollops;
-	base->evbase = base->evsel.init(base);
+	base->evsel = &epollops;
+	base->evbase = base->evsel->init(base);
 
 	if(base->evbase == NULL) {
 		fprintf(stderr, "%s: no event mechanism available", __func__);
@@ -94,8 +94,8 @@ void event_base_free(struct event_base *base)
 		fprintf(stderr,"%s : %d events were still set in base", __func__, n_deleted);
 	}
 
-	if (base->evsel.dealloc != NULL) {
-		base->evsel.dealloc(base, base->evbase);
+	if (base->evsel->dealloc != NULL) {
+		base->evsel->dealloc(base, base->evbase);
 	}
 
 
@@ -146,7 +146,7 @@ int event_base_dispatch(struct event_base *event_base)
 
 const char *event_base_get_method(struct event_base *base)
 {
-	return (base->evsel.name);
+	return (base->evsel->name);
 }
 
 
@@ -159,10 +159,8 @@ int event_loop(int flags)
 
 int event_base_loop(struct event_base *base, int flags)
 {
-	struct eventop evsel = base->evsel;
-	void *evbase = base->evbase;
-	struct timeval tv;
-	struct timeval *tv_p;
+	struct eventop *evsel = base->evsel;
+	struct epoll_loop *evbase = base->evbase;
 	int res;
 	int done;
 
@@ -186,7 +184,7 @@ int event_base_loop(struct event_base *base, int flags)
 			return 1;
 		}
 
-		res = evsel.dispatch(base, evbase);
+		res = evsel->dispatch(base, evbase);
 
 		if (res == -1) {
 			return -1;
@@ -211,14 +209,14 @@ int event_base_loop(struct event_base *base, int flags)
 int event_add(struct event *ev, const struct timeval *tv)
 {
 	struct event_base *base = ev->ev_base;
-	struct eventop evsel = base->evsel;
+	struct eventop *evsel = base->evsel;
 	struct epoll_loop *evbase =  base->evbase;
 
 	int res = 0;
 	
 	if ((ev->ev_events & (EV_READ | EV_WRITE)) &&
 		!(ev->ev_flags & (EVLIST_INSERTED | EVLIST_ACTIVE))) {
-		res = evsel.add(evbase, ev);
+		res = evsel->add(evbase, ev);
 
 		if (res != -1) {
 			event_queue_insert(base, ev, EVLIST_INSERTED);
@@ -240,6 +238,7 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_flags = EVLIST_INIT;
 	ev->ev_ncalls = 0;
 	ev->ev_pncalls = NULL;
+	INIT_LIST_HEAD(&ev->list);
 }
 
 
@@ -247,9 +246,9 @@ int event_del(struct event *ev)
 {
 	struct event_base *base;
 	
-	struct eventop evsel;
+	struct eventop *evsel;
 	
-	void *evbase;
+	struct epoll_loop *evbase;
 	
 	if (ev->ev_base == NULL) {
 		return -1;
@@ -270,7 +269,7 @@ int event_del(struct event *ev)
 
 	if (ev->ev_flags & EVLIST_INSERTED) {
 		event_queue_remove(base, ev, EVLIST_INSERTED);
-		return (evsel.del(evbase, ev));
+		return (evsel->del(evbase, ev));
 	}
 
 	return 0;	
@@ -292,7 +291,8 @@ void event_active(struct event *ev, int res, short ncalls)
 
 void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 {
-	if (ev->ev_flags & queue) {
+	if (ev->ev_flags & queue) { //进行与运算，看着个事件是不是在队列中（queue的值为EVLIST_INSERTED等待队列,数值为EVLIST_ACTIVE为事件就绪队列）
+		//这个在libevent1.X中的说明是可以的* Double insertion is possible for active events *
 		if (queue & EVLIST_ACTIVE) {
 			return ;
 		}
@@ -304,11 +304,10 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 	}
 	
 
-	ev->ev_flags |= queue;
+	ev->ev_flags |= queue; //打上标记，标示着个事件已经在这个queue队列中的
 
 	switch(queue) {
 		case EVLIST_INSERTED:
-			base->event_count++;
 			list_add_tail(&ev->list, &base->eventqueue);
 			break;
 		case EVLIST_ACTIVE:
