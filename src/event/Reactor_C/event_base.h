@@ -51,7 +51,8 @@ struct event{
 
   int ev_res;
   int ev_flags;
-  struct list_head list;
+  struct list_head event_list;
+	struct list_head active_list;
 };
 
 struct eventop {

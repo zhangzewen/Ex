@@ -10,7 +10,7 @@
 
 #include "http_epoll.h"
 
-#define HTTP_OK "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n"
+static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
 	
 
 int SetNoblock(int fd)
@@ -42,7 +42,8 @@ void ServerRead(int fd, short events, void *arg)
 		event_del(&ev);
 	}
 	
-	write(fd ,HTTP_OK, sizeof(HTTP_OK));
+	write(fd ,return_ok, sizeof(return_ok));
+	close(fd);
 
 //	event_del(&ev);
 }
@@ -51,8 +52,9 @@ void ServerAccept(int fd, short events, void *arg)
 {
 	int cfd;
 	struct sockaddr_in addr;
-	struct event cli_ev;
+	struct event *cli_ev;
 	socklen_t addrlen = sizeof(addr);
+	cli_ev = calloc(1, sizeof(struct event));
 	int yes = 1;
 	int retval;
 
@@ -68,8 +70,8 @@ void ServerAccept(int fd, short events, void *arg)
 		return;
 	}
 
-	event_set(&cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, NULL);
-	event_add(&cli_ev, NULL);
+	event_set(cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, NULL);
+	event_add(cli_ev, NULL);
 }
 
 
@@ -115,7 +117,7 @@ int main(int argc, char *argv[])
 	flags |= O_NONBLOCK;
 	fcntl(listen_fd, F_SETFL, flags);
 
-	event_set(&ev, listen_fd ,EV_READ /*| EV_PERSIST*/, ServerAccept, (void *)&ev);
+	event_set(&ev, listen_fd ,EV_READ | EV_PERSIST, ServerAccept, (void *)&ev);
 
 	event_add(&ev, NULL);
 

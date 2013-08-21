@@ -60,6 +60,7 @@ struct event_base *event_base_new(void)
 	return (base);
 }
 
+#if 0
 void event_base_free(struct event_base *base)
 {
 	int i;
@@ -102,7 +103,7 @@ void event_base_free(struct event_base *base)
 
 	free(base);
 }
-
+#endif
 
 
 static void event_process_active(struct event_base *base)
@@ -112,8 +113,8 @@ static void event_process_active(struct event_base *base)
 	short ncalls;
 	
 
-	list_for_each_entry(ev, &base->activequeue, list) {
-		if (ev->ev_events & EV_PERSIST) {
+	list_for_each_entry(ev, &base->activequeue, active_list) {
+		if (ev->ev_events & EV_PERSIST) {//
 			event_queue_remove(base, ev, EVLIST_ACTIVE);
 		}else{
 			event_del(ev);
@@ -125,10 +126,10 @@ static void event_process_active(struct event_base *base)
 			ncalls--;
 			ev->ev_ncalls = ncalls;
 			(*ev->ev_callback)((int)ev->ev_fd, ev->ev_res, ev->ev_arg);
+		}
 
-			if (base->event_break) {
-				return ;
-			}
+		if(list_empty(&base->activequeue)) {
+			return;
 		}
 	}
 }
@@ -238,7 +239,8 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_flags = EVLIST_INIT;
 	ev->ev_ncalls = 0;
 	ev->ev_pncalls = NULL;
-	INIT_LIST_HEAD(&ev->list);
+	INIT_LIST_HEAD(&ev->event_list);
+	INIT_LIST_HEAD(&ev->active_list);
 }
 
 
@@ -289,6 +291,40 @@ void event_active(struct event *ev, int res, short ncalls)
 	event_queue_insert(ev->ev_base, ev, EVLIST_ACTIVE);
 }
 
+
+/*
+	TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next) ===>
+	
+	do{
+		(ev)->ev_next.tqe_next = ((void *)0);
+		(ev)->ev_next.tqe_prev = (&base->eventqueue)->tqh_last;
+		*(&base->eventqueue)->tqh_last = (ev);
+		(&base->eventqueue)->tqh_last = &(ev)->ev_next.tqe_next;
+	}while(0)
+	
+	ptype base->eventqueue
+	type = struct event_list {
+		struct event *tqh_first;
+		struct event **tqh_last;
+	}
+
+	 TAILQ_ENTRY (event) ev_next ==> struct {
+																				struct event *tqe_next;
+																				struct event **tqe_prev;
+																		} ev_next;
+
+	 TAILQ_ENTRY (event) ev_active_next ==> struct {
+																							struct event *tqe_next;
+																							struct event **tqe_prev;
+																					} ev_active_next;
+	
+*/
+
+
+
+
+
+
 void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 {
 	if (ev->ev_flags & queue) { //进行与运算，看着个事件是不是在队列中（queue的值为EVLIST_INSERTED等待队列,数值为EVLIST_ACTIVE为事件就绪队列）
@@ -308,11 +344,12 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 
 	switch(queue) {
 		case EVLIST_INSERTED:
-			list_add_tail(&ev->list, &base->eventqueue);
+			list_add_tail(&ev->event_list, &base->eventqueue);
+			//TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next);
 			break;
 		case EVLIST_ACTIVE:
 			base->event_count_active++;
-			list_add_tail(&ev->list, &base->activequeue);
+			list_add_tail(&ev->active_list, &base->activequeue);
 			break;
 		default:
 			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
@@ -335,11 +372,11 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 
 	switch (queue) {
 		case EVLIST_INSERTED:
-			list_del(&ev->list);
+			list_del(&ev->event_list);
 			break;
 		case EVLIST_ACTIVE:
 			base->event_count_active--;
-			list_del(&ev->list);
+			list_del(&ev->active_list);
 			break;
 
 		default:
