@@ -70,7 +70,7 @@ void ServerAccept(int fd, short events, void *arg)
 		return;
 	}
 
-	event_set(cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, NULL);
+	event_set(cli_ev, cfd, EV_READ, ServerRead, NULL);
 	event_add(cli_ev, NULL);
 }
 

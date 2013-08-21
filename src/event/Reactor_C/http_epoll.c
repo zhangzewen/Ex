@@ -87,7 +87,7 @@ int epoll_dispatch(struct event_base *base, struct epoll_loop *loop)
 	int i;
 	int res;
 	
-	res = epoll_wait(loop->epfd, events, loop->nevents, 0);
+	res = epoll_wait(loop->epfd, events, loop->nevents, -1);
 	
 	if (res == -1) {
 		if (errno != EINTR) {

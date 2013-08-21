@@ -113,8 +113,12 @@ static void event_process_active(struct event_base *base)
 	short ncalls;
 	
 
+	if(list_empty(&base->activequeue)) {
+		return;
+	}
+
 	list_for_each_entry(ev, &base->activequeue, active_list) {
-		if (ev->ev_events & EV_PERSIST) {//
+		if (ev->ev_events & EV_PERSIST) {
 			event_queue_remove(base, ev, EVLIST_ACTIVE);
 		}else{
 			event_del(ev);
