@@ -68,16 +68,19 @@ epoll_ctl(3, EPOLL_CTL_DEL, 5, {EPOLLIN, {u32=5, u64=5}}) = 0
 read(5, "GET / HTTP/1.1\r\nHost: 192.168.10"..., 4095) = 150
 write(5, "HTTP/1.1 200 OK\r\nHost: 192.168.1"..., 114) = 114
 close(5)                                = 0
+
 epoll_wait(3, {{EPOLLIN, {u32=4, u64=4}}}, 32, 4294967295) = 1
 accept(4, {sa_family=AF_INET, sin_port=htons(63046), sin_addr=inet_addr("192.168.10.65")}, [5113274435515711504]) = 5
 fcntl(5, F_GETFL)                       = 0x2 (flags O_RDWR)
 fcntl(5, F_SETFL, O_RDWR|O_NONBLOCK)    = 0
 epoll_ctl(3, EPOLL_CTL_ADD, 5, {EPOLLIN, {u32=5, u64=5}}) = 0
+
 epoll_wait(3, {{EPOLLIN, {u32=4, u64=4}}}, 32, 4294967295) = 1
 accept(4, {sa_family=AF_INET, sin_port=htons(63047), sin_addr=inet_addr("192.168.10.65")}, [5185332029553639440]) = 6
 fcntl(6, F_GETFL)                       = 0x2 (flags O_RDWR)
 fcntl(6, F_SETFL, O_RDWR|O_NONBLOCK)    = 0
 epoll_ctl(3, EPOLL_CTL_ADD, 6, {EPOLLIN, {u32=6, u64=6}}) = 0
+
 epoll_wait(3, {{EPOLLIN, {u32=5, u64=5}}}, 32, 4294967295) = 1
 epoll_ctl(3, EPOLL_CTL_DEL, 5, {EPOLLIN, {u32=5, u64=5}}) = 0
 read(5, "GET / HTTP/1.1\r\nHost: 192.168.10"..., 4095) = 150

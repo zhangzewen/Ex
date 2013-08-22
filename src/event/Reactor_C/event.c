@@ -109,6 +109,7 @@ void event_base_free(struct event_base *base)
 static void event_process_active(struct event_base *base)
 {
 	struct event *ev;
+	struct event *tmp;
 	int i;
 	short ncalls;
 	
@@ -117,7 +118,7 @@ static void event_process_active(struct event_base *base)
 		return;
 	}
 
-	list_for_each_entry(ev, &base->activequeue, active_list) {
+	list_for_each_entry_safe(ev, tmp,&base->activequeue, active_list) {
 		if (ev->ev_events & EV_PERSIST) {
 			event_queue_remove(base, ev, EVLIST_ACTIVE);
 		}else{
