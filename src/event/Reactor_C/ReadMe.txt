@@ -1,8 +1,16 @@
-这个是纯粹是livevent-1.4.X版本上一个模子刻出来的，就是想自己看看libevent的工作工作流程以及Reactor模式
-当然这个复制品剔除了timeout和signal，单纯的I/O，现在还是跑的一塌糊涂
+这是一个纯粹从livevent-1.4.X版本上一个模子刻出来的，就是想自己看看libevent的工作流程以及Reactor模式
+当然，这个复制品剔除了timeout和signal，单纯的I/O，现在还是跑的一塌糊涂
 这个只是个人练习使用。
-你要是不拍抓狂的话，可以试试
+你要是不怕抓狂的话，可以试试
 当然，我会不停的去完善它
 
 This just a copy of libevent-1.4.x, I delete timeout and signal from the source code for exercise
 By now， it dose not work well！
+
+
+<1>到2013年8月22日，她可以正常的跑起来了 
+siege -c 10 -t 10 http://192.168.10.65:8080 跑起来很欢快，我太激动鸟。
+之前的错误就是出现在list_for_each_entry
+导致event_process_active在循环判断时失误，采用list_for_each_entry_safe就搞定了，但是这用了我几乎一天的事件
+又是gdb，又是strace。很高兴在早上时候想到了原因所在。具体的原因就是两个循环的实现的区别了。
+
