@@ -8,5 +8,5 @@ main.o: main.c event.h
 	gcc -c -g main.c -g -o main.o
 clean:
 	rm -fr *.o
-	rm -fr main
+	rm -fr server
 	rm -fr core.*
