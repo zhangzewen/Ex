@@ -27,7 +27,7 @@ void connfd_callback(int epfd, int epoll_fd, struct event *ev)
 		event_destroy(epfd, epoll_fd, ev);
 		return ;
 	}
-	printf("\nfrom ip:%s =========>%s\r\n", ip, buff);
+	printf("\nfrom ip:%s =========>%s\r\nwith epoll_fd=0x%x\n", ip, buff, epoll_fd);
 	write(epoll_fd, RESPONSE_HTTP, strlen(RESPONSE_HTTP));
 	return;
 }

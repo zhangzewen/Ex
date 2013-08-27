@@ -8,7 +8,9 @@
 #include "http_parse.h"
 #include "Define_Macro.h"
 #include <string.h>
+#include "http_buffer.h"
 
+#if 0
 #ifndef CREATE_HTTP_CONTENT_
 #define CREATE_HTTP_CONTENT(src,attr) strncat(src,attr,strlen(attr))														
 #endif
@@ -58,7 +60,7 @@ char *create_http_response(http_response response)
 }
 
 #undef CREATE_HTTP_CONTENT
-
+#endif
 
 static unsigned int  usual[] = { 
     0xffffdbfe, /* 1111 1111 1111 1111  1101 1011 1111 1110 */
@@ -67,11 +69,7 @@ static unsigned int  usual[] = {
     0x7fff37d6, /* 0111 1111 1111 1111  0011 0111 1101 0110 */
 
                 /* _^]\ [ZYX WVUT SRQP  ONML KJIH GFED CBA@ */
-#if (NGX_WIN32)
-    0xefffffff, /* 1110 1111 1111 1111  1111 1111 1111 1111 */
-#else
     0xffffffff, /* 1111 1111 1111 1111  1111 1111 1111 1111 */
-#endif
 
                 /*  ~}| {zyx wvut srqp  onml kjih gfed cba` */
     0xffffffff, /* 1111 1111 1111 1111  1111 1111 1111 1111 */
@@ -132,6 +130,7 @@ static unsigned int  usual[] = {
 	}\
 }while(0)
 
+#if 0
 int parse_http_request_core(const char *src, http_request request)
 {
 	
@@ -215,11 +214,11 @@ int http_process(int fd, )
 }
 
 #endif
+#endif
 
 
 
-
-int parse_http_request_line(char *start, char *end)
+int parse_http_request_line(http_buffer_t buffer)
 {
     char  c;
     char  ch;
@@ -260,7 +259,7 @@ int parse_http_request_line(char *start, char *end)
 		r =malloc(sizeof(struct http_request_st));
     state = sw_start;
 
-    for (p = start; p != end; p++) {
+    for (p = buffer->pos; p != buffer->end; p++) {
         ch = *p;
 
         switch (state) {
@@ -633,12 +632,6 @@ int parse_http_request_line(char *start, char *end)
                 r->complex_uri = 1;
                 state = sw_uri;
                 break;
-#if (NGX_WIN32)
-            case '\\':
-                r->complex_uri = 1;
-                state = sw_uri;
-                break;
-#endif
             case '?':
                 r->args_start = p + 1;
                 state = sw_uri;
@@ -667,13 +660,6 @@ int parse_http_request_line(char *start, char *end)
 
             switch (ch) {
             case '/':
-#if (NGX_WIN32)
-                if (r->uri_ext == p) {
-                    r->complex_uri = 1;
-                    state = sw_uri;
-                    break;
-                }
-#endif
                 r->uri_ext = NULL;
                 state = sw_after_slash_in_uri;
                 break;
@@ -693,12 +679,6 @@ int parse_http_request_line(char *start, char *end)
                 r->uri_end = p;
                 r->http_minor = 9;
                 goto done;
-#if (NGX_WIN32)
-            case '\\':
-                r->complex_uri = 1;
-                state = sw_after_slash_in_uri;
-                break;
-#endif
             case '%':
                 r->quoted_uri = 1;
                 state = sw_uri;
@@ -1266,38 +1246,7 @@ ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
             }
 
             switch(ch) {
-#if (NGX_WIN32)
-            case '\\':
-                if (u - 2 >= r->uri.data
-                    && *(u - 1) == '.' && *(u - 2) != '.')
-                {
-                    u--;
-                }
-
-                r->uri_ext = NULL;
-
-                if (p == r->uri_start + r->uri.len) {
-
-                    /*
-                     * we omit the last "\" to cause redirect because
-                     * the browsers do not treat "\" as "/" in relative URL path
-                     */
-
-                    break;
-                }
-
-                state = sw_slash;
-                *u++ = '/';
-                break;
-#endif
             case '/':
-#if (NGX_WIN32)
-                if (u - 2 >= r->uri.data
-                    && *(u - 1) == '.' && *(u - 2) != '.')
-                {
-                    u--;
-                }
-#endif
                 r->uri_ext = NULL;
                 state = sw_slash;
                 *u++ = ch;
@@ -1336,10 +1285,6 @@ ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
             }
 
             switch(ch) {
-#if (NGX_WIN32)
-            case '\\':
-                break;
-#endif
             case '/':
                 if (!merge_slashes) {
                     *u++ = ch;
@@ -1379,9 +1324,6 @@ ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
             }
 
             switch(ch) {
-#if (NGX_WIN32)
-            case '\\':
-#endif
             case '/':
                 state = sw_slash;
                 u--;
@@ -1420,9 +1362,6 @@ ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
             }
 
             switch(ch) {
-#if (NGX_WIN32)
-            case '\\':
-#endif
             case '/':
                 state = sw_slash;
                 u -= 5;
