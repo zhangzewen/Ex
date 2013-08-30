@@ -177,7 +177,7 @@ struct ngx_conf_s {
     ngx_uint_t            module_type;
     ngx_uint_t            cmd_type;
 
-    ngx_conf_handler_pt   handler;
+    ngx_conf_handler_pt   handler; // line:162
     char                 *handler_conf;
 };
 

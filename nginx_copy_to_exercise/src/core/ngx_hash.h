@@ -14,16 +14,16 @@
 
 
 typedef struct {
-    void             *value;
-    u_short           len;
-    u_char            name[1];
-} ngx_hash_elt_t;
+    void             *value;//value,即某个key对应的值,<key, value>中的value
+    u_short           len; // name的长度
+    u_char            name[1];//某个要hash的数据，<key, value>中的key
+} ngx_hash_elt_t; // hash元素结构
 
 
 typedef struct {
-    ngx_hash_elt_t  **buckets;
-    ngx_uint_t        size;
-} ngx_hash_t;
+    ngx_hash_elt_t  **buckets;//hash桶( 有size个桶)
+    ngx_uint_t        size;// hash桶的个数
+} ngx_hash_t; // hash结构
 
 
 typedef struct {
@@ -31,7 +31,8 @@ typedef struct {
     void             *value;
 } ngx_hash_wildcard_t;
 
-
+//该结构也主要用来保存hash的数据，<key, value>, 在实际使用中，一般将对个键值对保存在ngx_hash_key_t结构的数组中，
+//作为参数传给ngx_hash_init()或ngx_hash_wilcard_init()函数
 typedef struct {
     ngx_str_t         key;
     ngx_uint_t        key_hash;
@@ -50,16 +51,16 @@ typedef struct {
 
 
 typedef struct {
-    ngx_hash_t       *hash;
-    ngx_hash_key_pt   key;
+    ngx_hash_t       *hash;// 指向待初始化的hash结构
+    ngx_hash_key_pt   key;//hash函数指针 line:42
 
-    ngx_uint_t        max_size;
-    ngx_uint_t        bucket_size;
+    ngx_uint_t        max_size;//bucket的最大个数
+    ngx_uint_t        bucket_size;//每个buchet的空间
 
-    char             *name;
+    char             *name;//该hash结构的名字(在错误日志中使用)
     ngx_pool_t       *pool;
     ngx_pool_t       *temp_pool;
-} ngx_hash_init_t;
+} ngx_hash_init_t; //hash初始化结构
 
 
 #define NGX_HASH_SMALL            1
