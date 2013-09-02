@@ -41,35 +41,35 @@ static char *ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd,
     void *dummy);
 static ngx_int_t ngx_http_core_regex_location(ngx_conf_t *cf,
     ngx_http_core_loc_conf_t *clcf, ngx_str_t *regex, ngx_uint_t caseless);
-
+#if 0
 static char *ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
 static char *ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy,
     void *conf);
-
+#endif
 static char *ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
 static char *ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
 static char *ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-static char *ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
-static char *ngx_http_core_directio(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
+//static char *ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
+//static char *ngx_http_core_directio(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
 static char *ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
-static char *ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
-static char *ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
+//static char *ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
+//static char *ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
 static char *ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
-static char *ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
-static char *ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
-static char *ngx_http_core_resolver(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
+//static char *ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
+//static char *ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
+//static char *ngx_http_core_resolver(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
 #if (NGX_HTTP_GZIP)
 static ngx_int_t ngx_http_gzip_accept_encoding(ngx_str_t *ae);
 static ngx_uint_t ngx_http_gzip_quantity(u_char *p, u_char *last);
@@ -77,39 +77,39 @@ static char *ngx_http_gzip_disable(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
 #endif
 #if (NGX_HAVE_OPENAT)
-static char *ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd,
-    void *conf);
+//static char *ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd,
+//    void *conf);
 #endif
 
-static char *ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data);
-static char *ngx_http_core_pool_size(ngx_conf_t *cf, void *post, void *data);
+//sstatic char *ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data);
+//static char *ngx_http_core_pool_size(ngx_conf_t *cf, void *post, void *data);
 
-static ngx_conf_post_t  ngx_http_core_lowat_post =
-    { ngx_http_core_lowat_check };
+//static ngx_conf_post_t  ngx_http_core_lowat_post =
+//    { ngx_http_core_lowat_check };
 
-static ngx_conf_post_handler_pt  ngx_http_core_pool_size_p =
-    ngx_http_core_pool_size;
+//static ngx_conf_post_handler_pt  ngx_http_core_pool_size_p =
+//    ngx_http_core_pool_size;
 
-static ngx_conf_deprecated_t  ngx_conf_deprecated_optimize_server_names = {
-    ngx_conf_deprecated, "optimize_server_names", "server_name_in_redirect"
-};
+//static ngx_conf_deprecated_t  ngx_conf_deprecated_optimize_server_names = {
+//    ngx_conf_deprecated, "optimize_server_names", "server_name_in_redirect"
+//};
 
-static ngx_conf_deprecated_t  ngx_conf_deprecated_open_file_cache_retest = {
-    ngx_conf_deprecated, "open_file_cache_retest", "open_file_cache_valid"
-};
+//static ngx_conf_deprecated_t  ngx_conf_deprecated_open_file_cache_retest = {
+//    ngx_conf_deprecated, "open_file_cache_retest", "open_file_cache_valid"
+//};
 
-static ngx_conf_deprecated_t  ngx_conf_deprecated_satisfy_any = {
-    ngx_conf_deprecated, "satisfy_any", "satisfy"
-};
+//static ngx_conf_deprecated_t  ngx_conf_deprecated_satisfy_any = {
+//    ngx_conf_deprecated, "satisfy_any", "satisfy"
+//};
 
-
+#if 0
 static ngx_conf_enum_t  ngx_http_core_request_body_in_file[] = {
     { ngx_string("off"), NGX_HTTP_REQUEST_BODY_FILE_OFF },
     { ngx_string("on"), NGX_HTTP_REQUEST_BODY_FILE_ON },
     { ngx_string("clean"), NGX_HTTP_REQUEST_BODY_FILE_CLEAN },
     { ngx_null_string, 0 }
 };
-
+#endif
 
 #if (NGX_HAVE_FILE_AIO)
 
@@ -124,37 +124,37 @@ static ngx_conf_enum_t  ngx_http_core_aio[] = {
 
 #endif
 
-
+#if 0
 static ngx_conf_enum_t  ngx_http_core_satisfy[] = {
     { ngx_string("all"), NGX_HTTP_SATISFY_ALL },
     { ngx_string("any"), NGX_HTTP_SATISFY_ANY },
     { ngx_null_string, 0 }
 };
-
-
+#endif
+#if 0
 static ngx_conf_enum_t  ngx_http_core_lingering_close[] = {
     { ngx_string("off"), NGX_HTTP_LINGERING_OFF },
     { ngx_string("on"), NGX_HTTP_LINGERING_ON },
     { ngx_string("always"), NGX_HTTP_LINGERING_ALWAYS },
     { ngx_null_string, 0 }
 };
-
-
+#endif
+#if 0
 static ngx_conf_enum_t  ngx_http_core_if_modified_since[] = {
     { ngx_string("off"), NGX_HTTP_IMS_OFF },
     { ngx_string("exact"), NGX_HTTP_IMS_EXACT },
     { ngx_string("before"), NGX_HTTP_IMS_BEFORE },
     { ngx_null_string, 0 }
 };
-
-
+#endif
+#if 0
 static ngx_conf_bitmask_t  ngx_http_core_keepalive_disable[] = {
     { ngx_string("none"), NGX_HTTP_KEEPALIVE_DISABLE_NONE },
     { ngx_string("msie6"), NGX_HTTP_KEEPALIVE_DISABLE_MSIE6 },
     { ngx_string("safari"), NGX_HTTP_KEEPALIVE_DISABLE_SAFARI },
     { ngx_null_string, 0 }
 };
-
+#endif
 
 static ngx_path_init_t  ngx_http_client_temp_path = {
     ngx_string(NGX_HTTP_CLIENT_TEMP_PATH), { 0, 0, 0 }
@@ -192,7 +192,7 @@ static ngx_str_t  ngx_http_gzip_private = ngx_string("private");
 
 
 static ngx_command_t  ngx_http_core_commands[] = {
-
+#if 0
     { ngx_string("variables_hash_max_size"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
@@ -220,14 +220,14 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_MAIN_CONF_OFFSET,
       offsetof(ngx_http_core_main_conf_t, server_names_hash_bucket_size),
       NULL },
-
+#endif
     { ngx_string("server"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_core_server,
       0,
       0,
       NULL },
-
+#if 0
     { ngx_string("connection_pool_size"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_size_slot,
@@ -290,7 +290,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_SRV_CONF_OFFSET,
       offsetof(ngx_http_core_srv_conf_t, underscores_in_headers),
       NULL },
-
+#endif
     { ngx_string("location"),
       NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_BLOCK|NGX_CONF_TAKE12,
       ngx_http_core_location,
@@ -311,7 +311,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_SRV_CONF_OFFSET,
       0,
       NULL },
-
+#if 0
     { ngx_string("types_hash_max_size"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
@@ -325,7 +325,6 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_core_loc_conf_t, types_hash_bucket_size),
       NULL },
-
     { ngx_string("types"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
                                           |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
@@ -340,6 +339,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_core_loc_conf_t, default_type),
       NULL },
+#endif
 
     { ngx_string("root"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
@@ -348,7 +348,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       NULL },
-
+#if 0
     { ngx_string("alias"),
       NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_http_core_root,
@@ -509,7 +509,6 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       NULL },
-
     { ngx_string("keepalive_requests"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
@@ -649,6 +648,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_core_loc_conf_t, chunked_transfer_encoding),
       NULL },
+#endif
 
     { ngx_string("error_page"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
@@ -657,7 +657,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       NULL },
-
+#if 0
     { ngx_string("try_files"),
       NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_2MORE,
       ngx_http_core_try_files,
@@ -672,14 +672,14 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_core_loc_conf_t, post_action),
       NULL },
-
+#endif
     { ngx_string("error_log"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_1MORE,
       ngx_http_core_error_log,
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       NULL },
-
+#if 0
     { ngx_string("open_file_cache"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE12,
       ngx_http_core_open_file_cache,
@@ -778,7 +778,7 @@ static ngx_command_t  ngx_http_core_commands[] = {
       NULL },
 
 #endif
-
+#endif
       ngx_null_command
 };
 
@@ -3168,7 +3168,7 @@ ngx_http_core_regex_location(ngx_conf_t *cf, ngx_http_core_loc_conf_t *clcf,
 #endif
 }
 
-
+#if 0
 static char *
 ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -3261,7 +3261,7 @@ ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
     return NGX_CONF_OK;
 }
 
-
+#endif
 static ngx_int_t
 ngx_http_core_preconfiguration(ngx_conf_t *cf)
 {
@@ -4350,7 +4350,7 @@ static ngx_http_method_name_t  ngx_methods_names[] = {
    { NULL, 0 }
 };
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4450,7 +4450,7 @@ ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return rv;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_directio(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4597,7 +4597,7 @@ ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4677,7 +4677,7 @@ ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4789,7 +4789,7 @@ ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return ngx_log_set_levels(cf, clcf->error_log);
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4822,7 +4822,7 @@ ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4837,7 +4837,7 @@ ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_resolver(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -4963,7 +4963,7 @@ ngx_http_gzip_disable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 #if (NGX_HAVE_OPENAT)
-
+__attribute__((unused))
 static char *
 ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -5055,7 +5055,7 @@ ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 #endif
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
 {
@@ -5084,7 +5084,7 @@ ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
     return NGX_CONF_OK;
 }
 
-
+__attribute__((unused))
 static char *
 ngx_http_core_pool_size(ngx_conf_t *cf, void *post, void *data)
 {

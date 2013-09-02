@@ -18,7 +18,7 @@ static ngx_int_t ngx_test_lockfile(u_char *file, ngx_log_t *log);
 static void ngx_clean_old_cycles(ngx_event_t *ev);
 
 
-volatile ngx_cycle_t  *ngx_cycle;
+volatile ngx_cycle_t  *ngx_cycle; // tell the program ,that it is saved in mem
 ngx_array_t            ngx_old_cycles;
 
 static ngx_pool_t     *ngx_temp_pool;
@@ -847,7 +847,11 @@ ngx_destroy_cycle_pools(ngx_conf_t *conf)
     ngx_destroy_pool(conf->pool);
 }
 
-
+/*! compare two struct sockaddr
+	\param sa1 src
+	\param sa2 dest
+	\return NGX_OK for ==, NGX_DECLINED for !=
+*/
 static ngx_int_t
 ngx_cmp_sockaddr(struct sockaddr *sa1, struct sockaddr *sa2)
 {
