@@ -459,10 +459,6 @@ ngx_http_userid_create_uid(ngx_http_request_t *r, ngx_http_userid_ctx_t *ctx,
     ngx_connection_t           *c;
     struct sockaddr_in         *sin;
     ngx_http_variable_value_t  *vv;
-#if (NGX_HAVE_INET6)
-    u_char                     *p;
-    struct sockaddr_in6        *sin6;
-#endif
 
     if (ctx->uid_set[3] != 0) {
         return NGX_OK;
@@ -528,19 +524,6 @@ ngx_http_userid_create_uid(ngx_http_request_t *r, ngx_http_userid_ctx_t *ctx,
 
             switch (c->local_sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-            case AF_INET6:
-                sin6 = (struct sockaddr_in6 *) c->local_sockaddr;
-
-                p = (u_char *) &ctx->uid_set[0];
-
-                *p++ = sin6->sin6_addr.s6_addr[12];
-                *p++ = sin6->sin6_addr.s6_addr[13];
-                *p++ = sin6->sin6_addr.s6_addr[14];
-                *p = sin6->sin6_addr.s6_addr[15];
-
-                break;
-#endif
             default: /* AF_INET */
                 sin = (struct sockaddr_in *) c->local_sockaddr;
                 ctx->uid_set[0] = sin->sin_addr.s_addr;

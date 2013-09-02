@@ -136,36 +136,6 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
         } else {
 
-#if (NGX_HAVE_KQUEUE)
-
-            /*
-             * kqueue notifies about the end of file or a pending error.
-             * This test allows not to allocate a buf on these conditions
-             * and not to call c->recv_chain().
-             */
-
-            if (p->upstream->read->available == 0
-                && p->upstream->read->pending_eof)
-            {
-                p->upstream->read->ready = 0;
-                p->upstream->read->eof = 1;
-                p->upstream_eof = 1;
-                p->read = 1;
-
-                if (p->upstream->read->kq_errno) {
-                    p->upstream->read->error = 1;
-                    p->upstream_error = 1;
-                    p->upstream_eof = 0;
-
-                    ngx_log_error(NGX_LOG_ERR, p->log,
-                                  p->upstream->read->kq_errno,
-                                  "kevent() reported that upstream "
-                                  "closed connection");
-                }
-
-                break;
-            }
-#endif
 
             if (p->free_raw_bufs) {
 

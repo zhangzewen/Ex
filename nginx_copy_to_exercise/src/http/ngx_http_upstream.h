@@ -181,10 +181,6 @@ typedef struct {
     unsigned                         intercept_404:1;
     unsigned                         change_buffering:1;
 
-#if (NGX_HTTP_SSL)
-    ngx_ssl_t                       *ssl;
-    ngx_flag_t                       ssl_session_reuse;
-#endif
 
     ngx_str_t                        module;
 } ngx_http_upstream_conf_t;

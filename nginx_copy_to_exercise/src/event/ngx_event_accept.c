@@ -28,9 +28,6 @@ ngx_event_accept(ngx_event_t *ev)
     ngx_connection_t  *c, *lc;
     ngx_event_conf_t  *ecf;
     u_char             sa[NGX_SOCKADDRLEN];
-#if (NGX_HAVE_ACCEPT4)
-    static ngx_uint_t  use_accept4 = 1;
-#endif
 
     if (ev->timedout) {
         if (ngx_enable_accept_events((ngx_cycle_t *) ngx_cycle) != NGX_OK) {
@@ -59,16 +56,7 @@ ngx_event_accept(ngx_event_t *ev)
     do {
         socklen = NGX_SOCKADDRLEN;
 
-#if (NGX_HAVE_ACCEPT4)
-        if (use_accept4) {
-            s = accept4(lc->fd, (struct sockaddr *) sa, &socklen,
-                        SOCK_NONBLOCK);
-        } else {
-            s = accept(lc->fd, (struct sockaddr *) sa, &socklen);
-        }
-#else
         s = accept(lc->fd, (struct sockaddr *) sa, &socklen);
-#endif
 
         if (s == -1) {
             err = ngx_socket_errno;
@@ -88,18 +76,7 @@ ngx_event_accept(ngx_event_t *ev)
                 level = NGX_LOG_CRIT;
             }
 
-#if (NGX_HAVE_ACCEPT4)
-            ngx_log_error(level, ev->log, err,
-                          use_accept4 ? "accept4() failed" : "accept() failed");
-
-            if (use_accept4 && err == NGX_ENOSYS) {
-                use_accept4 = 0;
-                ngx_inherited_nonblocking = 0;
-                continue;
-            }
-#else
             ngx_log_error(level, ev->log, err, "accept() failed");
-#endif
 
             if (err == NGX_ECONNABORTED) {
                 if (ngx_event_flags & NGX_USE_KQUEUE_EVENT) {
@@ -134,9 +111,6 @@ ngx_event_accept(ngx_event_t *ev)
             return;
         }
 
-#if (NGX_STAT_STUB)
-        (void) ngx_atomic_fetch_add(ngx_stat_accepted, 1);
-#endif
 
         ngx_accept_disabled = ngx_cycle->connection_n / 8
                               - ngx_cycle->free_connection_n;
@@ -152,9 +126,6 @@ ngx_event_accept(ngx_event_t *ev)
             return;
         }
 
-#if (NGX_STAT_STUB)
-        (void) ngx_atomic_fetch_add(ngx_stat_active, 1);
-#endif
 
         c->pool = ngx_create_pool(ls->pool_size, ev->log);
         if (c->pool == NULL) {
@@ -238,9 +209,6 @@ ngx_event_accept(ngx_event_t *ev)
 
         if (ev->deferred_accept) {
             rev->ready = 1;
-#if (NGX_HAVE_KQUEUE)
-            rev->available = 1;
-#endif
         }
 
         rev->log = log;
@@ -257,16 +225,7 @@ ngx_event_accept(ngx_event_t *ev)
 
         c->number = ngx_atomic_fetch_add(ngx_connection_counter, 1);
 
-#if (NGX_STAT_STUB)
-        (void) ngx_atomic_fetch_add(ngx_stat_handled, 1);
-#endif
 
-#if (NGX_THREADS)
-        rev->lock = &c->lock;
-        wev->lock = &c->lock;
-        rev->own_lock = &c->lock;
-        wev->own_lock = &c->lock;
-#endif
 
         if (ls->addr_ntop) {
             c->addr_text.data = ngx_pnalloc(c->pool, ls->addr_text_max_len);
@@ -289,10 +248,6 @@ ngx_event_accept(ngx_event_t *ev)
         struct sockaddr_in   *sin;
         ngx_cidr_t           *cidr;
         ngx_uint_t            i;
-#if (NGX_HAVE_INET6)
-        struct sockaddr_in6  *sin6;
-        ngx_uint_t            n;
-#endif
 
         cidr = ecf->debug_connection.elts;
         for (i = 0; i < ecf->debug_connection.nelts; i++) {
@@ -302,19 +257,6 @@ ngx_event_accept(ngx_event_t *ev)
 
             switch (cidr[i].family) {
 
-#if (NGX_HAVE_INET6)
-            case AF_INET6:
-                sin6 = (struct sockaddr_in6 *) c->sockaddr;
-                for (n = 0; n < 16; n++) {
-                    if ((sin6->sin6_addr.s6_addr[n]
-                        & cidr[i].u.in6.mask.s6_addr[n])
-                        != cidr[i].u.in6.addr.s6_addr[n])
-                    {
-                        goto next;
-                    }
-                }
-                break;
-#endif
 
 #if (NGX_HAVE_UNIX_DOMAIN)
             case AF_UNIX:
@@ -495,9 +437,6 @@ ngx_close_accepted_connection(ngx_connection_t *c)
         ngx_destroy_pool(c->pool);
     }
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_active, -1);
-#endif
 }
 
 

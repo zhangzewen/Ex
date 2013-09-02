@@ -856,9 +856,6 @@ static ngx_int_t
 ngx_cmp_sockaddr(struct sockaddr *sa1, struct sockaddr *sa2)
 {
     struct sockaddr_in   *sin1, *sin2;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6  *sin61, *sin62;
-#endif
 #if (NGX_HAVE_UNIX_DOMAIN)
     struct sockaddr_un   *saun1, *saun2;
 #endif
@@ -869,21 +866,6 @@ ngx_cmp_sockaddr(struct sockaddr *sa1, struct sockaddr *sa2)
 
     switch (sa1->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin61 = (struct sockaddr_in6 *) sa1;
-        sin62 = (struct sockaddr_in6 *) sa2;
-
-        if (sin61->sin6_port != sin62->sin6_port) {
-            return NGX_DECLINED;
-        }
-
-        if (ngx_memcmp(&sin61->sin6_addr, &sin62->sin6_addr, 16) != 0) {
-            return NGX_DECLINED;
-        }
-
-        break;
-#endif
 
 #if (NGX_HAVE_UNIX_DOMAIN)
     case AF_UNIX:

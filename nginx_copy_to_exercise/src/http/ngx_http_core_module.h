@@ -57,9 +57,6 @@ typedef struct {
     union {
         struct sockaddr        sockaddr;
         struct sockaddr_in     sockaddr_in;
-#if (NGX_HAVE_INET6)
-        struct sockaddr_in6    sockaddr_in6;
-#endif
 #if (NGX_HAVE_UNIX_DOMAIN)
         struct sockaddr_un     sockaddr_un;
 #endif
@@ -72,12 +69,6 @@ typedef struct {
     unsigned                   default_server:1;
     unsigned                   bind:1;
     unsigned                   wildcard:1;
-#if (NGX_HTTP_SSL)
-    unsigned                   ssl:1;
-#endif
-#if (NGX_HAVE_INET6 && defined IPV6_V6ONLY)
-    unsigned                   ipv6only:2;
-#endif
     unsigned                   so_keepalive:2;
 
     int                        backlog;
@@ -214,9 +205,6 @@ typedef struct {
 
     ngx_http_virtual_names_t  *virtual_names;
 
-#if (NGX_HTTP_SSL)
-    ngx_uint_t                 ssl;   /* unsigned  ssl:1; */
-#endif
 } ngx_http_addr_conf_t;
 
 
@@ -226,14 +214,6 @@ typedef struct {
 } ngx_http_in_addr_t;
 
 
-#if (NGX_HAVE_INET6)
-
-typedef struct {
-    struct in6_addr            addr6;
-    ngx_http_addr_conf_t       conf;
-} ngx_http_in6_addr_t;
-
-#endif
 
 
 typedef struct {

@@ -40,9 +40,6 @@ typedef u_char *(*ngx_http_log_handler_pt)(ngx_http_request_t *r,
 #if (NGX_HTTP_SSI)
 #include <ngx_http_ssi_filter_module.h>
 #endif
-#if (NGX_HTTP_SSL)
-#include <ngx_http_ssl_module.h>
-#endif
 
 
 struct ngx_http_log_ctx_s {
@@ -73,9 +70,6 @@ ngx_int_t ngx_http_add_listen(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
 void ngx_http_init_connection(ngx_connection_t *c);
 
-#ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
-int ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg);
-#endif
 
 ngx_int_t ngx_http_parse_request_line(ngx_http_request_t *r, ngx_buf_t *b);
 ngx_int_t ngx_http_parse_complex_uri(ngx_http_request_t *r,

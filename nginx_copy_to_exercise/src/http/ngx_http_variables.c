@@ -1019,24 +1019,9 @@ ngx_http_variable_binary_remote_addr(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
     struct sockaddr_in   *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6  *sin6;
-#endif
 
     switch (r->connection->sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = (struct sockaddr_in6 *) r->connection->sockaddr;
-
-        v->len = sizeof(struct in6_addr);
-        v->valid = 1;
-        v->no_cacheable = 0;
-        v->not_found = 0;
-        v->data = sin6->sin6_addr.s6_addr;
-
-        break;
-#endif
 
     default: /* AF_INET */
         sin = (struct sockaddr_in *) r->connection->sockaddr;
@@ -1074,9 +1059,6 @@ ngx_http_variable_remote_port(ngx_http_request_t *r,
 {
     ngx_uint_t            port;
     struct sockaddr_in   *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6  *sin6;
-#endif
 
     v->len = 0;
     v->valid = 1;
@@ -1090,12 +1072,6 @@ ngx_http_variable_remote_port(ngx_http_request_t *r,
 
     switch (r->connection->sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = (struct sockaddr_in6 *) r->connection->sockaddr;
-        port = ntohs(sin6->sin6_port);
-        break;
-#endif
 
     default: /* AF_INET */
         sin = (struct sockaddr_in *) r->connection->sockaddr;
@@ -1148,9 +1124,6 @@ ngx_http_variable_server_port(ngx_http_request_t *r,
 {
     ngx_uint_t            port;
     struct sockaddr_in   *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6  *sin6;
-#endif
 
     v->len = 0;
     v->valid = 1;
@@ -1168,12 +1141,6 @@ ngx_http_variable_server_port(ngx_http_request_t *r,
 
     switch (r->connection->local_sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = (struct sockaddr_in6 *) r->connection->local_sockaddr;
-        port = ntohs(sin6->sin6_port);
-        break;
-#endif
 
     default: /* AF_INET */
         sin = (struct sockaddr_in *) r->connection->local_sockaddr;

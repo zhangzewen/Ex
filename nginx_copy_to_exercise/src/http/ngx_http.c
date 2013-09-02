@@ -61,10 +61,6 @@ static ngx_listening_t *ngx_http_add_listening(ngx_conf_t *cf,
     ngx_http_conf_addr_t *addr);
 static ngx_int_t ngx_http_add_addrs(ngx_conf_t *cf, ngx_http_port_t *hport,
     ngx_http_conf_addr_t *addr);
-#if (NGX_HAVE_INET6)
-static ngx_int_t ngx_http_add_addrs6(ngx_conf_t *cf, ngx_http_port_t *hport,
-    ngx_http_conf_addr_t *addr);
-#endif
 
 ngx_uint_t   ngx_http_max_module;
 
@@ -1146,9 +1142,6 @@ ngx_http_add_listen(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
     struct sockaddr_in         *sin;
     ngx_http_conf_port_t       *port;
     ngx_http_core_main_conf_t  *cmcf;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6        *sin6;
-#endif
 
     cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module);
 
@@ -1164,12 +1157,6 @@ ngx_http_add_listen(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
     switch (sa->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = &lsopt->u.sockaddr_in6;
-        p = sin6->sin6_port;
-        break;
-#endif
 
 #if (NGX_HAVE_UNIX_DOMAIN)
     case AF_UNIX:
@@ -1235,12 +1222,6 @@ ngx_http_add_addresses(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
     switch (sa->sa_family) {
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        off = offsetof(struct sockaddr_in6, sin6_addr);
-        len = 16;
-        break;
-#endif
 
 #if (NGX_HAVE_UNIX_DOMAIN)
     case AF_UNIX:
@@ -1703,13 +1684,6 @@ ngx_http_init_listening(ngx_conf_t *cf, ngx_http_conf_port_t *port)
 
         switch (ls->sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-            if (ngx_http_add_addrs6(cf, hport, addr) != NGX_OK) {
-                return NGX_ERROR;
-            }
-            break;
-#endif
         default: /* AF_INET */
             if (ngx_http_add_addrs(cf, hport, addr) != NGX_OK) {
                 return NGX_ERROR;
@@ -1783,9 +1757,6 @@ ngx_http_add_listening(ngx_conf_t *cf, ngx_http_conf_addr_t *addr)
     ls->deferred_accept = addr->opt.deferred_accept;
 #endif
 
-#if (NGX_HAVE_INET6 && defined IPV6_V6ONLY)
-    ls->ipv6only = addr->opt.ipv6only;
-#endif
 
 #if (NGX_HAVE_SETFIB)
     ls->setfib = addr->opt.setfib;
@@ -1854,67 +1825,6 @@ ngx_http_add_addrs(ngx_conf_t *cf, ngx_http_port_t *hport,
 }
 
 
-#if (NGX_HAVE_INET6)
-
-static ngx_int_t
-ngx_http_add_addrs6(ngx_conf_t *cf, ngx_http_port_t *hport,
-    ngx_http_conf_addr_t *addr)
-{
-    ngx_uint_t                 i;
-    ngx_http_in6_addr_t       *addrs6;
-    struct sockaddr_in6       *sin6;
-    ngx_http_virtual_names_t  *vn;
-
-    hport->addrs = ngx_pcalloc(cf->pool,
-                               hport->naddrs * sizeof(ngx_http_in6_addr_t));
-    if (hport->addrs == NULL) {
-        return NGX_ERROR;
-    }
-
-    addrs6 = hport->addrs;
-
-    for (i = 0; i < hport->naddrs; i++) {
-
-        sin6 = &addr[i].opt.u.sockaddr_in6;
-        addrs6[i].addr6 = sin6->sin6_addr;
-        addrs6[i].conf.default_server = addr[i].default_server;
-#if (NGX_HTTP_SSL)
-        addrs6[i].conf.ssl = addr[i].opt.ssl;
-#endif
-
-        if (addr[i].hash.buckets == NULL
-            && (addr[i].wc_head == NULL
-                || addr[i].wc_head->hash.buckets == NULL)
-            && (addr[i].wc_tail == NULL
-                || addr[i].wc_tail->hash.buckets == NULL)
-#if (NGX_PCRE)
-            && addr[i].nregex == 0
-#endif
-            )
-        {
-            continue;
-        }
-
-        vn = ngx_palloc(cf->pool, sizeof(ngx_http_virtual_names_t));
-        if (vn == NULL) {
-            return NGX_ERROR;
-        }
-
-        addrs6[i].conf.virtual_names = vn;
-
-        vn->names.hash = addr[i].hash;
-        vn->names.wc_head = addr[i].wc_head;
-        vn->names.wc_tail = addr[i].wc_tail;
-#if (NGX_PCRE)
-        vn->nregex = addr[i].nregex;
-        vn->regex = addr[i].regex;
-#endif
-    }
-
-    return NGX_OK;
-}
-
-#endif
 
 
 char *

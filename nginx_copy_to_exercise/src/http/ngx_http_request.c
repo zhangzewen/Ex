@@ -59,10 +59,6 @@ static u_char *ngx_http_log_error(ngx_log_t *log, u_char *buf, size_t len);
 static u_char *ngx_http_log_error_handler(ngx_http_request_t *r,
     ngx_http_request_t *sr, u_char *buf, size_t len);
 
-#if (NGX_HTTP_SSL)
-static void ngx_http_ssl_handshake(ngx_event_t *rev);
-static void ngx_http_ssl_handshake_handler(ngx_connection_t *c);
-#endif
 
 
 static char *ngx_http_client_errors[] = {
@@ -206,9 +202,6 @@ ngx_http_init_connection(ngx_connection_t *c)
     rev->handler = ngx_http_init_request;
     c->write->handler = ngx_http_empty_handler;
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
-#endif
 
     if (rev->ready) {
         /* the deferred accept(), rtsig, aio, iocp */
@@ -225,9 +218,6 @@ ngx_http_init_connection(ngx_connection_t *c)
     ngx_add_timer(rev, c->listening->post_accept_timeout);
 
     if (ngx_handle_read_event(rev, 0) != NGX_OK) {
-#if (NGX_STAT_STUB)
-        (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
-#endif
         ngx_http_close_connection(c);
         return;
     }
@@ -250,14 +240,7 @@ ngx_http_init_request(ngx_event_t *rev)
     ngx_http_core_srv_conf_t   *cscf;
     ngx_http_core_loc_conf_t   *clcf;
     ngx_http_core_main_conf_t  *cmcf;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6        *sin6;
-    ngx_http_in6_addr_t        *addr6;
-#endif
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
-#endif
 
     c = rev->data;
 
@@ -328,24 +311,6 @@ ngx_http_init_request(ngx_event_t *rev)
 
         switch (c->local_sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-            sin6 = (struct sockaddr_in6 *) c->local_sockaddr;
-
-            addr6 = port->addrs;
-
-            /* the last address is "*" */
-
-            for (i = 0; i < port->naddrs - 1; i++) {
-                if (ngx_memcmp(&addr6[i].addr6, &sin6->sin6_addr, 16) == 0) {
-                    break;
-                }
-            }
-
-            addr_conf = &addr6[i].conf;
-
-            break;
-#endif
 
         default: /* AF_INET */
             sin = (struct sockaddr_in *) c->local_sockaddr;
@@ -369,12 +334,6 @@ ngx_http_init_request(ngx_event_t *rev)
 
         switch (c->local_sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-            addr6 = port->addrs;
-            addr_conf = &addr6[0].conf;
-            break;
-#endif
 
         default: /* AF_INET */
             addr = port->addrs;
@@ -510,11 +469,6 @@ ngx_http_init_request(ngx_event_t *rev)
     ctx->current_request = r;
     r->log_handler = ngx_http_log_error_handler;
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
-    r->stat_reading = 1;
-    (void) ngx_atomic_fetch_add(ngx_stat_requests, 1);
-#endif
 
     rev->handler(rev);
 }
@@ -1673,12 +1627,6 @@ ngx_http_process_request(ngx_http_request_t *r)
         ngx_del_timer(c->read);
     }
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
-    r->stat_reading = 0;
-    (void) ngx_atomic_fetch_add(ngx_stat_writing, 1);
-    r->stat_writing = 1;
-#endif
 
     c->read->handler = ngx_http_request_handler;
     c->write->handler = ngx_http_request_handler;
@@ -2533,9 +2481,6 @@ ngx_http_set_keepalive(ngx_http_request_t *r)
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0, "pipelined request");
 
-#if (NGX_STAT_STUB)
-        (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
-#endif
 
         hc->pipeline = 1;
         c->log->action = "reading client pipelined request line";
@@ -2778,9 +2723,6 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
 
     b->last += n;
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
-#endif
 
     c->log->handler = ngx_http_log_error;
     c->log->action = "reading client request line";
@@ -3032,17 +2974,6 @@ ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)
         }
     }
 
-#if (NGX_STAT_STUB)
-
-    if (r->stat_reading) {
-        (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
-    }
-
-    if (r->stat_writing) {
-        (void) ngx_atomic_fetch_add(ngx_stat_writing, -1);
-    }
-
-#endif
 
     if (rc > 0 && (r->headers_out.status == 0 || r->connection->sent == 0)) {
         r->headers_out.status = rc;
@@ -3119,9 +3050,6 @@ ngx_http_close_connection(ngx_connection_t *c)
 
 #endif
 
-#if (NGX_STAT_STUB)
-    (void) ngx_atomic_fetch_add(ngx_stat_active, -1);
-#endif
 
     c->destroyed = 1;
 

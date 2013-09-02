@@ -16,15 +16,6 @@
 #define NGX_INVALID_INDEX  0xd0d0d0d0
 
 
-#if (NGX_HAVE_IOCP)
-
-typedef struct {
-    WSAOVERLAPPED    ovlp;
-    ngx_event_t     *event;
-    int              error;
-} ngx_event_ovlp_t;
-
-#endif
 
 
 typedef struct {
@@ -78,54 +69,9 @@ struct ngx_event_s {
     /* the pending eof reported by kqueue or in aio chain operation */
     unsigned         pending_eof:1;
 
-#if !(NGX_THREADS)
-    unsigned         posted_ready:1;
-#endif
-
-#if (NGX_WIN32)
-    /* setsockopt(SO_UPDATE_ACCEPT_CONTEXT) was successful */
-    unsigned         accept_context_updated:1;
-#endif
-
-#if (NGX_HAVE_KQUEUE)
-    unsigned         kq_vnode:1;
-
-    /* the pending errno reported by kqueue */
-    int              kq_errno;
-#endif
-
-    /*
-     * kqueue only:
-     *   accept:     number of sockets that wait to be accepted
-     *   read:       bytes to read when event is ready
-     *               or lowat when event is set with NGX_LOWAT_EVENT flag
-     *   write:      available space in buffer when event is ready
-     *               or lowat when event is set with NGX_LOWAT_EVENT flag
-     *
-     * iocp: TODO
-     *
-     * otherwise:
-     *   accept:     1 if accept many, 0 otherwise
-     */
-
-#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_IOCP)
-    int              available;
-#else
     unsigned         available:1;
-#endif
 
     ngx_event_handler_pt  handler;
-
-
-#if (NGX_HAVE_AIO)
-
-#if (NGX_HAVE_IOCP)
-    ngx_event_ovlp_t ovlp;
-#else
-    struct aiocb     aiocb;
-#endif
-
-#endif
 
     ngx_uint_t       index;
 
@@ -139,86 +85,12 @@ struct ngx_event_s {
     unsigned         channel:1;
     unsigned         resolver:1;
 
-#if (NGX_THREADS)
-
-    unsigned         locked:1;
-
-    unsigned         posted_ready:1;
-    unsigned         posted_timedout:1;
-    unsigned         posted_eof:1;
-
-#if (NGX_HAVE_KQUEUE)
-    /* the pending errno reported by kqueue */
-    int              posted_errno;
-#endif
-
-#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_IOCP)
-    int              posted_available;
-#else
-    unsigned         posted_available:1;
-#endif
-
-    ngx_atomic_t    *lock;
-    ngx_atomic_t    *own_lock;
-
-#endif
 
     /* the links of the posted queue */
     ngx_event_t     *next;
     ngx_event_t    **prev;
-
-
-#if 0
-
-    /* the threads support */
-
-    /*
-     * the event thread context, we store it here
-     * if $(CC) does not understand __thread declaration
-     * and pthread_getspecific() is too costly
-     */
-
-    void            *thr_ctx;
-
-#if (NGX_EVENT_T_PADDING)
-
-    /* event should not cross cache line in SMP */
-
-    uint32_t         padding[NGX_EVENT_T_PADDING];
-#endif
-#endif
 };
 
-
-#if (NGX_HAVE_FILE_AIO)
-
-struct ngx_event_aio_s {
-    void                      *data;
-    ngx_event_handler_pt       handler;
-    ngx_file_t                *file;
-
-    ngx_fd_t                   fd;
-
-#if (NGX_HAVE_EVENTFD)
-    int64_t                    res;
-#if (NGX_TEST_BUILD_EPOLL)
-    ngx_err_t                  err;
-    size_t                     nbytes;
-#endif
-#else
-    ngx_err_t                  err;
-    size_t                     nbytes;
-#endif
-
-#if (NGX_HAVE_AIO_SENDFILE)
-    off_t                      last_offset;
-#endif
-
-    ngx_aiocb_t                aiocb;
-    ngx_event_t                event;
-};
-
-#endif
 
 
 typedef struct {
@@ -502,17 +374,6 @@ extern ngx_uint_t             ngx_accept_mutex_held;
 extern ngx_msec_t             ngx_accept_mutex_delay;
 extern ngx_int_t              ngx_accept_disabled;
 
-
-#if (NGX_STAT_STUB)
-
-extern ngx_atomic_t  *ngx_stat_accepted;
-extern ngx_atomic_t  *ngx_stat_handled;
-extern ngx_atomic_t  *ngx_stat_requests;
-extern ngx_atomic_t  *ngx_stat_active;
-extern ngx_atomic_t  *ngx_stat_reading;
-extern ngx_atomic_t  *ngx_stat_writing;
-
-#endif
 
 
 #define NGX_UPDATE_TIME         1

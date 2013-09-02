@@ -98,9 +98,6 @@ ngx_http_upstream_init_ip_hash_peer(ngx_http_request_t *r,
     ngx_http_upstream_srv_conf_t *us)
 {
     struct sockaddr_in                     *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6                    *sin6;
-#endif
     ngx_http_upstream_ip_hash_peer_data_t  *iphp;
 
     iphp = ngx_palloc(r->pool, sizeof(ngx_http_upstream_ip_hash_peer_data_t));
@@ -124,13 +121,6 @@ ngx_http_upstream_init_ip_hash_peer(ngx_http_request_t *r,
         iphp->addrlen = 3;
         break;
 
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = (struct sockaddr_in6 *) r->connection->sockaddr;
-        iphp->addr = (u_char *) &sin6->sin6_addr.s6_addr;
-        iphp->addrlen = 16;
-        break;
-#endif
 
     default:
         iphp->addr = ngx_http_upstream_ip_hash_pseudo_addr;

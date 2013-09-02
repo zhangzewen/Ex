@@ -51,11 +51,6 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
     ls->addr_text.len = len;
 
     switch (ls->sockaddr->sa_family) {
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-         ls->addr_text_max_len = NGX_INET6_ADDRSTRLEN;
-         break;
-#endif
 #if (NGX_HAVE_UNIX_DOMAIN)
     case AF_UNIX:
          ls->addr_text_max_len = NGX_UNIX_ADDRSTRLEN;
@@ -126,12 +121,6 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
 
         switch (ls[i].sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-             ls[i].addr_text_max_len = NGX_INET6_ADDRSTRLEN;
-             len = NGX_INET6_ADDRSTRLEN + sizeof(":65535") - 1;
-             break;
-#endif
 
 #if (NGX_HAVE_UNIX_DOMAIN)
         case AF_UNIX:
@@ -343,23 +332,6 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 return NGX_ERROR;
             }
 
-#if (NGX_HAVE_INET6 && defined IPV6_V6ONLY)
-
-            if (ls[i].sockaddr->sa_family == AF_INET6 && ls[i].ipv6only) {
-                int  ipv6only;
-
-                ipv6only = (ls[i].ipv6only == 1);
-
-                if (setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
-                               (const void *) &ipv6only, sizeof(int))
-                    == -1)
-                {
-                    ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                  "setsockopt(IPV6_V6ONLY) %V failed, ignored",
-                                  &ls[i].addr_text);
-                }
-            }
-#endif
             /* TODO: close on exit */
 
             if (!(ngx_event_flags & NGX_USE_AIO_EVENT)) {
@@ -1043,29 +1015,9 @@ ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
     ngx_uint_t            addr;
     u_char                sa[NGX_SOCKADDRLEN];
     struct sockaddr_in   *sin;
-#if (NGX_HAVE_INET6)
-    ngx_uint_t            i;
-    struct sockaddr_in6  *sin6;
-#endif
 
-    switch (c->local_sockaddr->sa_family) {
-
-#if (NGX_HAVE_INET6)
-    case AF_INET6:
-        sin6 = (struct sockaddr_in6 *) c->local_sockaddr;
-
-        for (addr = 0, i = 0; addr == 0 && i < 16; i++) {
-            addr |= sin6->sin6_addr.s6_addr[i];
-        }
-
-        break;
-#endif
-
-    default: /* AF_INET */
-        sin = (struct sockaddr_in *) c->local_sockaddr;
-        addr = sin->sin_addr.s_addr;
-        break;
-    }
+    sin = (struct sockaddr_in *) c->local_sockaddr;
+    addr = sin->sin_addr.s_addr;
 
     if (addr == 0) { //means that did not set the local address
 

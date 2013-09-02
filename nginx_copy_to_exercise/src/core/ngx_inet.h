@@ -22,8 +22,6 @@
  */
 
 #define NGX_INET_ADDRSTRLEN   (sizeof("255.255.255.255") - 1)
-#define NGX_INET6_ADDRSTRLEN                                                 \
-    (sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255") - 1)
 #define NGX_UNIX_ADDRSTRLEN                                                  \
     (sizeof(struct sockaddr_un) - offsetof(struct sockaddr_un, sun_path))
 
@@ -46,23 +44,12 @@ typedef struct {
 } ngx_in_cidr_t;
 
 
-#if (NGX_HAVE_INET6)
-
-typedef struct {
-    struct in6_addr           addr;
-    struct in6_addr           mask;
-} ngx_in6_cidr_t;
-
-#endif
 
 
 typedef struct {
     ngx_uint_t                family;
     union {
         ngx_in_cidr_t         in;
-#if (NGX_HAVE_INET6)
-        ngx_in6_cidr_t        in6;
-#endif
     } u;
 } ngx_cidr_t;
 
@@ -103,10 +90,6 @@ typedef struct {
 
 
 in_addr_t ngx_inet_addr(u_char *text, size_t len);
-#if (NGX_HAVE_INET6)
-ngx_int_t ngx_inet6_addr(u_char *p, size_t len, u_char *addr);
-size_t ngx_inet6_ntop(u_char *p, u_char *text, size_t len);
-#endif
 size_t ngx_sock_ntop(struct sockaddr *sa, u_char *text, size_t len,
     ngx_uint_t port);
 size_t ngx_inet_ntop(int family, void *addr, u_char *text, size_t len);

@@ -59,22 +59,6 @@ ngx_int_t             ngx_accept_disabled;
 ngx_file_t            ngx_accept_mutex_lock_file;
 
 
-#if (NGX_STAT_STUB)
-
-ngx_atomic_t   ngx_stat_accepted0;
-ngx_atomic_t  *ngx_stat_accepted = &ngx_stat_accepted0;
-ngx_atomic_t   ngx_stat_handled0;
-ngx_atomic_t  *ngx_stat_handled = &ngx_stat_handled0;
-ngx_atomic_t   ngx_stat_requests0;
-ngx_atomic_t  *ngx_stat_requests = &ngx_stat_requests0;
-ngx_atomic_t   ngx_stat_active0;
-ngx_atomic_t  *ngx_stat_active = &ngx_stat_active0;
-ngx_atomic_t   ngx_stat_reading0;
-ngx_atomic_t  *ngx_stat_reading = &ngx_stat_reading0;
-ngx_atomic_t   ngx_stat_writing0;
-ngx_atomic_t  *ngx_stat_writing = &ngx_stat_writing0;
-
-#endif
 
 
 
@@ -521,16 +505,6 @@ ngx_event_module_init(ngx_cycle_t *cycle)
            + cl          /* ngx_connection_counter */
            + cl;         /* ngx_temp_number */
 
-#if (NGX_STAT_STUB)
-
-    size += cl           /* ngx_stat_accepted */
-           + cl          /* ngx_stat_handled */
-           + cl          /* ngx_stat_requests */
-           + cl          /* ngx_stat_active */
-           + cl          /* ngx_stat_reading */
-           + cl;         /* ngx_stat_writing */
-
-#endif
 
     shm.size = size;
     shm.name.len = sizeof("nginx_shared_zone");
@@ -567,16 +541,6 @@ ngx_event_module_init(ngx_cycle_t *cycle)
 
     ngx_random_number = (tp->msec << 16) + ngx_pid;
 
-#if (NGX_STAT_STUB)
-
-    ngx_stat_accepted = (ngx_atomic_t *) (shared + 3 * cl);
-    ngx_stat_handled = (ngx_atomic_t *) (shared + 4 * cl);
-    ngx_stat_requests = (ngx_atomic_t *) (shared + 5 * cl);
-    ngx_stat_active = (ngx_atomic_t *) (shared + 6 * cl);
-    ngx_stat_reading = (ngx_atomic_t *) (shared + 7 * cl);
-    ngx_stat_writing = (ngx_atomic_t *) (shared + 8 * cl);
-
-#endif
 
     return NGX_OK;
 }
@@ -1084,9 +1048,6 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ngx_cidr_t            c, *cidr;
     ngx_uint_t            i;
     struct sockaddr_in   *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6  *sin6;
-#endif
 
     value = cf->args->elts;
 
@@ -1148,13 +1109,6 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         switch (cidr[i].family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-            sin6 = (struct sockaddr_in6 *) u.addrs[i].sockaddr;
-            cidr[i].u.in6.addr = sin6->sin6_addr;
-            ngx_memset(cidr[i].u.in6.mask.s6_addr, 0xff, 16);
-            break;
-#endif
 
         default: /* AF_INET */
             sin = (struct sockaddr_in *) u.addrs[i].sockaddr;

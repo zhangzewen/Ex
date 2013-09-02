@@ -165,9 +165,6 @@ ngx_http_header_filter(ngx_http_request_t *r)
     ngx_http_core_loc_conf_t  *clcf;
     ngx_http_core_srv_conf_t  *cscf;
     struct sockaddr_in        *sin;
-#if (NGX_HAVE_INET6)
-    struct sockaddr_in6       *sin6;
-#endif
     u_char                     addr[NGX_SOCKADDR_STRLEN];
 
     if (r->header_sent) {
@@ -332,12 +329,6 @@ ngx_http_header_filter(ngx_http_request_t *r)
 
         switch (c->local_sockaddr->sa_family) {
 
-#if (NGX_HAVE_INET6)
-        case AF_INET6:
-            sin6 = (struct sockaddr_in6 *) c->local_sockaddr;
-            port = ntohs(sin6->sin6_port);
-            break;
-#endif
 #if (NGX_HAVE_UNIX_DOMAIN)
         case AF_UNIX:
             port = 0;
@@ -355,11 +346,6 @@ ngx_http_header_filter(ngx_http_request_t *r)
 
         if (clcf->port_in_redirect) {
 
-#if (NGX_HTTP_SSL)
-            if (c->ssl)
-                port = (port == 443) ? 0 : port;
-            else
-#endif
                 port = (port == 80) ? 0 : port;
 
         } else {
