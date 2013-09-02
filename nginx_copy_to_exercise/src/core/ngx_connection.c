@@ -15,7 +15,13 @@ ngx_os_io_t  ngx_io;
 
 static void ngx_drain_connections(void);
 
-
+//! init the ngx_listening_t struct ,not binding ,listening yet!
+/*!
+	\param cf a pointer to ngx_conf_t struct that the config args
+	\param sockaddr the ip and port that binded to socket fd ，void * will be transformed to struct sockaddr *
+	\param socklen 
+	\return get the inited pointer to ngx_listening_t 
+*/
 ngx_listening_t *
 ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
 {
@@ -264,7 +270,10 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+/*!as we known ,that we init the ngx_listening_t from function ngx_create_listening(ngx_conf_t *cf, void *sockaddr, sockent_t socklen),now wo band it and listen it
+	\param cycle it contains all of the arags parased from the conf/nginx.conf 
+	\return NGX_ERROR for listening fall ,NGX_OK for listening successes!
+*/
 ngx_int_t
 ngx_open_listening_sockets(ngx_cycle_t *cycle)
 {
@@ -308,7 +317,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
                 continue;
             }
-
+						//socket(domain, type , flags)
             s = ngx_socket(ls[i].sockaddr->sa_family, ls[i].type, 0);
 
             if (s == -1) {
@@ -316,7 +325,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                               ngx_socket_n " %V failed", &ls[i].addr_text);
                 return NGX_ERROR;
             }
-
+						//set socket address reuseadble
             if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                            (const void *) &reuseaddr, sizeof(int))
                 == -1)
@@ -371,7 +380,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
             ngx_log_debug2(NGX_LOG_DEBUG_CORE, log, 0,
                            "bind() %V #%d ", &ls[i].addr_text, s);
-
+						//bind(fd, struct sockaddr *, socklen_t)
             if (bind(s, ls[i].sockaddr, ls[i].socklen) == -1) {
                 err = ngx_socket_errno;
 
@@ -419,7 +428,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 }
             }
 #endif
-
+						//listen(fd, backlog)
             if (listen(s, ls[i].backlog) == -1) {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
                               "listen() to %V, backlog %d failed",
@@ -459,7 +468,10 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+/*! config the ngx_listening_t args such as rcvbuf, sndbuf, and so on use setsockopt flags SO_RCVBUF, SNDBUF to size socket recv and send buff
+	\param cycle it contines all of the args parsed from conf/nginx.conf 
+	\return noting
+*/
 void
 ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 {
@@ -478,7 +490,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
     for (i = 0; i < cycle->listening.nelts; i++) {
 
         ls[i].log = *ls[i].logp;
-
+				//set SO_RCVBUF
         if (ls[i].rcvbuf != -1) {
             if (setsockopt(ls[i].fd, SOL_SOCKET, SO_RCVBUF,
                            (const void *) &ls[i].rcvbuf, sizeof(int))
@@ -489,7 +501,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                               ls[i].rcvbuf, &ls[i].addr_text);
             }
         }
-
+				//set SO_SNDBUF
         if (ls[i].sndbuf != -1) {
             if (setsockopt(ls[i].fd, SOL_SOCKET, SO_SNDBUF,
                            (const void *) &ls[i].sndbuf, sizeof(int))
@@ -500,7 +512,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                               ls[i].sndbuf, &ls[i].addr_text);
             }
         }
-
+				//set SO_KEEPALIVE
         if (ls[i].keepalive) {
             keepalive = (ls[i].keepalive == 1) ? 1 : 0;
 
@@ -552,6 +564,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 #endif
 
 #if (NGX_HAVE_SETFIB)
+				//i do not find flag SO_SETFIB int SOL_SOCKET,and whatever ,i think it's useless maybe
         if (ls[i].setfib != -1) {
             if (setsockopt(ls[i].fd, SOL_SOCKET, SO_SETFIB,
                            (const void *) &ls[i].setfib, sizeof(int))
@@ -678,7 +691,10 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
     return;
 }
 
-
+/*!close socket fd
+	\param cycle it contains all of args parsed from conf/nginx.conf
+	\return noting 
+*/
 void
 ngx_close_listening_sockets(ngx_cycle_t *cycle)
 {
@@ -828,7 +844,10 @@ ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
     return c;
 }
 
-
+/*!delete connection from connection table
+	\param c the connection to be delete
+	\return noting
+*/
 void
 ngx_free_connection(ngx_connection_t *c)
 {
@@ -845,7 +864,10 @@ ngx_free_connection(ngx_connection_t *c)
     }
 }
 
-
+/*!close the connection 
+	\param c the connection to be closed
+	\return noting
+*/
 void
 ngx_close_connection(ngx_connection_t *c)
 {
@@ -1008,7 +1030,11 @@ ngx_drain_connections(void)
     }
 }
 
-
+/*! set local_socaddr ,getsockname return the load address bind to the socket fd
+	\param c connection
+	\param s domain to be seted 
+	\param port port
+*/
 ngx_int_t
 ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
     ngx_uint_t port)
@@ -1041,11 +1067,11 @@ ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
         break;
     }
 
-    if (addr == 0) {
+    if (addr == 0) { //means that did not set the local address
 
         len = NGX_SOCKADDRLEN;
 
-        if (getsockname(c->fd, (struct sockaddr *) &sa, &len) == -1) {
+        if (getsockname(c->fd, (struct sockaddr *) &sa, &len) == -1) { // get the local address
             ngx_connection_error(c, ngx_socket_errno, "getsockname() failed");
             return NGX_ERROR;
         }
@@ -1062,7 +1088,7 @@ ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
         return NGX_OK;
     }
 
-    s->len = ngx_sock_ntop(c->local_sockaddr, s->data, s->len, port);
+    s->len = ngx_sock_ntop(c->local_sockaddr, s->data, s->len, port); //set the local address by s and  port via ngx_sock_ntop
 
     return NGX_OK;
 }
