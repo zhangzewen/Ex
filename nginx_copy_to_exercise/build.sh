@@ -1,3 +1,5 @@
+make clean;
+
 	./configure --prefix=/usr/local/nginx \
 	--without-http_charset_module \
   --without-http_gzip_module \
@@ -20,4 +22,8 @@
   --without-http_upstream_ip_hash_module  \
   --without-http_upstream_least_conn_module  \
   --without-http_upstream_keepalive_module \
-	--with-pcre=/root/tar/pcre
+	--with-pcre=/root/tar/pcre \
+	--with-debug \
+	--without-http-cache
+
+exit 0;

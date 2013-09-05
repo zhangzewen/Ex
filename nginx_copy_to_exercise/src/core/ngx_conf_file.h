@@ -109,8 +109,8 @@ struct ngx_open_file_s {
 #define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0
 
 struct ngx_module_s {
-    ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
+    ngx_uint_t            ctx_index; //此模块在所有http_module类型中的索引
+    ngx_uint_t            index; // 此模块在所有的模块中的索引
 
     ngx_uint_t            spare0;
     ngx_uint_t            spare1;

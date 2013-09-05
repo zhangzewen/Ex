@@ -755,7 +755,6 @@ ngx_event_process_init(ngx_cycle_t *cycle)
             }
         }
 
-#endif
 
     }
 
@@ -828,7 +827,7 @@ ngx_events_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
-    *(void **) conf = ctx;
+    *(void **) conf = ctx; // 这一步，把把ctx赋值cycle->conf_ctx[3]
 
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_EVENT_MODULE) {

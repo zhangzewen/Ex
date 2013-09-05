@@ -1,0 +1,95 @@
+
+Breakpoint 1, ngx_http_block (cf=0x7fffffffe610, cmd=0x66c640, conf=0x683a38) at src/http/ngx_http.c:116
+116     {
+(gdb) p cf
+$1 = (ngx_conf_t *) 0x7fffffffe610
+(gdb) p cf->cycle
+$2 = (ngx_cycle_t *) 0x682bd0
+(gdb) p cf->cycle->conf_ctx
+$3 = (void ****) 0x683a00
+(gdb) p *(cf->cycle->conf_ctx)@26
+$4 = {0x683ad8, 0x0, 0x0, 0x683da8, 0x0, 0x0, 0x683bc0, 0x0 <repeats 17 times>, 0x736f686c61636f6c, 0x646c61636f6c2e74}
+(gdb) cf->cycle->conf_ctx[3]
+Undefined command: "cf->cycle->conf_ctx".  Try "help".
+(gdb) pcf->cycle->conf_ctx[3]
+Undefined command: "pcf->cycle->conf_ctx".  Try "help".
+(gdb) p cf->cycle->conf_ctx[3]
+$5 = (void ***) 0x683da8
+(gdb) p *(cf->cycle->conf_ctx[3])
+$6 = (void **) 0x683db0
+(gdb) p (*(cf->cycle->conf_ctx[3]))[0]
+$7 = (void *) 0x683dc0
+(gdb) p (*(cf->cycle->conf_ctx[3]))[0]  
+$8 = (void *) 0x683dc0
+(gdb) p *((*(cf->cycle->conf_ctx[3]))[0])@3
+Attempt to dereference a generic pointer.
+(gdb) p (*(cf->cycle->conf_ctx[3]))
+$9 = (void **) 0x683db0
+(gdb) p *(*(cf->cycle->conf_ctx[3]))@3
+$10 = {0x683dc0, 0x683e58, 0x400}
+(gdb) p *(*(cf->cycle->conf_ctx[3]))@4
+$11 = {0x683dc0, 0x683e58, 0x400, 0x1}
+(gdb) p (*(cf->cycle->conf_ctx[3]))
+$12 = (void **) 0x683db0
+(gdb) p (*(cf->cycle->conf_ctx[3]))[0]
+$13 = (void *) 0x683dc0
+(gdb) p (ngx_event_conf_t *)(*(cf->cycle->conf_ctx[3]))[0]
+$14 = (ngx_event_conf_t *) 0x683dc0
+(gdb) p *(ngx_event_conf_t *)(*(cf->cycle->conf_ctx[3]))[0]
+$15 = {connections = 1024, use = 1, multi_accept = 0, accept_mutex = 1, accept_mutex_delay = 500, name = 0x459905 "epoll", debug_connection = {elts = 0x683e18, nelts = 1, size = 16, nalloc = 4, pool = 0x682b80}}
+(gdb) p *(ngx_epoll_conf_t *)(*(cf->cycle->conf_ctx[3]))[1]
+$16 = {events = 512, aio_requests = 32}
+(gdb) 
+
+
+
+
+
+======================================地址转换=======================================================================
+Breakpoint 1, ngx_http_block (cf=0x7fffffffe610, cmd=0x66c640, conf=0x683a38) at src/http/ngx_http.c:116
+116     {
+(gdb) n
+128         ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t));
+(gdb) ptype ctx
+type = struct {
+    void **main_conf;
+    void **srv_conf;
+    void **loc_conf;
+} *
+(gdb) n
+129         if (ctx == NULL) {
+(gdb) n
+128         ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t));
+(gdb) n
+133         *(ngx_http_conf_ctx_t **) conf = ctx;
+(gdb) p conf
+$1 = (void *) 0x683a38
+(gdb) p cf->cycle->conf_ctx
+$2 = (void ****) 0x683a00
+(gdb) p *(cf->cycle->conf_ctx)
+$3 = (void ***) 0x683ad8
+(gdb) p *(cf->cycle->conf_ctx)@32
+$4 = {0x683ad8, 0x0, 0x0, 0x683da8, 0x0, 0x0, 0x683bc0, 0x0 <repeats 17 times>, 0x736f686c61636f6c, 0x646c61636f6c2e74, 0x6e69616d6f, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x1, 0xffffffffffffffff}
+(gdb) p cf->cycle->conf_ctx[7]
+$5 = (void ***) 0x0
+(gdb) p &cf->cycle->conf_ctx[7]
+$6 = (void ****) 0x683a38
+(gdb) 
+
+
+=========================在ngx_http_block 第一次循环create_main|srv|loc_conf 后的内存表===============================
+(gdb) p mi
+$15 = 15
+(gdb) p *(ctx->main_conf)@15
+$16 = {0x6b1048, 0x6b15e0, 0x6b18e0, 0x0 <repeats 12 times>}
+(gdb) p *(ctx->main_conf)@16
+$17 = {0x6b1048, 0x6b15e0, 0x6b18e0, 0x0 <repeats 13 times>}
+(gdb) p *(ctx->main_conf)@17
+$18 = {0x6b1048, 0x6b15e0, 0x6b18e0, 0x0 <repeats 13 times>, 0x6b12e8}
+(gdb) p *(ctx->main_conf)@15
+$19 = {0x6b1048, 0x6b15e0, 0x6b18e0, 0x0 <repeats 12 times>}
+(gdb) p *(ctx->srv_conf)@15 
+$20 = {0x6b12e8, 0x0 <repeats 14 times>}
+(gdb) p *(ctx->loc_conf)@15
+$21 = {0x6b1380, 0x6b18b8, 0x0, 0x0, 0x6b1938, 0x6b1948, 0x6b1950, 0x6b1970, 0x0, 0x0, 0x0, 0x0, 0x6b1998, 0x6b19b0, 0x0}
+(gdb) 

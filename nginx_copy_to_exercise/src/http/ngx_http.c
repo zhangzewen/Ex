@@ -134,7 +134,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
     /* count the number of the http modules and set up their indices */
-
+		//给每个NGX_HTTP_MODULE的模块分配索引
     ngx_http_max_module = 0;
     for (m = 0; ngx_modules[m]; m++) {
         if (ngx_modules[m]->type != NGX_HTTP_MODULE) {
@@ -146,7 +146,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
     /* the http main_conf context, it is the same in the all http contexts */
-
+		//main_conf在http{...}里面的所有上下文中都是一致的
+		//分配内存，个数为http模块的个数
     ctx->main_conf = ngx_pcalloc(cf->pool,
                                  sizeof(void *) * ngx_http_max_module);
     if (ctx->main_conf == NULL) {
@@ -158,7 +159,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
      * the http null srv_conf context, it is used to merge
      * the server{}s' srv_conf's
      */
-
+		//用来合并server{..}里面的srv_conf
+		//分配内存，个数为http模块的个数
     ctx->srv_conf = ngx_pcalloc(cf->pool, sizeof(void *) * ngx_http_max_module);
     if (ctx->srv_conf == NULL) {
         return NGX_CONF_ERROR;
@@ -169,7 +171,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
      * the http null loc_conf context, it is used to merge
      * the server{}s' loc_conf's
      */
-
+		//用来合并server{..}下loc{..}里面的loc_conf
+		//分配内存，个数为http模块的个数
     ctx->loc_conf = ngx_pcalloc(cf->pool, sizeof(void *) * ngx_http_max_module);
     if (ctx->loc_conf == NULL) {
         return NGX_CONF_ERROR;
@@ -220,7 +223,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         module = ngx_modules[m]->ctx;
-
+				//调用没有NGX_HTTP_MODULE模块的怕热configuration()函数
+				//一般模块的preconfiguration()作用是添加一些模块要用的变量到ngx_http_core_main_conf_t的hashbiaovariables_keys
         if (module->preconfiguration) {
             if (module->preconfiguration(cf) != NGX_OK) {
                 return NGX_CONF_ERROR;
@@ -271,21 +275,22 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
     /* create location trees */
-
+		//给每个server创建location tree
     for (s = 0; s < cmcf->servers.nelts; s++) {
 
         clcf = cscfp[s]->ctx->loc_conf[ngx_http_core_module.ctx_index];
-
+				//每个srv(虚拟主机)的ngx_http_core_loc_conf_t
+				//location根据字母顺序排列
         if (ngx_http_init_locations(cf, cscfp[s], clcf) != NGX_OK) {
             return NGX_CONF_ERROR;
         }
-
+				//建立静态location树(三叉树)
         if (ngx_http_init_static_location_trees(cf, clcf) != NGX_OK) {
             return NGX_CONF_ERROR;
         }
     }
 
-
+		//初始化几个phase的handler(分配内存)
     if (ngx_http_init_phases(cf, cmcf) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
@@ -294,7 +299,10 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
-
+    //注册每个模块对应phase的处理函数
+		//这儿的处理函数是通用的(如http模块的所有location)
+		//特定location的处理函数在指令(directve)的set()里面设置
+		//
     for (m = 0; ngx_modules[m]; m++) {
         if (ngx_modules[m]->type != NGX_HTTP_MODULE) {
             continue;
@@ -308,7 +316,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
             }
         }
     }
-
+		//设置pre-defined variables的get_handler等，并放入hash table里
     if (ngx_http_variables_init_vars(cf) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
@@ -319,7 +327,9 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
      */
 
     *cf = pcf;
-
+		//注册各http模块phase的checker，并把postconfiguration注册的handler都放到cmcf的phase_engine，
+		//phase_engine把cheker和对应的handler一同放入数组，并通过next变量连接，供之后处理
+		//请求的时候按phase顺序调用
 
     if (ngx_http_init_phase_handlers(cf, cmcf) != NGX_OK) {
         return NGX_CONF_ERROR;
@@ -327,7 +337,8 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
     /* optimize the lists of ports, addresses and server names */
-
+		//把server_name存储在hash table里，最后给每个listeningsocket注册 ls->handler=
+		//ngx_http_init_connection;
     if (ngx_http_optimize_servers(cf, cmcf, cmcf->ports) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
