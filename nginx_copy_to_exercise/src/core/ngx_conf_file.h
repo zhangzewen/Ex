@@ -79,7 +79,9 @@ struct ngx_command_s {
     ngx_str_t             name;
     ngx_uint_t            type;
     char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-    ngx_uint_t            conf;
+    ngx_uint_t            conf;//字段conf被NGX_HTTP_MODULE类型的模块使用，该字段指定当前配置项所在的大致位置，取值为
+//NGX_HTTP_MAIN_CONF_OFFSET, NGX_HTTP_SRV_CONF_OFFSET, NGX_HTTP_LOC_CONF_OFFSET三者之一，其他模块不使用该字段，直接指定为0
+//字段offset指定该配置项的精确位置，一般指定为某一个结构体变量的字段偏移
     ngx_uint_t            offset;
     void                 *post;
 };

@@ -274,6 +274,47 @@ done:
 
     return NGX_CONF_OK;
 }
+/*
+	参数last是ngx_conf_read_token解析的返回结果
+ cf->args中已经保存了我们需要的各个参数
+ 四步走
+ 
+	(1)模块匹配
+	(2)command匹配
+	(3)参数个数匹配
+	(4)执行command（set函数）
+	这里涉及command的类型问题：NGX_DIRECT_CONF, NGX_MAIN_CONF, NGX_HTTP_MAIN_CONF, NGX_HTTP_SRV_CONF
+	NGX_HTTP_LOC_CONF
+	其中NGX_DIRECT_CONF一般是在http块等之外的配置，NGX_HTTP_MAIN_CONF是直接配置在http块中，
+  NGX_HTTP_SRV_CONF配置在server块中，NGX_HTTP_LOC_CONF配置在location中等等
+
+	在ngx_init_cycle中最初cf->ctx类型为void *由cycle->conf_ctx赋值得到。	
+	在ngx_init_cycle中有：
+	cycle->conf_ctx = ngx_pcalloc(pool, ngx_max_module * sizeof(void*)); ngx_max_module是系统所有的mok
+	的数量，conf_ctx在这一句中用来给每个module占一个位置。但是每个位置到底指向啥东西，反正是void*
+	指啥都行，可能对于有的module，我们要拿到一个我们想要的实体，要透过4层指针
+
+	(1)NGX_DIRECT_CONF
+	对于那些游离于{}之外的配置，一般属于ngx_core_conf_t的配置内容，在ngx_init_cycle的时候
+	已经对NGX_CORE_MODULE类型的模块进行了初始化（模块需要有init函数），这里根据配置信息，set函数
+	会做配置结构内中成员的赋值
+	(2)NGX_MAIN_CONF
+	这样的配置包括event,http等，他们没有init函数，所以在实际的空间分配需要在set函数内完成，
+	于是就有了
+  
+  conf = &(((void **)cf->ctx)[ngx_modules[i]->index]) //取指针的地址
+	rv = cmd->set(cf, cmd, conf); // 指针在函数内被赋值
+  set中的conf参数是一个二重指针，这也就有个之后在ngx_http_block中的语句：
+	ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t));
+	*(ngx_http_conf_ctx_t **)conf = ctx;
+	(3)其他
+	
+	这里的"其他"， 主要是一些server和location的类型的command，这些command大量的集中于http的
+	相关配置中
+	
+*/
+
+
 
 
 static ngx_int_t
