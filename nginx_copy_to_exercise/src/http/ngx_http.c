@@ -457,52 +457,58 @@ ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
     ngx_uint_t                  i, n;
     ngx_uint_t                  find_config_index, use_rewrite, use_access;
     ngx_http_handler_pt        *h;
+		//最终的handler数组
     ngx_http_phase_handler_t   *ph;
     ngx_http_phase_handler_pt   checker;
 
     cmcf->phase_engine.server_rewrite_index = (ngx_uint_t) -1;
     cmcf->phase_engine.location_rewrite_index = (ngx_uint_t) -1;
     find_config_index = 0;
+		//是否有使用rewrite以及access
     use_rewrite = cmcf->phases[NGX_HTTP_REWRITE_PHASE].handlers.nelts ? 1 : 0;
     use_access = cmcf->phases[NGX_HTTP_ACCESS_PHASE].handlers.nelts ? 1 : 0;
 
     n = use_rewrite + use_access + cmcf->try_files + 1 /* find config phase */;
-
+		//开始计算handler数组的大小
     for (i = 0; i < NGX_HTTP_LOG_PHASE; i++) {
         n += cmcf->phases[i].handlers.nelts;
     }
-
+		//数组分配内存
     ph = ngx_pcalloc(cf->pool,
                      n * sizeof(ngx_http_phase_handler_t) + sizeof(void *));
     if (ph == NULL) {
         return NGX_ERROR;
     }
-
+		//handler数组放到handler里面
     cmcf->phase_engine.handlers = ph;
+		//n表示下一个phase的索引
     n = 0;
-
+		//开始便利phase handler 这里是一个phase一个pahse的遍历
     for (i = 0; i < NGX_HTTP_LOG_PHASE; i++) {
+				//取出对应的handler处理函数
         h = cmcf->phases[i].handlers.elts;
-
+				//根据不同的phase来处理
         switch (i) {
-
+				//server重写phase(也就是内部重定向phase)
         case NGX_HTTP_SERVER_REWRITE_PHASE:
+				//如果有定义重写规则则设置重写handler的索引n
             if (cmcf->phase_engine.server_rewrite_index == (ngx_uint_t) -1) {
                 cmcf->phase_engine.server_rewrite_index = n;
             }
+				//赋值checker
             checker = ngx_http_core_rewrite_phase;
 
             break;
-
+				//config phase 只有一个，这里设置find_config_index，是因为当我们rewrite之后的url就必须重新挂载location的一些结构，因此就需要再次进入这个phase
         case NGX_HTTP_FIND_CONFIG_PHASE:
             find_config_index = n;
-
+						//自己的checker
             ph->checker = ngx_http_core_find_config_phase;
             n++;
             ph++;
 
             continue;
-
+				//rewrite phase
         case NGX_HTTP_REWRITE_PHASE:
             if (cmcf->phase_engine.location_rewrite_index == (ngx_uint_t) -1) {
                 cmcf->phase_engine.location_rewrite_index = n;
@@ -512,8 +518,10 @@ ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
             break;
 
         case NGX_HTTP_POST_REWRITE_PHASE:
+				//如果有使用rewriteze给它的checker赋值
             if (use_rewrite) {
                 ph->checker = ngx_http_core_post_rewrite_phase;
+				//注意它的next就是find_config phase，也就是说需要重新挂载location的数据
                 ph->next = find_config_index;
                 n++;
                 ph++;
@@ -551,13 +559,16 @@ ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
         default:
             checker = ngx_http_core_generic_phase;
         }
-
+				//这里n刚好就是下一个phase的真实索引
         n += cmcf->phases[i].handlers.nelts;
 
         for (j = cmcf->phases[i].handlers.nelts - 1; j >=0; j--) {
             ph->checker = checker;
+				//每个的handler就是注册的时候的回调函数
             ph->handler = h[j];
+				//next为下一个phase的索引
             ph->next = n;
+				//下一个handler
             ph++;
         }
     }

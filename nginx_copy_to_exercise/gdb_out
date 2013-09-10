@@ -93,3 +93,376 @@ $20 = {0x6b12e8, 0x0 <repeats 14 times>}
 (gdb) p *(ctx->loc_conf)@15
 $21 = {0x6b1380, 0x6b18b8, 0x0, 0x0, 0x6b1938, 0x6b1948, 0x6b1950, 0x6b1970, 0x0, 0x0, 0x0, 0x0, 0x6b1998, 0x6b19b0, 0x0}
 (gdb) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==============================================刚开始分配cycle->conf_ctx的时候=========================================================================
+(gdb) p cycle->conf_ctx
+$2 = (void ****) 0x6b0a00
+(gdb) p cycle->conf_ctx + 0
+$3 = (void ****) 0x6b0a00
+(gdb) p cycle->conf_ctx + 1
+$4 = (void ****) 0x6b0a08
+(gdb) p cycle->conf_ctx + 2
+$5 = (void ****) 0x6b0a10
+(gdb) p cycle->conf_ctx + 3
+$6 = (void ****) 0x6b0a18
+(gdb) p cycle->conf_ctx + 4
+$7 = (void ****) 0x6b0a20
+(gdb) p cycle->conf_ctx + 5
+$8 = (void ****) 0x6b0a28
+(gdb) p cycle->conf_ctx + 6
+$9 = (void ****) 0x6b0a30
+(gdb) p *cycle->conf_ctx
+$10 = (void ***) 0x0
+(gdb) p *(cycle->conf_ctx)@24
+$11 = {0x0 <repeats 24 times>}
+(gdb) 
+
+==================================================ngx_init_cycle给每个NGX_CORE_MODULE的配置分配空间的时候==================================================================
+(gdb) 
+220             module = ngx_modules[i]->ctx;
+(gdb) 
+222             if (module->create_conf) {
+(gdb) 
+223                 rv = module->create_conf(cycle);
+(gdb) 
+224                 if (rv == NULL) {
+(gdb) 
+228                 cycle->conf_ctx[ngx_modules[i]->index] = rv;
+(gdb) 
+215         for (i = 0; ngx_modules[i]; i++) {
+(gdb) 
+216             if (ngx_modules[i]->type != NGX_CORE_MODULE) {
+(gdb) 
+220             module = ngx_modules[i]->ctx;
+(gdb) 
+222             if (module->create_conf) {
+(gdb) 
+215         for (i = 0; ngx_modules[i]; i++) {
+(gdb) 
+216             if (ngx_modules[i]->type != NGX_CORE_MODULE) {
+(gdb) 
+215         for (i = 0; ngx_modules[i]; i++) {
+(gdb) 
+216             if (ngx_modules[i]->type != NGX_CORE_MODULE) {
+(gdb) 
+215         for (i = 0; ngx_modules[i]; i++) {
+(gdb) u
+233         senv = environ;
+(gdb) p cycle->conf_ctx 
+$12 = (void ****) 0x6b0a00
+(gdb) p cycle->conf_ctx + 1
+$13 = (void ****) 0x6b0a08
+(gdb) p cycle->conf_ctx + 2
+$14 = (void ****) 0x6b0a10
+(gdb) p cycle->conf_ctx + 3
+$15 = (void ****) 0x6b0a18
+(gdb) p cycle->conf_ctx + 4
+$16 = (void ****) 0x6b0a20
+(gdb) p cycle->conf_ctx + 5
+$17 = (void ****) 0x6b0a28
+(gdb) p *(cycle->conf_ctx)@24
+$18 = {0x6b0ad8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x6b0bc0, 0x0 <repeats 17 times>}
+(gdb) p cycle->conf_ctx[0]
+$19 = (void ***) 0x6b0ad8
+(gdb) p cycle->conf_ctx[1]   
+$20 = (void ***) 0x0
+(gdb) p cycle->conf_ctx[2]
+$21 = (void ***) 0x0
+(gdb) p cycle->conf_ctx[3]
+$22 = (void ***) 0x0
+(gdb) p cycle->conf_ctx[4]
+$23 = (void ***) 0x0
+(gdb) p cycle->conf_ctx[5]
+$24 = (void ***) 0x0
+(gdb) p cycle->conf_ctx[6]
+$25 = (void ***) 0x6b0bc0
+(gdb) p cycle->conf_ctx[7]
+$26 = (void ***) 0x0
+(gdb) 
+
+
+========================================================当配置worker_processes的时候=================================================================================================================
+ngx_conf_handler (cf=0x7fffffffe580, last=0) at src/core/ngx_conf_file.c:329
+329         name = cf->args->elts;
+(gdb) n
+331         found = 0;
+(gdb) p *name
+$27 = {len = 16, data = 0x6b0d48 "worker_processes"}
+(gdb) n
+333         for (i = 0; ngx_modules[i]; i++) {
+(gdb) n
+335             cmd = ngx_modules[i]->commands;
+(gdb) n
+336             if (cmd == NULL) {
+(gdb) n
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+346                 if (ngx_strcmp(name->data, cmd->name.data) != 0) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+346                 if (ngx_strcmp(name->data, cmd->name.data) != 0) {
+(gdb) 
+350                 found = 1;
+(gdb) 
+352                 if (ngx_modules[i]->type != NGX_CONF_MODULE
+(gdb) 
+360                 if (!(cmd->type & cf->cmd_type)) {
+(gdb) 
+364                 if (!(cmd->type & NGX_CONF_BLOCK) && last != NGX_OK) {
+(gdb) 
+371                 if ((cmd->type & NGX_CONF_BLOCK) && last != NGX_CONF_BLOCK_START) {
+(gdb) 
+380                 if (!(cmd->type & NGX_CONF_ANY)) {
+(gdb) 
+382                     if (cmd->type & NGX_CONF_FLAG) {
+(gdb) 
+388                     } else if (cmd->type & NGX_CONF_1MORE) {
+(gdb) 
+394                     } else if (cmd->type & NGX_CONF_2MORE) {
+(gdb) 
+400                     } else if (cf->args->nelts > NGX_CONF_MAX_ARGS) {
+(gdb) 
+404                     } else if (!(cmd->type & argument_number[cf->args->nelts - 1]))
+(gdb) 
+412                 conf = NULL;
+(gdb) 
+414                 if (cmd->type & NGX_DIRECT_CONF) {
+(gdb) 
+415                     conf = ((void **) cf->ctx)[ngx_modules[i]->index];
+(gdb) p cf->ctx
+$28 = (void *) 0x6b0a00
+(gdb) 
+===================================================================================================================================================
+ngx_conf_handler (cf=0x7fffffffe580, last=0) at src/core/ngx_conf_file.c:329
+329         name = cf->args->elts;
+(gdb) m
+Ambiguous command "m": macro, maintenance, make, mem, monitor, mt.
+(gdb) p *name
+$36 = {len = 5, data = 0x6b0d78 "debug"}
+(gdb) n
+331         found = 0;
+(gdb) n
+333         for (i = 0; ngx_modules[i]; i++) {
+(gdb) p *name@4
+$37 = {{len = 9, data = 0x6b0d5d "error_log"}, {len = 14, data = 0x6b0d68 "logs/error.log"}, {len = 5, data = 0x6b0d78 "debug"}, {len = 0, data = 0x0}}
+(gdb) n
+335             cmd = ngx_modules[i]->commands;
+(gdb) n
+336             if (cmd == NULL) {
+(gdb) n
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) n
+342                 if (name->len != cmd->name.len) {
+(gdb) n
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) n
+342                 if (name->len != cmd->name.len) {
+(gdb) n
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+346                 if (ngx_strcmp(name->data, cmd->name.data) != 0) {
+(gdb) 
+							................................................................
+(gdb) 
+333         for (i = 0; ngx_modules[i]; i++) {
+(gdb) 
+335             cmd = ngx_modules[i]->commands;
+(gdb) 
+336             if (cmd == NULL) {
+(gdb) 
+340             for ( /* void */ ; cmd->name.len; cmd++) {
+(gdb) 
+342                 if (name->len != cmd->name.len) {
+(gdb) 
+346                 if (ngx_strcmp(name->data, cmd->name.data) != 0) {
+(gdb) 
+350                 found = 1;
+(gdb) 
+352                 if (ngx_modules[i]->type != NGX_CONF_MODULE
+(gdb) 
+360                 if (!(cmd->type & cf->cmd_type)) {
+(gdb) 
+364                 if (!(cmd->type & NGX_CONF_BLOCK) && last != NGX_OK) {
+(gdb) 
+371                 if ((cmd->type & NGX_CONF_BLOCK) && last != NGX_CONF_BLOCK_START) {
+(gdb) 
+380                 if (!(cmd->type & NGX_CONF_ANY)) {
+(gdb) 
+382                     if (cmd->type & NGX_CONF_FLAG) {
+(gdb) 
+388                     } else if (cmd->type & NGX_CONF_1MORE) {
+(gdb) 
+390                         if (cf->args->nelts < 2) {
+(gdb) 
+391                             goto invalid;
+(gdb) 
+412                 conf = NULL;
+(gdb) 
+414                 if (cmd->type & NGX_DIRECT_CONF) {
+(gdb) 
+417                 } else if (cmd->type & NGX_MAIN_CONF) {
+(gdb) 
+418                     conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);
+(gdb) 
+428                 rv = cmd->set(cf, cmd, conf);
+(gdb) p conf
+$38 = (void *) 0x6b0a08
+(gdb) p *((void ****)cf->ctx)@24
+$39 = {0x6b0ad8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x6b0bc0, 0x0 <repeats 17 times>}
+(gdb) p i
+$40 = 1
+(gdb) p (void ****)cf->ctx + 1
+$41 = (void ****) 0x6b0a08
+(gdb) 
+======================================================================================================================================================
+(gdb) p cycle
+$1 = (ngx_cycle_t *) 0x682bd0
+(gdb) p *(cycle->conf_ctx)@24
+$2 = {0x683ad8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x683bc0, 0x0 <repeats 17 times>}
+(gdb) p *(cycle->conf_ctx)@30
+$3 = {0x683ad8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x683bc0, 0x0 <repeats 17 times>, 0x736f686c61636f6c, 0x646c61636f6c2e74, 0x6e69616d6f, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff}
+(gdb) p *(ngx_core_conf_t *)(cycle->conf_ctx[0])
+$4 = {daemon = -1, master = -1, timer_resolution = 18446744073709551615, worker_processes = -1, debug_points = -1, rlimit_nofile = -1, rlimit_sigpending = -1, rlimit_core = -1, priority = 0, cpu_affinity_n = 0, cpu_affinity = 0x0, 
+  username = 0x0, user = 4294967295, group = 4294967295, working_directory = {len = 0, data = 0x0}, lock_file = {len = 0, data = 0x0}, pid = {len = 0, data = 0x0}, oldpid = {len = 0, data = 0x0}, env = {elts = 0x683bb0, nelts = 0, 
+    size = 16, nalloc = 1, pool = 0x682b80}, environment = 0x0}
+(gdb) set print pretty on
+(gdb) p *(ngx_core_conf_t *)(cycle->conf_ctx[0])
+$5 = {
+  daemon = -1, 
+  master = -1, 
+  timer_resolution = 18446744073709551615, 
+  worker_processes = -1, 
+  debug_points = -1, 
+  rlimit_nofile = -1, 
+  rlimit_sigpending = -1, 
+  rlimit_core = -1, 
+  priority = 0, 
+  cpu_affinity_n = 0, 
+  cpu_affinity = 0x0, 
+  username = 0x0, 
+  user = 4294967295, 
+  group = 4294967295, 
+  working_directory = {
+    len = 0, 
+    data = 0x0
+  }, 
+  lock_file = {
+    len = 0, 
+    data = 0x0
+  }, 
+  pid = {
+    len = 0, 
+    data = 0x0
+  }, 
+  oldpid = {
+    len = 0, 
+    data = 0x0
+  }, 
+  env = {
+    elts = 0x683bb0, 
+    nelts = 0, 
+    size = 16, 
+    nalloc = 1, 
+    pool = 0x682b80
+  }, 
+  environment = 0x0
+}
+(gdb) p*((ngx_regex_conf_t *)(cycle->conf_ctx[6])) 
+$6 = {
+  pcre_jit = -1
+}
+(gdb) 
+
+
+
+
+718                     if (ch == ';') {
+2: cf->conf_file->line = 2
+1: ch = 59 ';'
+(gdb) u
+719                         return NGX_OK;
+2: cf->conf_file->line = 2
+1: ch = 59 ';'
+(gdb) p workd
+No symbol "workd" in current context.
+(gdb) p word
+$16 = (ngx_str_t *) 0x6b0cb8
+(gdb) p *word
+$17 = {
+  len = 1, 
+  data = 0x6b0d5a "1"
+}
+(gdb) p cf->args
+$18 = (ngx_array_t *) 0x6b0c80
+(gdb) p *cf->args
+$19 = {
+  elts = 0x6b0ca8, 
+  nelts = 2, 
+  size = 16, 
+  nalloc = 10, 
+  pool = 0x6afb80
+}
+(gdb) p cf->args->elts[0]
+Attempt to dereference a generic pointer.
+(gdb) p *(ngx_str_t *)cf->args->elts[0]
+Attempt to dereference a generic pointer.
+(gdb) p *(ngx_str_t *)cf->args.elts[0] 
+Attempt to dereference a generic pointer.
+(gdb) p *(ngx_str_t *)cf->args.elts
+$20 = {
+  len = 16, 
+  data = 0x6b0d48 "worker_processes"
+}
+(gdb) p *(ngx_str_t *)(cf->args.elts + sizeof(ngx_str_t))
+$21 = {
+  len = 1, 
+  data = 0x6b0d5a "1"
+}
+(gdb) 

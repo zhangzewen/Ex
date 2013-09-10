@@ -12,7 +12,7 @@ static ngx_int_t write_back_request_init(ngx_conf_t *cf);
 static void *ngx_http_write_back_request_create_loc_conf(ngx_conf_t *cf);
 
 typedef struct {
-	unsigned int enable;
+	ngx_uint_t enable;
 }ngx_http_write_back_request_loc_conf_t;
 
 static ngx_command_t ngx_http_write_back_request_commands[] = {
@@ -77,10 +77,14 @@ static ngx_int_t write_back_request_init(ngx_conf_t *cf)
 static ngx_int_t ngx_http_write_back_request_handler(ngx_http_request_t *r)
 {
 	ngx_int_t rc;
-	ngx_buf_t *b;
-	ngx_chain_t *out = NULL;
+	ngx_buf_t *b = NULL;
+	ngx_chain_t out;
 	ngx_http_write_back_request_loc_conf_t *wbrcf;
 	wbrcf = ngx_http_get_module_loc_conf(r, ngx_http_write_back_request_module);
+	
+	if(wbrcf->enable != 1) {
+		return NGX_DECLINED;
+	}
 
 	if(!(r->method & (NGX_HTTP_HEAD | NGX_HTTP_GET| NGX_HTTP_POST))) {
 		return NGX_HTTP_NOT_ALLOWED;
@@ -106,9 +110,9 @@ static ngx_int_t ngx_http_write_back_request_handler(ngx_http_request_t *r)
 		ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Failed to allocate response buffer.");
 		return NGX_HTTP_INTERNAL_SERVER_ERROR;
 	}
-	out->buf = b;
-	out->next = NULL;
-	if(wbrcf->enable != 0) {
+	out.buf = b;
+	out.next = NULL;
+	if(wbrcf->enable == 1) {
 		b->pos = r->request_start;
 		b->last = r->request_end;	
 		b->memory = 1;
@@ -117,12 +121,12 @@ static ngx_int_t ngx_http_write_back_request_handler(ngx_http_request_t *r)
 
 	rc = ngx_http_send_header(r);
 
-	if(rc != NGX_ERROR) {
+	if(rc != NGX_OK) {
 		return rc;
 	}
 
 
-	return ngx_http_output_filter(r, out);
+	return ngx_http_output_filter(r, &out);
 	
 }
 
@@ -136,7 +140,7 @@ static void *ngx_http_write_back_request_create_loc_conf(ngx_conf_t *cf)
 		return NGX_CONF_ERROR;
 	}
 
-	conf->enable = 0;
+	conf->enable = NGX_CONF_UNSET;
 	
 	return conf;
 }

@@ -238,9 +238,9 @@ ngx_http_core_run_phases(ngx_http_request_t *r)
     ph = cmcf->phase_engine.handlers;
 
     while (ph[r->phase_handler].checker) {
-
+				//调用checker
         rc = ph[r->phase_handler].checker(r, &ph[r->phase_handler]);
-
+				//如果有一个checker返回OK，则后面的phase就不会处理了
         if (rc == NGX_OK) {
             return;
         }

@@ -93,24 +93,35 @@ typedef struct {
     u_char                     addr[NGX_SOCKADDR_STRLEN + 1];
 } ngx_http_listen_opt_t;
 
-
+/*
+*以下几个是特例，它不调用挂载的任何handler，也就是说不用挂载到这几个阶段
+*NGX_HTTP_FIND_CONFIG_PHASE
+*NGX_HTTP_POST_ACCESS_PHASE
+*NGX_HTTP_POST_REWRITE_PHASE
+*NGX_HTTP_TRY_FILES_PHASE
+*/
 typedef enum {
+		//读取请求内容阶段
     NGX_HTTP_POST_READ_PHASE = 0,
-
+		//Server请求地址重写阶段
     NGX_HTTP_SERVER_REWRITE_PHASE,
-
+		//配置查找阶段
     NGX_HTTP_FIND_CONFIG_PHASE,
+		//location请求地址重写阶段
     NGX_HTTP_REWRITE_PHASE,
+		//请求地址重写提交阶段
     NGX_HTTP_POST_REWRITE_PHASE,
-
+		//访问权限检查准备阶段
     NGX_HTTP_PREACCESS_PHASE,
-
+		//访问穿线检查阶段
     NGX_HTTP_ACCESS_PHASE,
+		//访问权限检查提交阶段
     NGX_HTTP_POST_ACCESS_PHASE,
-
+		//配置项try_file处理阶段
     NGX_HTTP_TRY_FILES_PHASE,
+		//内容产生阶段
     NGX_HTTP_CONTENT_PHASE,
-
+		//日志模块处理阶段
     NGX_HTTP_LOG_PHASE
 } ngx_http_phases;
 
