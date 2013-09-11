@@ -353,14 +353,23 @@ typedef void (*ngx_http_event_handler_pt)(ngx_http_request_t *r);
 
 struct ngx_http_request_s {
     uint32_t                          signature;         /* "HTTP" */
-
+//请求对应的客户端连接
     ngx_connection_t                 *connection;
-
+//指向存放所有HTTP模块的上下文结构体的指针数组
     void                            **ctx;
+//指向请求对应的存放main级别配置结构体的指针数组
     void                            **main_conf;
+//指向请求对应的存放srv级别配置结构体的指针数组
     void                            **srv_conf;
+//指向请求对应的存放loc级别配置结构体的指针数组
     void                            **loc_conf;
+/*
+在接收完http头部，第一次在业务上处理http请求时，http框架提供的处理方法是ngx_http_process_request.
+但是该方法无法一次处理完该请求的全部业务，在归还控制权到epoll时间模块后，该请求再次被回调时，
+将通过Ngx_http_request_hanler方法来处理，而这个方法中对于可读事件的处理就是调用read_event_handler处理请求
+也就是说，http模块希望在底层处理请求的读事件时，重新实现read_event_handler方法
 
+*/
     ngx_http_event_handler_pt         read_event_handler;
     ngx_http_event_handler_pt         write_event_handler;
 
@@ -373,29 +382,34 @@ struct ngx_http_request_s {
                                          /* of ngx_http_upstream_state_t */
 
     ngx_pool_t                       *pool;
+//用于接受http请求内容的缓冲区，主要接手http头部
     ngx_buf_t                        *header_in;
-
+//ngx_http_process——request_handers在接收解析完http请求的头部后，会把解析完的每一个http头部加入到header_in的headers链表中，同时会构造
+//headers_in中的其他成员    
     ngx_http_headers_in_t             headers_in;
+//http模块会把想要发送的http相应信息放到header_out中，期望http框架将headers_out中的成员序列化为http响应包发送给用户
     ngx_http_headers_out_t            headers_out;
-
+//接收请求中包体的数据结构
     ngx_http_request_body_t          *request_body;
-
+//延迟关闭连接的时间
     time_t                            lingering_time;
+//当前请求初始化时的时间
     time_t                            start_sec;
     ngx_msec_t                        start_msec;
-
-    ngx_uint_t                        method;
-    ngx_uint_t                        http_version;
+//以下9个成员是函数ngx_http_process_request_line方法在接收，解析http请求时解析出的信息
+    ngx_uint_t                        method;//方法名
+    ngx_uint_t                        http_version;//协议版本
 
     ngx_str_t                         request_line;
-    ngx_str_t                         uri;
-    ngx_str_t                         args;
-    ngx_str_t                         exten;
-    ngx_str_t                         unparsed_uri;
+    ngx_str_t                         uri;//用户请求中的uri
+    ngx_str_t                         args;//用户请求中的url参数
+    ngx_str_t                         exten;//用户请求的文件扩展名
+    ngx_str_t                         unparsed_uri;//没有进行URL解码的原始请求
 
     ngx_str_t                         method_name;
     ngx_str_t                         http_protocol;
-
+//表示需要发送给客户端的http响应，out中保存着由headers_out中序列化后的表示http头部的TCP流
+//在调用ngx_http_output_filter方法后，out中还会保cun着待发送的http包体，它是实现异步发送http响应的关键
     ngx_chain_t                      *out;
     ngx_http_request_t               *main;
     ngx_http_request_t               *parent;
