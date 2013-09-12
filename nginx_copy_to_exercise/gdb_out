@@ -466,3 +466,162 @@ $21 = {
   data = 0x6b0d5a "1"
 }
 (gdb) 
+====查看ngx_http_core_main_conf_t的phases数组======================================================================================================================
+252         ph = cmcf->phase_engine.handlers;
+(gdb) p cmcf->phases
+$9 = {{
+    handlers = {
+      elts = 0x266d7d0, 
+      nelts = 0, 
+      size = 8, 
+      nalloc = 1, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x266d7d8, 
+      nelts = 1, 
+      size = 8, 
+      nalloc = 1, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x0, 
+      nelts = 0, 
+      size = 0, 
+      nalloc = 0, 
+      pool = 0x0
+    }
+  }, {
+    handlers = {
+      elts = 0x266d7e0, 
+      nelts = 1, 
+      size = 8, 
+      nalloc = 1, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x0, 
+      nelts = 0, 
+      size = 0, 
+      nalloc = 0, 
+      pool = 0x0
+    }
+  }, {
+    handlers = {
+      elts = 0x266d7e8, 
+      nelts = 0, 
+      size = 8, 
+      nalloc = 1, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x266d7f0, 
+      nelts = 1, 
+      size = 8, 
+      nalloc = 2, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x0, 
+      nelts = 0, 
+      size = 0, 
+      nalloc = 0, 
+      pool = 0x0
+    }
+  }, {
+    handlers = {
+      elts = 0x0, 
+      nelts = 0, 
+      size = 0, 
+      nalloc = 0, 
+---Type <return> to continue, or q <return> to quit---
+      pool = 0x0
+    }
+  }, {
+    handlers = {
+      elts = 0x266d800, 
+      nelts = 3, 
+      size = 8, 
+      nalloc = 4, 
+      pool = 0x265fb80
+    }
+  }, {
+    handlers = {
+      elts = 0x266d820, 
+      nelts = 1, 
+      size = 8, 
+      nalloc = 1, 
+      pool = 0x265fb80
+    }
+  }}
+(gdb) p cmcf->phases[0].handlers.elts
+$10 = (void *) 0x266d7d0
+(gdb) p *((ngx_http_handler_pt *)cmcf->phases[0].handlers.elts)
+$11 = (ngx_http_handler_pt) 0
+(gdb) p (ngx_http_handler_pt *)cmcf->phases[0].handlers.elts  
+$12 = (ngx_http_handler_pt *) 0x266d7d0
+(gdb) p (ngx_http_handler_pt *)cmcf->phases[1].handlers.elts
+$13 = (ngx_http_handler_pt *) 0x266d7d8
+(gdb) p *(ngx_http_handler_pt *)cmcf->phases[1].handlers.elts
+$14 = (ngx_http_handler_pt) 0x46e044 <ngx_http_rewrite_handler>
+(gdb) p *(ngx_http_handler_pt *)cmcf->phases[10].handlers.elts
+$15 = (ngx_http_handler_pt) 0x451a18 <ngx_http_log_handler>
+(gdb) p *(ngx_http_handler_pt *)cmcf->phases[9].handlers.elts 
+$16 = (ngx_http_handler_pt) 0x468278 <ngx_http_static_handler>
+(gdb) p *(ngx_http_handler_pt *)(cmcf->phases[9].handlers.elt+ sizeof(void *))
+There is no member named elt.
+(gdb) p *(ngx_http_handler_pt *)(cmcf->phases[9].handlers.elts+ sizeof(void *))
+$17 = (ngx_http_handler_pt) 0x468c04 <ngx_http_index_handler>
+(gdb) p *(ngx_http_handler_pt *)(cmcf->phases[9].handlers.elts+ sizeof(void *) + sizeof(void *))
+$18 = (ngx_http_handler_pt) 0x47146b <ngx_http_write_back_request_handler>
+(gdb) 
+
+
+=====查看ngx_http_core_main_conf_t->phase_engine->handlers下挂载的handler===========================================================================================================
+(gdb) p *(cmcf->phase_engine->handlers)@10
+$21 = {{
+    checker = 0x43c3c8 <ngx_http_core_rewrite_phase>, 
+    handler = 0x46e044 <ngx_http_rewrite_handler>, 
+    next = 1
+  }, {
+    checker = 0x43c48d <ngx_http_core_find_config_phase>, 
+    handler = 0, 
+    next = 0
+  }, {
+    checker = 0x43c3c8 <ngx_http_core_rewrite_phase>, 
+    handler = 0x46e044 <ngx_http_rewrite_handler>, 
+    next = 3
+  }, {
+    checker = 0x43c8d6 <ngx_http_core_post_rewrite_phase>, 
+    handler = 0, 
+    next = 1
+  }, {
+    checker = 0x43cac7 <ngx_http_core_access_phase>, 
+    handler = 0x46db60 <ngx_http_access_handler>, 
+    next = 6
+  }, {
+    checker = 0x43cccc <ngx_http_core_post_access_phase>, 
+    handler = 0, 
+    next = 6
+  }, {
+    checker = 0x43d70d <ngx_http_core_content_phase>, 
+    handler = 0x47146b <ngx_http_write_back_request_handler>, 
+    next = 9
+  }, {
+    checker = 0x43d70d <ngx_http_core_content_phase>, 
+    handler = 0x468c04 <ngx_http_index_handler>, 
+    next = 9
+  }, {
+    checker = 0x43d70d <ngx_http_core_content_phase>, 
+    handler = 0x468278 <ngx_http_static_handler>, 
+    next = 9
+  }, {
+    checker = 0, 
+    handler = 0x50000002, 
+    next = 0
+  }}

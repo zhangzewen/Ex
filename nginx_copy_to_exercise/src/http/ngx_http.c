@@ -449,7 +449,17 @@ ngx_http_init_headers_in_hash(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
     return NGX_OK;
 }
 
+/*
+cmcf->phases数组中保存了在post config之前注册的所有模块函数，上面的函数先计算执行链的节点个数，并分配相应的空间，前面提到有4个阶段不能注册模块，
+并且POST_REWRITE和POST_ACCESS这2个阶段分别只有在REWRITE和ACCESS阶段注册了模块时才存在，另外TRY_FILES阶段只有在配置了try_files指令的时候才存在，
+最后FIND_CONFIG阶段虽然不能注册模块，但它是必须存在的，所以在计算执行链节点数时需要考虑这些因素
 
+SERVER_REWRITE阶段的节点的next域指向FIND_CONFIG阶段的第1个节点，REWRITE阶段的next域指向POST_REWRITE阶段的第1个节点，
+而POST_REWRITE阶段的next域则指向FIND_CONFIG，因为当出现location级别的uri重写时，
+可能需要重新匹配新的location，PREACCESS阶段的next域指向ACCESS域，ACCESS和POST_ACCESS阶段的next域则是则是指向CONTENT阶段，
+当然如果TRY_FILES阶段存在的话，则是指向TRY_FILES阶段，最后CONTENT阶段的next域指向LOG阶段，当然next域是每个阶段的checker函数根据该阶段的需求来使用的，
+没有需要时，checker函数可能都不会使用到它
+*/
 static ngx_int_t
 ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
 {

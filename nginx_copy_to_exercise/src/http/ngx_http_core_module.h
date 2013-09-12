@@ -100,28 +100,37 @@ typedef struct {
 *NGX_HTTP_POST_REWRITE_PHASE
 *NGX_HTTP_TRY_FILES_PHASE
 */
+
+/*
+
+POST_READ阶段是nginx处理请求流程中第一个可以添加模块函数的阶段，任何需要在接收完请求头之后立刻处理的逻辑可以在该阶段注册处理函数。
+nginx源码中只有realip模块在该阶段注册了函数，当nginx前端多了一个7层负载均衡层，并且客户端的真实ip被前端保存在请求头中时，该模块用来
+将客户端的ip替换为请求头中保存的值。realip模块之所以在POST_READ阶段执行的原因是它需要在其他模块执行之前悄悄的将客户端ip替换为真实值，
+而且它需要的信息仅仅只是请求头。一般很少有模块需要注册在POST_READ阶段，realip模块默认没有编译进nginx
+*/
+
 typedef enum {
-		//读取请求内容阶段
+		//读取请求内容阶段 接收完请求头之后的第一个阶段，它位于uri重写之前，实际上很少有模块会注册在该阶段，默认的情况下，该阶段被跳过
     NGX_HTTP_POST_READ_PHASE = 0,
-		//Server请求地址重写阶段
+		//Server请求地址重写阶段 server级别的uri重写阶段，也就是该阶段执行处于server块内，location块外的重写指令，前面的章节已经说明在读取请求头的过程中nginx会根据host及端口找到对应的虚拟主机配置
     NGX_HTTP_SERVER_REWRITE_PHASE,
-		//配置查找阶段
+		//配置查找阶段 寻找location配置阶段，该阶段使用重写之后的uri来查找对应的location，值得注意的是该阶段可能会被执行多次，因为也可能有location级别的重写指令；
     NGX_HTTP_FIND_CONFIG_PHASE,
-		//location请求地址重写阶段
+		//location请求地址重写阶段  location级别的uri重写阶段，该阶段执行location基本的重写指令，也可能会被执行多次；
     NGX_HTTP_REWRITE_PHASE,
-		//请求地址重写提交阶段
+		//请求地址重写提交阶段  location级别重写的后一阶段，用来检查上阶段是否有uri重写，并根据结果跳转到合适的阶段；
     NGX_HTTP_POST_REWRITE_PHASE,
-		//访问权限检查准备阶段
+		//访问权限检查准备阶段  访问权限控制的前一阶段，该阶段在权限控制阶段之前，一般也用于访问控制，比如限制访问频率，链接数等；
     NGX_HTTP_PREACCESS_PHASE,
-		//访问穿线检查阶段
+		//访问穿线检查阶段  访问权限控制阶段，比如基于ip黑白名单的权限控制，基于用户名密码的权限控制等；
     NGX_HTTP_ACCESS_PHASE,
-		//访问权限检查提交阶段
+		//访问权限检查提交阶段  访问权限控制的后一阶段，该阶段根据权限控制阶段的执行结果进行相应处理；
     NGX_HTTP_POST_ACCESS_PHASE,
-		//配置项try_file处理阶段
+		//配置项try_file处理阶段  try_files指令的处理阶段，如果没有配置try_files指令，则该阶段被跳过；
     NGX_HTTP_TRY_FILES_PHASE,
-		//内容产生阶段
+		//内容产生阶段  内容生成阶段，该阶段产生响应，并发送到客户端；
     NGX_HTTP_CONTENT_PHASE,
-		//日志模块处理阶段
+		//日志模块处理阶段  日志记录阶段，该阶段记录访问日志。
     NGX_HTTP_LOG_PHASE
 } ngx_http_phases;
 
@@ -129,7 +138,11 @@ typedef struct ngx_http_phase_handler_s  ngx_http_phase_handler_t;
 
 typedef ngx_int_t (*ngx_http_phase_handler_pt)(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph);
-
+/*
+	其中checker和handler都是函数指针，相同阶段的节点具有相同的checker函数，handler字段保存的是模块处理函数，一般在checker函数中会执行当前节点的handler函数。但是例外的是
+	NGX_HTTP_FIND_CONFIG_PHASE, NGX_HTTP_POST_REWRITE_PHASE, NGX_HTTP_POST_ACCESS_PHASE 和NGX_HTTP_TRY_FILES_PHASE这四个阶段不能注册模块函数.next字段为快速跳跃索引，多数情况下，
+	执行流程是按照执行链顺序的往前执行，但是在某些执行阶段的checker函数中由于执行了某个逻辑可能需要回跳至之前的执行阶段，也可能需要跳过之后的某些执行阶段next字段保存的就是跳跃的目的索引
+*/
 struct ngx_http_phase_handler_s {
     ngx_http_phase_handler_pt  checker;
     ngx_http_handler_pt        handler;
@@ -138,7 +151,7 @@ struct ngx_http_phase_handler_s {
 
 
 typedef struct {
-    ngx_http_phase_handler_t  *handlers;
+    ngx_http_phase_handler_t  *handlers; //为执行链，实际上它是一个数组，而每个元素之间又被串成链表，从而允许执行流程向前或者向后的阶段跳转
     ngx_uint_t                 server_rewrite_index;
     ngx_uint_t                 location_rewrite_index;
 } ngx_http_phase_engine_t;
