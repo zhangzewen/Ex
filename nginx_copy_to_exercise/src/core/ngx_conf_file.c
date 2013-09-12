@@ -157,14 +157,14 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
         cf->conf_file->file.log = cf->log;
         cf->conf_file->line = 1;
 
-        type = parse_file;
+        type = parse_file; //解析配置文件
 
     } else if (cf->conf_file->file.fd != NGX_INVALID_FILE) {
 
-        type = parse_block;
+        type = parse_block; //解析块配置。块配置一定是由"{" 和 "}"包裹起来的
 
     } else {
-        type = parse_param;
+        type = parse_param;  // 解析命令行配置，命令行配置中不支持块指令
     }
 
 
@@ -217,7 +217,9 @@ ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename)
         }
 
         /* rc == NGX_OK || rc == NGX_CONF_BLOCK_START */
-
+				/*
+					cf->handler和cf->handler_conf这两个属性，其中handler是自定义解析函数指针，handler_conf是conf指针
+				*/
         if (cf->handler) {
 
             /*
@@ -348,7 +350,10 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             }
 
             found = 1;
-
+						/*
+							只有处理的模块的类型是NGX_CONF_MODULE或者是当前正在处理的模块类型，才可能被执行。nginx中有一种模块类型是NGX_CONF_MODULE，当前
+							只有ngx_conf_module一种，只支持一条指令"include"
+						*/
             if (ngx_modules[i]->type != NGX_CONF_MODULE
                 && ngx_modules[i]->type != cf->module_type)
             {
@@ -356,18 +361,19 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             }
 
             /* is the directive's location right ? */
-
+						//匹配指令名，判断指令用法是否正确
+						//a.指令的Context必须当前解析Context相符
             if (!(cmd->type & cf->cmd_type)) {
                 continue;
             }
-
+						//b.非块指令必须以";"结尾
             if (!(cmd->type & NGX_CONF_BLOCK) && last != NGX_OK) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                                   "directive \"%s\" is not terminated by \";\"",
                                   name->data);
                 return NGX_ERROR;
             }
-
+						//c,块指令必须后面接 "{"
             if ((cmd->type & NGX_CONF_BLOCK) && last != NGX_CONF_BLOCK_START) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                                    "directive \"%s\" has no opening \"{\"",
@@ -376,7 +382,7 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
             }
 
             /* is the directive's argument count right ? */
-
+						//d.指令参数个数必须正确，注意指令参数最大值NGX_CONF_MAX_ARGS，目前值为8
             if (!(cmd->type & NGX_CONF_ANY)) {
 
                 if (cmd->type & NGX_CONF_FLAG) {

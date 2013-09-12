@@ -156,9 +156,9 @@ typedef struct {
 
     ngx_hash_t                 headers_in_hash;
 
-    ngx_hash_t                 variables_hash;
+    ngx_hash_t                 variables_hash; // 变量的hash表
 
-    ngx_array_t                variables;       /* ngx_http_variable_t */
+    ngx_array_t                variables;       /* ngx_http_variable_t *///索引变量的数组
     ngx_uint_t                 ncaptures;
 
     ngx_uint_t                 server_names_hash_max_size;
@@ -167,7 +167,7 @@ typedef struct {
     ngx_uint_t                 variables_hash_max_size;
     ngx_uint_t                 variables_hash_bucket_size;
 
-    ngx_hash_keys_arrays_t    *variables_keys;
+    ngx_hash_keys_arrays_t    *variables_keys;//变量的hash数组
 
     ngx_array_t               *ports;
 

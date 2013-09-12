@@ -22,7 +22,8 @@ typedef struct {
 
 
 typedef struct {
-//在创建和读取该模块的配置信息之前被调用
+//在创建和读取该模块的配置信息之前被调用,在 此过程中将模块自身支持的内部变量统一计入到http核心配置函数
+//ngx_http_core_main_conf_t的variables_keys字段内
     ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);
 //在创建和读取该模块的配置信息之后被调用
     ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);

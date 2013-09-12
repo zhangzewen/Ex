@@ -33,12 +33,12 @@ typedef ngx_int_t (*ngx_http_get_variable_pt) (ngx_http_request_t *r,
 
 
 struct ngx_http_variable_s {
-    ngx_str_t                     name;   /* must be first to build the hash */
-    ngx_http_set_variable_pt      set_handler;
-    ngx_http_get_variable_pt      get_handler;
-    uintptr_t                     data;
-    ngx_uint_t                    flags;
-    ngx_uint_t                    index;
+    ngx_str_t                     name;   /* must be first to build the hash */ //变量的名称
+    ngx_http_set_variable_pt      set_handler;//变量的设置函数
+    ngx_http_get_variable_pt      get_handler;//变量的获取函数
+    uintptr_t                     data; //传给get与set_handler的值
+    ngx_uint_t                    flags;//变量的标志
+    ngx_uint_t                    index; //如果没有索引，则是变量的索引号
 };
 
 

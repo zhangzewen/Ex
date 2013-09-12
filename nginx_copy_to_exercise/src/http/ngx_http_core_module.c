@@ -5,6 +5,20 @@
  */
 
 
+
+/*
+公理11-1：所有存放参数为NGX_HTTP_SRV_CONF_OFFSET的配置，配置仅在请求匹配的虚拟主机(server)上下文中生效，而所有存放参数为NGX_HTTP_LOC_CONF_OFFSET的配置，配置仅在请求匹配的路径(location)上下文中生效。
+正因为有公理11-1，所以nginx需要调用merge_XXX回调函数合并配置。具体的原因是很多配置指令可以放在不同配置层级，比如access_log既可以在http块中配置，又可以在server块中配置，还可以在location块中配置。
+但是因为公理11-1，access_log指令配置只有在路径(location)上下文中生效，所以需要将在http块中配置的access_log指令的配置向路径上下文做两次传递，
+第一次从HTTP(http)上下文到虚拟主机(server)上下文，第二次从虚拟主机上下文到路径上下文。
+可能有人会疑惑，为什么需要传递和合并呢？难道它们不在一张表里么？对，在创建并初始化上下文环境的过程中，大家已经看到，nginx为HTTP上下文创建了main_conf，为虚拟主机上下文创建了srv_conf，
+为路径上下文创建了loc_conf。但是，这张表只是用于解析在http块但不包含server块中定义的指令。而后面我们会看到，在server块指令中，
+同样建立了srv_conf和loc_conf，用于解析在server块但不含location块中定义的指令。所以nginx其实维护了很多张配置表，因此nginx必须将配置在这些表中从顶至下不断传递。
+
+
+*/
+
+
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>

@@ -25,8 +25,8 @@ make clean;
 	--with-pcre=/root/tar/pcre \
 	--with-debug \
 	--without-http-cache \
-	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_write_back_request_module 
-	#--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_hello_world_module \
-	#--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_echo_module 
+	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_write_back_request_module \
+#	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_hello_world_module \
+#	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_echo_module 
 
 exit 0;

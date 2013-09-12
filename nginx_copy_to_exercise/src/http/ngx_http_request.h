@@ -422,8 +422,14 @@ struct ngx_http_request_s {
     ngx_int_t                         phase_handler;
     ngx_http_handler_pt               content_handler;
     ngx_uint_t                        access_code;
-
-    ngx_http_variable_value_t        *variables;
+/*
+变量在每个请求中的值都是不一样的，也就是说变量是请求相关的
+所以在ngx_http_request_s中有一个变量数组，主要用于缓存当前请求的变量结果
+从而可以避免一个变量的多次计数，计算过一次的变量就不用在计算了
+但里面保存的一定是索引变量的值，是否缓存，也要友变量的特性来决定
+	
+*/
+    ngx_http_variable_value_t        *variables; 
 
 #if (NGX_PCRE)
     ngx_uint_t                        ncaptures;

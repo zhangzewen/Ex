@@ -24,16 +24,16 @@ typedef struct {
     ngx_str_t   value;
 } ngx_keyval_t;
 
-
+//ngx_variable_value_t即变量的结果，变量的值
 typedef struct {
     unsigned    len:28;
 
-    unsigned    valid:1;
-    unsigned    no_cacheable:1;
-    unsigned    not_found:1;
+    unsigned    valid:1; // 当前变量是否合法
+    unsigned    no_cacheable:1; //当前变量是否可以缓存，缓存过的变量将只会调用一次get_handler函数
+    unsigned    not_found:1;//变量是否找到
     unsigned    escape:1;
 
-    u_char     *data;
+    u_char     *data;//变量的数据
 } ngx_variable_value_t;
 
 

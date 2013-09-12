@@ -11,6 +11,33 @@
 #include <nginx.h>
 
 
+/*
+	1.变量的分类
+	站在使用者的角度来看，我们在配置文件中可以看到：
+	1) set添加的变量(变量名由用户设定)
+	2) nginx功能模块中添加的变量，如geo模块(变量名由用户设定)
+	3) nginx内建的变量(变量名已由nginx设定好，可以看ngx_http_core_variables结构)
+	4) 有一定规则的变量，如”http_host”等(有相同前缀，表示某一类变量)，我们就称为规则变量吧
+	从这里，也解决我们的问题，在配置access_log时，我们可以配置哪些变量，是否是用户添加的变量，
+	是否是内建变量在ngx_http_core_variables中有，其次，是否是规则变量，另外，如果想输出自己的内容，
+	那只能写模块自己添加一个变量了，或者hack nginx在ngx_http_core_variables中添加一个变量。
+	
+	从nginx内部实现上来看，变量可分为：
+	1) hash过的变量
+	2) 未hash过的变量，变量有设置NGX_HTTP_VAR_NOHASH
+	2) 未hash过的变量，但有一定规则的变量，如以这些串开头的：”http_”,”sent_http_”,”upstream_http_”,”cookie_”,”arg_”
+	我们在模块里面可以通过ngx_http_add_variable来添加一个变量，在后面的介绍中我们可以看到。而我们添加的变量，
+	最好不要是以这些规则开头的变量，否则就有可能会覆盖掉这些规则的变量。
+
+	从变量获取者来看，可以分为索引变量与未索引的变量。
+	1)索引变量，我们通过ngx_http_get_variable_index来获得一个索引变量的索引号。
+	然后可以通过ngx_http_get_indexed_variable与ngx_http_get_flushed_variable来获取索引过变量的值。
+	如果要索引某个变量，则只能在配置文件初始化的时候来设置。ngx_http_get_variable_index不会添加一个真正的变量，
+	在配置文件初始化结束时，会检查该变量的合法性。索引过的变量，将会有缓存等特性(缓存在r->variables中)。
+	2)未索引过的变量，则只能通过ngx_http_get_variable来获取变量的值
+*/
+
+
 static ngx_int_t ngx_http_variable_request(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data);
 static void ngx_http_variable_request_set(ngx_http_request_t *r,
@@ -318,7 +345,22 @@ ngx_http_variable_value_t  ngx_http_variable_null_value =
 ngx_http_variable_value_t  ngx_http_variable_true_value =
     ngx_http_variable("1");
 
-
+/*
+	@name :即变量的名字
+	@flags：如果同一个变量要多次添加则flags应该设置NGX_HTTP_VAR_CHANGEABLE
+	flags表示可以是：
+							NGX_HTTP_VAR_CHANGEABLE
+							NGX_HTTP_VAR_NOCACHEABLE
+							NGX_HTTP_VAR_INDEXED
+							NGX_HTTP_VAR_NOHASH
+	
+不过，要注意的是，添加的变量必须是nginx支持的已存在的变量。即如果是hash过的变量，则一定是通过ngx_http_add_variable添加的变量，否则，
+一定是规则变量，如”http_host”。当然，在解析配置文件的时候，变量不一定是要先通过ngx_http_add_variable然后才能获取索引，这个是不需要有顺序保证的。ng
+inx会将在最后配置文件解析完成后，去验证这些索引变量的合法性，在ngx_http_variables_init_vars函数中可以看到，我们在后面具体再分析。
+所以，可以看到，获取索引的操作，一定是要在解析配置文件的过程是进行的， 一旦配置文件解析完成后，索引变量不能再添加。
+在获取索引号后，我们需要保存该索引号，以便在后面通过索引号来获取变量。
+那么，索引变量的获取，可以通过ngx_http_get_indexed_variable与ngx_http_get_flushed_variable来获取
+*/
 ngx_http_variable_t *
 ngx_http_add_variable(ngx_conf_t *cf, ngx_str_t *name, ngx_uint_t flags)
 {
@@ -383,7 +425,10 @@ ngx_http_add_variable(ngx_conf_t *cf, ngx_str_t *name, ngx_uint_t flags)
     return v;
 }
 
-
+/*
+	name: 即ngix支持的任意变量名
+	return 返回变量的索引
+*/
 ngx_int_t
 ngx_http_get_variable_index(ngx_conf_t *cf, ngx_str_t *name)
 {
@@ -494,7 +539,10 @@ ngx_http_get_flushed_variable(ngx_http_request_t *r, ngx_uint_t index)
     return ngx_http_get_indexed_variable(r, index);
 }
 
-
+/*
+	没有索引过的变量
+	key 由ngx_hash_strlow来计算 ,索引变量名不区分大小写
+*/
 ngx_http_variable_value_t *
 ngx_http_get_variable(ngx_http_request_t *r, ngx_str_t *name, ngx_uint_t key)
 {
