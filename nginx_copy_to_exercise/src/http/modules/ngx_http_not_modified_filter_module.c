@@ -45,7 +45,7 @@ ngx_module_t  ngx_http_not_modified_filter_module = {
     NGX_MODULE_V1_PADDING
 };
 
-
+//static修饰符决定了ngx_http_next_header_filter在模块范围内可见的局部变量
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 
 
