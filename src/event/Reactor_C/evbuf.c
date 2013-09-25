@@ -315,7 +315,7 @@ int evbuffer_expand(struct evbuffer *buf, size_t datlen)
 		size_t length = buf->totallen;
 
 		if (length < 256) {
-			length = 256;
+			length = 16;
 		}
 		while (length < need) {
 			length <<= 1;

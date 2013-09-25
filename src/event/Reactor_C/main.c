@@ -32,23 +32,22 @@ int SetNoblock(int fd)
 void ServerRead(int fd, short events, void *arg)
 {
 	struct event *ev = (struct event *)arg;
-	struct evbuffer *buff;
-
-	buff = evbuffer_new();
 	
-	char buff[4096]= {0};
 	
 	int nread = 0;
 	
 	//nread = read(fd, buff, sizeof(buff) - 1);
-	nread = evbuffer_read(buffer, fd, 4096);
+	nread = evbuffer_read(ev->buffer, fd, 16);
+	printf("\n----------------------------------------\n");
+	printf("ev->buffer->off: %d", ev->buffer->off);
+	printf("\n----------------------------------------\n");
 
 	if (nread  == -1) {
 		event_del(&ev);
 	}
 	
 	write(fd ,return_ok, sizeof(return_ok));
-	close(fd);
+	//close(fd);
 
 //	event_del(&ev);
 }
@@ -75,7 +74,7 @@ void ServerAccept(int fd, short events, void *arg)
 		return;
 	}
 
-	event_set(cli_ev, cfd, EV_READ, ServerRead, NULL);
+	event_set(cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, (void *)cli_ev);
 	event_add(cli_ev, NULL);
 }
 
