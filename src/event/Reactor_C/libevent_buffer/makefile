@@ -1,8 +1,8 @@
-main: main.o evbuf.o
-	gcc -g3 main.o evbuf.o -o main
-evbuf.o: evbuf.c evbuf.h
-	gcc -g3 -c evbuf.c -o evbuf.o
-main.o: main.c evbuf.h
+main: main.o http_buffer.o
+	gcc -g3 main.o http_buffer.o -o main
+http_buffer.o: http_buffer.c http_buffer.h
+	gcc -g3 -c http_buffer.c -o http_buffer.o
+main.o: main.c http_buffer.h
 	gcc -g3 -c main.c -o main.o
 clean:
 	rm -fr *.o

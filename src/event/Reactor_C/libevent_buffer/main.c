@@ -1,4 +1,4 @@
-#include "evbuf.h"
+#include "http_buffer.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -17,8 +17,7 @@ int main(int argc, char **argv)
 	int n = 0;
 	int nwrite;
 	int i = 0;
-	struct evbuffer *buffer;
-	struct evbuffer *buffer_1;
+	struct http_buffer *buffer;
 	fd = open(FILE_PATH, O_RDONLY);
 	if(fd < 0) {
 		fprintf(stderr, "can't open file %s!\n", FILE_PATH);
@@ -31,22 +30,18 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	buffer = evbuffer_new();
+	buffer = buffer_new();
 	
 	if(NULL == buffer) {
 		fprintf(stderr, "can't create evbuffer!\n");
 	}
 
-	buffer_1 = evbuffer_new();
 	
-	if(NULL == buffer_1) {
-		fprintf(stderr, "can't create evbuffer!\n");
-	}
-	while((n = evbuffer_read(buffer, fd , 8096))!= 0) {
+	while((n = buffer_read(buffer, fd , 8096))!= 0) {
 		printf("\n-------------------------%d------------------------------\n", i);
 		printf("buffer->off: %6d", buffer->off);
 		printf("read : %5d", n);
-		nwrite=evbuffer_write(buffer, fd_out);
+		nwrite=buffer_write(buffer, fd_out);
 		printf("write: %5d", nwrite);
 		i++;
 		printf("\n-------------------------------------------------------\n");
