@@ -175,6 +175,13 @@ ngx_http_header_t  ngx_http_headers_in[] = {
 };
 
 
+/*
+	ngx_http_init_connection函数主要是设置当前句柄的读handler，如果数据可读，则直接调用
+	request handler，如果数据不可读，则设置定时器，病将这个句柄挂载到事件处理器上
+	如果使用了ngx_use_accept_mutex锁的话，那么就不能够立即处理request，因为处理request是
+	一个非常耗时的操作，而现在在锁里面，所以此时需要将这个读读事件挂载到ngx_posted_events队列，等
+	退出锁之后再进行处理 
+*/
 void
 ngx_http_init_connection(ngx_connection_t *c)
 {
@@ -197,13 +204,14 @@ ngx_http_init_connection(ngx_connection_t *c)
     c->log->action = "reading client request line";
 
     c->log_error = NGX_ERROR_INFO;
-
+		//设置读的handler
     rev = c->read;
     rev->handler = ngx_http_init_request;
     c->write->handler = ngx_http_empty_handler;
 
 
     if (rev->ready) {
+				//如果接收准备好了，则直接调用ngx_http_init_request，如果使用mutex锁，则post这个event，然后返回
         /* the deferred accept(), rtsig, aio, iocp */
 
         if (ngx_use_accept_mutex) {
@@ -473,191 +481,6 @@ ngx_http_init_request(ngx_event_t *rev)
     rev->handler(rev);
 }
 
-
-#if (NGX_HTTP_SSL)
-
-static void
-ngx_http_ssl_handshake(ngx_event_t *rev)
-{
-    u_char               buf[1];
-    ssize_t              n;
-    ngx_int_t            rc;
-    ngx_connection_t    *c;
-    ngx_http_request_t  *r;
-
-    c = rev->data;
-    r = c->data;
-
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
-                   "http check ssl handshake");
-
-    if (rev->timedout) {
-        ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT, "client timed out");
-        c->timedout = 1;
-        ngx_http_close_request(r, NGX_HTTP_REQUEST_TIME_OUT);
-        return;
-    }
-
-    n = recv(c->fd, (char *) buf, 1, MSG_PEEK);
-
-    if (n == -1 && ngx_socket_errno == NGX_EAGAIN) {
-
-        if (!rev->timer_set) {
-            ngx_add_timer(rev, c->listening->post_accept_timeout);
-        }
-
-        if (ngx_handle_read_event(rev, 0) != NGX_OK) {
-            ngx_http_close_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return;
-    }
-
-    if (n == 1) {
-        if (buf[0] & 0x80 /* SSLv2 */ || buf[0] == 0x16 /* SSLv3/TLSv1 */) {
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, rev->log, 0,
-                           "https ssl handshake: 0x%02Xd", buf[0]);
-
-            rc = ngx_ssl_handshake(c);
-
-            if (rc == NGX_AGAIN) {
-
-                if (!rev->timer_set) {
-                    ngx_add_timer(rev, c->listening->post_accept_timeout);
-                }
-
-                c->ssl->handler = ngx_http_ssl_handshake_handler;
-                return;
-            }
-
-            ngx_http_ssl_handshake_handler(c);
-
-            return;
-
-        } else {
-            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
-                           "plain http");
-
-            r->plain_http = 1;
-        }
-    }
-
-    c->log->action = "reading client request line";
-
-    rev->handler = ngx_http_process_request_line;
-    ngx_http_process_request_line(rev);
-}
-
-
-static void
-ngx_http_ssl_handshake_handler(ngx_connection_t *c)
-{
-    ngx_http_request_t  *r;
-
-    if (c->ssl->handshaked) {
-
-        /*
-         * The majority of browsers do not send the "close notify" alert.
-         * Among them are MSIE, old Mozilla, Netscape 4, Konqueror,
-         * and Links.  And what is more, MSIE ignores the server's alert.
-         *
-         * Opera and recent Mozilla send the alert.
-         */
-
-        c->ssl->no_wait_shutdown = 1;
-
-        c->log->action = "reading client request line";
-
-        c->read->handler = ngx_http_process_request_line;
-        /* STUB: epoll edge */ c->write->handler = ngx_http_empty_handler;
-
-        ngx_http_process_request_line(c->read);
-
-        return;
-    }
-
-    r = c->data;
-
-    ngx_http_close_request(r, NGX_HTTP_BAD_REQUEST);
-
-    return;
-}
-
-#ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
-
-int
-ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
-{
-    size_t                    len;
-    u_char                   *host;
-    const char               *servername;
-    ngx_connection_t         *c;
-    ngx_http_request_t       *r;
-    ngx_http_ssl_srv_conf_t  *sscf;
-
-    servername = SSL_get_servername(ssl_conn, TLSEXT_NAMETYPE_host_name);
-
-    if (servername == NULL) {
-        return SSL_TLSEXT_ERR_NOACK;
-    }
-
-    c = ngx_ssl_get_connection(ssl_conn);
-
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "SSL server name: \"%s\"", servername);
-
-    len = ngx_strlen(servername);
-
-    if (len == 0) {
-        return SSL_TLSEXT_ERR_NOACK;
-    }
-
-    r = c->data;
-
-    host = (u_char *) servername;
-
-    len = ngx_http_validate_host(r, &host, len, 1);
-
-    if (len <= 0) {
-        return SSL_TLSEXT_ERR_NOACK;
-    }
-
-    if (ngx_http_find_virtual_server(r, host, len) != NGX_OK) {
-        return SSL_TLSEXT_ERR_NOACK;
-    }
-
-    sscf = ngx_http_get_module_srv_conf(r, ngx_http_ssl_module);
-
-    if (sscf->ssl.ctx) {
-        SSL_set_SSL_CTX(ssl_conn, sscf->ssl.ctx);
-
-        /*
-         * SSL_set_SSL_CTX() only changes certs as of 1.0.0d
-         * adjust other things we care about
-         */
-
-        SSL_set_verify(ssl_conn, SSL_CTX_get_verify_mode(sscf->ssl.ctx),
-                       SSL_CTX_get_verify_callback(sscf->ssl.ctx));
-
-        SSL_set_verify_depth(ssl_conn, SSL_CTX_get_verify_depth(sscf->ssl.ctx));
-
-#ifdef SSL_CTRL_CLEAR_OPTIONS
-        /* only in 0.9.8m+ */
-        SSL_clear_options(ssl_conn, SSL_get_options(ssl_conn) &
-                                    ~SSL_CTX_get_options(sscf->ssl.ctx));
-#endif
-
-        SSL_set_options(ssl_conn, SSL_CTX_get_options(sscf->ssl.ctx));
-    }
-
-    return SSL_TLSEXT_ERR_OK;
-}
-
-#endif
-
-#endif
-
-
 static void
 ngx_http_process_request_line(ngx_event_t *rev)
 {
@@ -765,55 +588,6 @@ ngx_http_process_request_line(ngx_event_t *rev)
                 r->args.data = r->args_start;
             }
 
-#if (NGX_WIN32)
-            {
-            u_char  *p, *last;
-
-            p = r->uri.data;
-            last = r->uri.data + r->uri.len;
-
-            while (p < last) {
-
-                if (*p++ == ':') {
-
-                    /*
-                     * this check covers "::$data", "::$index_allocation" and
-                     * ":$i30:$index_allocation"
-                     */
-
-                    if (p < last && *p == '$') {
-                        ngx_log_error(NGX_LOG_INFO, c->log, 0,
-                                      "client sent unsafe win32 URI");
-                        ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
-                        return;
-                    }
-                }
-            }
-
-            p = r->uri.data + r->uri.len - 1;
-
-            while (p > r->uri.data) {
-
-                if (*p == ' ') {
-                    p--;
-                    continue;
-                }
-
-                if (*p == '.') {
-                    p--;
-                    continue;
-                }
-
-                break;
-            }
-
-            if (p != r->uri.data + r->uri.len - 1) {
-                r->uri.len = p + 1 - r->uri.data;
-                ngx_http_set_exten(r);
-            }
-
-            }
-#endif
 
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                            "http request line: \"%V\"", &r->request_line);
@@ -1121,17 +895,17 @@ ngx_http_read_request_header(ngx_http_request_t *r)
     c = r->connection;
     rev = c->read;
 
-    n = r->header_in->last - r->header_in->pos;
+    n = r->header_in->last - r->header_in->pos; //header_in 中的有效数据的长度
 
     if (n > 0) {
-        return n;
+        return n; //如果 还有有效数据就直接返回继续解析
     }
 
     if (rev->ready) {
         n = c->recv(c, r->header_in->last,
                     r->header_in->end - r->header_in->last);
     } else {
-        n = NGX_AGAIN;
+        n = NGX_AGAIN; //第一次进来设置n为again
     }
 
     if (n == NGX_AGAIN) {
@@ -1139,7 +913,7 @@ ngx_http_read_request_header(ngx_http_request_t *r)
             cscf = ngx_http_get_module_srv_conf(r, ngx_http_core_module);
             ngx_add_timer(rev, cscf->client_header_timeout);
         }
-
+//然后挂载读事件
         if (ngx_handle_read_event(rev, 0) != NGX_OK) {
             ngx_http_close_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
             return NGX_ERROR;
@@ -1180,7 +954,8 @@ ngx_http_alloc_large_header_buffer(ngx_http_request_t *r,
                    "http alloc large header buffer");
 
     if (request_line && r->state == 0) {
-
+				//首先判断如果实在处理完request_line并且状态为0，则说明用户的rquest line的第一行是空
+				//此时需要忽略这个回车换行
         /* the client fills up the buffer with "\r\n" */
 
         r->header_in->pos = r->header_in->start;
@@ -1192,23 +967,27 @@ ngx_http_alloc_large_header_buffer(ngx_http_request_t *r,
     old = request_line ? r->request_start : r->header_name_start;
 
     cscf = ngx_http_get_module_srv_conf(r, ngx_http_core_module);
-
+		//state不为0，则说明request未解析完毕，此时如果已经解析完毕的部分太大，则直接返回
     if (r->state != 0
         && (size_t) (r->header_in->pos - old)
                                      >= cscf->large_client_header_buffers.size)
     {
         return NGX_DECLINED;
     }
-
+/*
+	接下来这部分就是准备分配新的内存供request使用，这里有一个http_connection的概念, 在nginx中
+	这个主要用于pipeline请求和keepalive请求，主要是为了buf的重用设计的
+*/
     hc = r->http_connection;
-
+//如果有已经被free，也就是空闲的buf，则我们就不用重新分配
     if (hc->nfree) {
+//直接取得buf
         b = hc->free[--hc->nfree];
-
+				
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "http large header free: %p %uz",
                        b->pos, b->end - b->last);
-
+//否则如果large_client_header_buffer的没有被使用完毕，则我们重新alloc新的buf
     } else if (hc->nbusy < cscf->large_client_header_buffers.num) {
 
         if (hc->busy == NULL) {
@@ -1218,7 +997,7 @@ ngx_http_alloc_large_header_buffer(ngx_http_request_t *r,
                 return NGX_ERROR;
             }
         }
-
+//创建新的buf
         b = ngx_create_temp_buf(r->connection->pool,
                                 cscf->large_client_header_buffers.size);
         if (b == NULL) {
@@ -1232,7 +1011,7 @@ ngx_http_alloc_large_header_buffer(ngx_http_request_t *r,
     } else {
         return NGX_DECLINED;
     }
-
+//这里nbusy作为一个计数，用来限制large_client_header_buffers中限制的buf个数
     hc->busy[hc->nbusy++] = b;
 
     if (r->state == 0) {

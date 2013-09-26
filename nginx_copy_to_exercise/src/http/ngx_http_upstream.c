@@ -416,7 +416,10 @@ ngx_http_upstream_create(ngx_http_request_t *r)
     return NGX_OK;
 }
 
-
+/*
+	这个函数首先删除设置的定时器，然后如果是边缘触发的话，则挂载write的事件
+	这是因为走upstream，如果接下来我们connect不成功(NGX_EINPROGRESS)，则不会进入ngx_http_finalize_request以挂载写hook，所以这里需要先挂载写事件
+*/
 void
 ngx_http_upstream_init(ngx_http_request_t *r)
 {
@@ -426,11 +429,11 @@ ngx_http_upstream_init(ngx_http_request_t *r)
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http init upstream, client timer: %d", c->read->timer_set);
-
+//删除定时器
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
     }
-
+//挂载写事件
     if (ngx_event_flags & NGX_USE_CLEAR_EVENT) {
 
         if (!c->write->active) {
@@ -442,7 +445,7 @@ ngx_http_upstream_init(ngx_http_request_t *r)
             }
         }
     }
-
+//进入upstream的初始化
     ngx_http_upstream_init_request(r);
 }
 

@@ -156,6 +156,16 @@ static ngx_int_t ngx_http_variable_msec(ngx_http_request_t *r,
  * they are handled using dedicated entries
  */
 
+/*
+struct ngx_http_variable_s { 
+     ngx_str_t                     name;   // must be first to build the hash 变量的名称
+     ngx_http_set_variable_pt      set_handler;//变量的设置函数
+     ngx_http_get_variable_pt      get_handler;//变量的获取函数
+     uintptr_t                     data; //传给get与set_handler的值
+     ngx_uint_t                    flags;//变量的标志
+     ngx_uint_t                    index; //如果没有索引，则是变量的索引号
+ };
+*/
 static ngx_http_variable_t  ngx_http_core_variables[] = {
 
     { ngx_string("http_host"), NULL, ngx_http_variable_header,

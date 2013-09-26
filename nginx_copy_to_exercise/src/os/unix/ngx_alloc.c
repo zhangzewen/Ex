@@ -61,10 +61,10 @@ ngx_memalign(size_t alignment, size_t size, ngx_log_t *log)
                       "posix_memalign(%uz, %uz) failed", alignment, size);
         p = NULL;
     }
-
+#if 0
     ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, log, 0,
                    "posix_memalign: %p:%uz @%uz", p, size, alignment);
-
+#endif
     return p;
 }
 

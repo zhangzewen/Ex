@@ -11,6 +11,9 @@
 
 #include <ngx_config.h>
 #include <ngx_core.h>
+/*
+nginx的hash表示静态只读，即不能在运行时动态添加新的元素
+*/
 
 
 typedef struct {
@@ -90,9 +93,14 @@ typedef struct {
 } ngx_hash_keys_arrays_t;
 
 
+/*
+ngx_table_elt_t是为HTTP头部"量身定制"的，其中key存储头部名称(如Content-Length)，value存储对应的值
+(1024),lowcase_key是为了忽略HTTP头部名称的大小写(例如，有些客户端发来的HTTP请求头部是content-length，Nginx
+希望它与大小写敏感的Content-Length做相同的处理，有了全小写的lowcase_key成员后就可以快速达成目的)
+*/
 typedef struct {
-    ngx_uint_t        hash;
-    ngx_str_t         key;
+    ngx_uint_t        hash;//value
+    ngx_str_t         key;//key
     ngx_str_t         value;
     u_char           *lowcase_key;
 } ngx_table_elt_t;

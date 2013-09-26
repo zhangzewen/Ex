@@ -256,8 +256,22 @@ ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
     u_short         *test;
     ngx_uint_t       i, n, key, size, start, bucket_size;
     ngx_hash_elt_t  *elt, **buckets;
+		/*
+			nelts是关键字的数量，bucket_size为一个bucket的大小，一个bucket至少可以容得下一个关键字
+			下面的NGX_HASH_ELT_SIZE(&name[n] + sizeof(void *))正好就是一个关键字所占的空间
+			如果我们设定的bucket大小必须保证能容得下任何一个关键字，否则，就报错，提示bucket指定的太小
+			关于NGX_HASH_ELT_SIZE这个宏，nginx把所有定位到某个bucket的关键字，即冲突的，封装成ngx_hash_elt_t结构挨在一起放置
+			这样组成了ngx_hash_elt_t数组，这个数组空间的地址，由ngx_hash_t中的buckets保存。对于某个关键字来说，它有
+			一个ngx_hash_elt_t的头结构和紧跟在后面的内容组成。从这个角度看一个关键字所占的空间正好等于NGX_HASH_ELT_SIZE
+			宏的值
+			只是里面多了一个对齐的动作
+		*/
 
     for (n = 0; n < nelts; n++) {
+				/*
+					这里考虑放置每个bucket最后的null指针所需要的空间，即代码中sizeof(void *)这个NULL在find过程中作为一个bucket
+					的结束标记来使用
+				*/
         if (hinit->bucket_size < NGX_HASH_ELT_SIZE(&names[n]) + sizeof(void *))
         {
             ngx_log_error(NGX_LOG_EMERG, hinit->pool->log, 0,
@@ -268,11 +282,19 @@ ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
         }
     }
 
+/*
+	max_size是bucket的最大数量，这里的test是用来做探测用的，探测的目标是在当前bucket的数量下，冲突发生的是否频繁
+	过于频繁则说明当前的bucket数量过少，需要调整。那么如何判定冲突过于频繁呢，就是利用这个test数组，它总共有max_size个元素，即最大的bucket
+	每个元素会累计落到该位置关键字长度，当大于256个字节，即u_short所表示的最大大小时，则判定bucket过少，引起了严重的冲突
+	
+*/
     test = ngx_alloc(hinit->max_size * sizeof(u_short), hinit->pool->log);
     if (test == NULL) {
         return NGX_ERROR;
     }
-
+/*
+		每个bucket的末尾一个null指针作为bucket的结束标志，这里bucket_size是容纳实际数据大小，故减去一个指针大小
+*/
     bucket_size = hinit->bucket_size - sizeof(void *);
 
     start = nelts / (bucket_size / (2 * sizeof(void *)));
