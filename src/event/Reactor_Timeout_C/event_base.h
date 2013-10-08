@@ -5,6 +5,7 @@
 #include "evbuf.h"
 
 #include "list.h"
+#include "min_heap.h"
 /*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
 #define EVLIST_TIMOUT 0X01 /*event在time堆中*/
 #define EVLIST_INSERTED 0X02/*event已经在注册事件链表中*/
@@ -47,6 +48,8 @@ struct epoll_loop{
 
 struct event{
   struct event_base *ev_base;
+	unsigned int min_heap_idx;
+	struct timeval ev_timeout;
 
   int ev_fd;
 	struct evbuffer *buffer;	
@@ -80,6 +83,10 @@ struct event_base {
 	
 	int event_gotterm;
 	int event_break;
+	
+	struct min_heap timeheap;
+	struct timeval tv_cache;
+	struct timeval event_tv;
 
 	int nactivequeues;
 	

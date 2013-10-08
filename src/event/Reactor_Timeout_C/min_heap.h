@@ -1,12 +1,13 @@
 #ifndef __REACTOR_C_MIN_HEAP_H_INCLUDED_
 #define __REACTOR_C_MIN_HEAP_H_INCLUDED_
 
+#include "evutil.h"
 typedef struct min_heap
 {
 	struct event **p;
 	unsigned int n;
 	unsigned int a;
-}
+}min_heap_t;
 
 static inline void min_heap_ctor(min_heap_t* s);
 static inline void min_heap_dtor(min_heap_t* s);
@@ -25,7 +26,7 @@ static inline void min_heap_shift_down_(min_heap_t* s, unsigned hole_index, stru
 
 int min_heap_elem_greater(struct event *a, struct event *b)
 {
-	return evutil_timercmp(&a->ev_timeout, &b->ev_timeout, >);
+	return evutil_timercmp(&a->ev_timeout, &b->ev_timeout, > );
 }
 
 void min_heap_ctor(min_heap_t* s)
