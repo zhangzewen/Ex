@@ -15,11 +15,11 @@
 
 #define EVLIST_ALL (0Xf000 | 0x9f)
 
-#define EV_TIMEOUT 0X01
-#define EV_READ 0X02
-#define EV_WRITE 0X04
-#define EV_SIGNAL 0X08
-#define EV_PERSIST 0X10
+#define EV_TIMEOUT 0X01 //=====1
+#define EV_READ 0X02   //======10
+#define EV_WRITE 0X04  //=====>100
+#define EV_SIGNAL 0X08 //=====>1000
+#define EV_PERSIST 0X10 //====>10000
 
 #define EVLOOP_NONBLOCK 0x02  /**< Do not block. */
 #include <sys/epoll.h>

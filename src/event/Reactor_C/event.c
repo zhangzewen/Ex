@@ -287,6 +287,7 @@ int event_del(struct event *ev)
 __attribute__((unused))
 void event_active(struct event *ev, int res, short ncalls)
 {
+	//当事件处在激活队列中，可能会有不同是事件，把这些事件都加在一起
 	if (ev->ev_flags & EVLIST_ACTIVE) {
 		ev->ev_res |= res;
 		return ;
