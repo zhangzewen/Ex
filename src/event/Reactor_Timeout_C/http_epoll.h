@@ -1,5 +1,5 @@
-#ifndef __HTTP_EPOLL_H_INCLUDED_
-#define __HTTP_EPOLL_H_INCLUDED_
+#ifndef __REACTOR_TIMEOUT_C_HTTP_EPOLL_H_INCLUDED_
+#define __REACTOR_TIMEOUT_C_HTTP_EPOLL_H_INCLUDED_
 
 #include <sys/types.h>
 #include <sys/time.h>

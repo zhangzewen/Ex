@@ -1,5 +1,5 @@
-#ifndef REACTOR_TIMEOUT_C_EVUTIL_H_INCLUDED__
-#define REACTOR_TIMEOUT_C_EVUTIL_H_INCLUDED__
+#ifndef __REACTOR_TIMEOUT_C_EVUTIL_H_INCLUDED__
+#define __REACTOR_TIMEOUT_C_EVUTIL_H_INCLUDED__
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>

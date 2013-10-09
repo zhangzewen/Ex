@@ -1,10 +1,11 @@
-#ifndef __EVENT_BASE_H_INCLUDED__
-#define __EVENT_BASE_H_INCLUDED__
+#ifndef __REACTOR_TIMEOUT_C_EVENT_BASE_H_INCLUDED__
+#define __REACTOR_TIMEOUT_C_EVENT_BASE_H_INCLUDED__
 
 #include <sys/time.h>
 #include "evbuf.h"
 
 #include "list.h"
+#include "min_heap.h"
 /*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
 #define EVLIST_TIMOUT 0X01 /*event在time堆中*/
 #define EVLIST_INSERTED 0X02/*event已经在注册事件链表中*/
@@ -93,5 +94,59 @@ struct event_base {
 	struct list_head eventqueue;
 };
 
+typedef struct min_heap
+{
+	struct event **p;
+	unsigned n;
+	unsigned a;
+}min_heap_t;
 
+
+inline int min_heap_elem_greater(struct event *a, struct event *b)
+{
+	return evutil_timercmp(&a->ev_timeout, &b->ev_timeout, >);
+}
+
+inline void min_heap_ctor(min_heap_t *s)
+{
+	s->p = NULL;
+	s->n = 0;
+	s->a = 0;
+}
+
+inline void min_heap_dtor(min_heap_t *s)
+{
+	if (s->p) {
+		free(s->p);//这个释放有问题
+	}
+}
+
+inline void min_heap_elem_init(struct event *e)
+{
+	e->min_heap_idx = -1;
+}
+
+inline int min_heap_empty(min_heap_t *s)
+{
+	return 0u == s->n;
+}
+
+
+inline unsigned int min_heap_size(min_heap_t *s)
+{
+	return s->n;
+}
+
+inline struct event* min_heap_top(min_heap_t *s)
+{
+	return s->n ? *s->p : 0;
+}
+
+
+int min_heap_push(min_heap_t *s, struct event *e)
+{
+	if (min_heap_reserve(s, s->n + 1)) {
+		return -1;
+	}
+}
 #endif
