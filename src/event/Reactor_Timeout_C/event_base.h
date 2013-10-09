@@ -5,7 +5,6 @@
 #include "evbuf.h"
 
 #include "list.h"
-#include "min_heap.h"
 /*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
 #define EVLIST_TIMOUT 0X01 /*event在time堆中*/
 #define EVLIST_INSERTED 0X02/*event已经在注册事件链表中*/

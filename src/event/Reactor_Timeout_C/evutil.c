@@ -14,33 +14,6 @@ int evutil_gettimeofday(struct timeval *tv, struct timezone *tz)
 	return 0;
 }
 
-int evutil_timercmp(struct timeval *tvp, struct timeval *uvp)
-{
-	if (tvp->sec - uvp->sec > 0) {
-		return 1;
-	}
-
-	if (tvp->sec - uvp->sec == 0) {
-		return 0;
-	}
-
-	if (tvp->sec - uvp->sec < 0) {
-		return -1;
-	}
-
-	if (tvp->usec - uvp->usec > 0) {
-		return 1;
-	}
-
-	if (tvp->usec - uvp->usec == 0) {
-		return 0;
-	}
-
-	if (tvp->usec - uvp->usec < 0) {
-		return -1;
-	}
-	return 1;
-}
 
 void evutil_timeradd(struct timeval *tvp, struct timeval *uvp, struct timeval *vvp)	
 {

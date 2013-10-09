@@ -8,7 +8,7 @@ evbuf.o: evbuf.c evbuf.h
 	gcc -c -g3 evbuf.c -o evbuf.o
 evutil.o: evutil.h evutil.c
 	gcc -c -g3 evutil.c -o evutil.o
-main.o: main.c event.h evbuf.h evutil.h
+main.o: main.c event.h evbuf.h  
 	gcc -c -g3 main.c -g -o main.o
 clean:
 	rm -fr *.o

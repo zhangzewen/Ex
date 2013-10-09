@@ -6,6 +6,7 @@
 #include "http_epoll.h"
 #include "event.h"
 #include "evbuf.h"
+#include "list.h"
 
 struct eventop epollops = {
     .name = "epoll",

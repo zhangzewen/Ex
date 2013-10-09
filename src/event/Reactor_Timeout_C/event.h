@@ -4,7 +4,6 @@
 #include <sys/time.h>
 #include "event_base.h"
 
-#include "list.h"
 
 
 

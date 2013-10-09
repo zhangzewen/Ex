@@ -13,8 +13,7 @@ void evutil_timersub(struct timeval *tvp, struct timeval *uvp, struct timeval *v
 
 #define evutil_timerclear(tvp) (tvp)->tv_sec = (tvp)->tv_usec = 0
 
-int evutil_timercmp(struct timeval *tvp, struct timeval *uvp);
-
+#define evutil_timercmp(tvp, uvp, cmp) (((tvp)->tv_sec == (uvp)->tv_sec) ? ((tvp)->tv_usec cmp (uvp)->tv_usec) : ((tvp)->tv_sec cmp (uvp)->tv_sec))
 
 #define evutil_timerisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
 
