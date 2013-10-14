@@ -9,6 +9,8 @@
 #include <string.h>
 #include "event_base.h"
 #include "http_epoll.h"
+
+
 struct epoll_loop  *epoll_init(struct event_base *base)
 {
 	int epfd;
@@ -80,7 +82,7 @@ int epoll_recalc(struct event_base *base, struct epoll_loop *loop, int max)
 }
 
 
-int epoll_dispatch(struct event_base *base, struct epoll_loop *loop)
+int epoll_dispatch(struct event_base *base, struct epoll_loop *loop, struct timeval *tv)
 {
 	struct epoll_event *events = loop->events;
 	struct event_epoll *event_epoll;
@@ -98,7 +100,7 @@ int epoll_dispatch(struct event_base *base, struct epoll_loop *loop)
 	
 	
 	
-	res = epoll_wait(loop->epfd, events, loop->nevents, timout);
+	res = epoll_wait(loop->epfd, events, loop->nevents, timeout);
 	
 	if (res == -1) {
 		if (errno != EINTR) {

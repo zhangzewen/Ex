@@ -37,6 +37,8 @@ int event_del(struct event *ev);
 
 void event_active(struct event *, int, short);
 
+void timeout_process(struct event_base *base);
+
 
 #define event_initialized(ev) ((ev)->ev_flags & EVLIST_INIT)
 

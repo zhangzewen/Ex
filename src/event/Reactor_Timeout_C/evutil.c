@@ -1,4 +1,9 @@
 #include "evutil.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/timeb.h>
+#include <sys/types.h>
+#include <time.h>
 int evutil_gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	struct _timeb tb;
@@ -35,4 +40,3 @@ void evutil_timersub(struct timeval *tvp, struct timeval *uvp, struct timeval *v
 	}	
 }
 
-#endif

@@ -19,6 +19,6 @@
 struct epoll_loop *epoll_init (struct event_base *);
 int epoll_add (struct epoll_loop *loop, struct event *);
 int epoll_del (struct epoll_loop *loop, struct event *);
-int epoll_dispatch (struct event_base *, struct epoll_loop *loop);
+int epoll_dispatch (struct event_base *, struct epoll_loop *loop, struct timeval *tv);
 void epoll_dealloc (struct event_base *, struct epoll_loop *loop);
 #endif
