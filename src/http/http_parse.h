@@ -238,6 +238,7 @@ int parse_http_request_head_line(char *buff);
 
 struct http_request_st{
 	int method;
+	int fd; //socket文件描述符
 	int http_version;
 	char request_line[1024];
 	char uri[1024];
@@ -264,15 +265,6 @@ struct http_request_st{
 	char *port_start;
 	char *port_end;
 	
-	size_t limit_rate;
-	size_t header_size;
-	off_t request_length;
-	int http_minor;
-	int http_major;
-	int complex_uri;
-	int quoted_uri;
-	int plus_in_uri;
-	int space_in_uri;
 	unsigned int state;
 	
 	
