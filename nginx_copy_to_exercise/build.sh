@@ -22,7 +22,7 @@ make clean;
   --without-http_upstream_ip_hash_module  \
   --without-http_upstream_least_conn_module  \
   --without-http_upstream_keepalive_module \
-	--with-pcre=/root/tar/pcre \
+	--with-pcre=/root/tar/pcre-8.21 \
 	--with-debug \
 	--without-http-cache \
 	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_write_back_request_module \

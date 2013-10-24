@@ -421,8 +421,8 @@ ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last)
                 conf = ((void **) cf->ctx)[ngx_modules[i]->index];
 
             } else if (cmd->type & NGX_MAIN_CONF) {
-                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]);
-
+                conf = &(((void **) cf->ctx)[ngx_modules[i]->index]); //这是取0x0的地址 ((void **) cf->ctx)[ngx_modules[i]->index]所指向的地址是零,因为在开始分配空间的时候都指向NULL，第二步就是给NGX_DIRECT_MODULE分配空间，所以属于
+																																			//NGX_MAIN_CONF的空间都还是空的
             } else if (cf->ctx) {
                 confp = *(void **) ((char *) cf->ctx + cmd->conf);
 

@@ -51,12 +51,6 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
     ls->addr_text.len = len;
 
     switch (ls->sockaddr->sa_family) {
-#if (NGX_HAVE_UNIX_DOMAIN)
-    case AF_UNIX:
-         ls->addr_text_max_len = NGX_UNIX_ADDRSTRLEN;
-         len++;
-         break;
-#endif
     case AF_INET:
          ls->addr_text_max_len = NGX_INET_ADDRSTRLEN;
          break;
@@ -79,9 +73,6 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
     ls->rcvbuf = -1;
     ls->sndbuf = -1;
 
-#if (NGX_HAVE_SETFIB)
-    ls->setfib = -1;
-#endif
 
     return ls;
 }
@@ -94,13 +85,6 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
     ngx_uint_t                 i;
     ngx_listening_t           *ls;
     socklen_t                  olen;
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined SO_ACCEPTFILTER)
-    ngx_err_t                  err;
-    struct accept_filter_arg   af;
-#endif
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined TCP_DEFER_ACCEPT)
-    int                        timeout;
-#endif
 
     ls = cycle->listening.elts;
     for (i = 0; i < cycle->listening.nelts; i++) {
@@ -122,12 +106,6 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
         switch (ls[i].sockaddr->sa_family) {
 
 
-#if (NGX_HAVE_UNIX_DOMAIN)
-        case AF_UNIX:
-             ls[i].addr_text_max_len = NGX_UNIX_ADDRSTRLEN;
-             len = NGX_UNIX_ADDRSTRLEN;
-             break;
-#endif
 
         case AF_INET:
              ls[i].addr_text_max_len = NGX_INET_ADDRSTRLEN;
@@ -182,78 +160,8 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
             ls[i].sndbuf = -1;
         }
 
-#if 0
-        /* SO_SETFIB is currently a set only option */
 
-#if (NGX_HAVE_SETFIB)
 
-        if (getsockopt(ls[i].setfib, SOL_SOCKET, SO_SETFIB,
-                       (void *) &ls[i].setfib, &olen)
-            == -1)
-        {
-            ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                          "getsockopt(SO_SETFIB) %V failed, ignored",
-                          &ls[i].addr_text);
-
-            ls[i].setfib = -1;
-        }
-
-#endif
-#endif
-
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined SO_ACCEPTFILTER)
-
-        ngx_memzero(&af, sizeof(struct accept_filter_arg));
-        olen = sizeof(struct accept_filter_arg);
-
-        if (getsockopt(ls[i].fd, SOL_SOCKET, SO_ACCEPTFILTER, &af, &olen)
-            == -1)
-        {
-            err = ngx_errno;
-
-            if (err == NGX_EINVAL) {
-                continue;
-            }
-
-            ngx_log_error(NGX_LOG_NOTICE, cycle->log, err,
-                          "getsockopt(SO_ACCEPTFILTER) for %V failed, ignored",
-                          &ls[i].addr_text);
-            continue;
-        }
-
-        if (olen < sizeof(struct accept_filter_arg) || af.af_name[0] == '\0') {
-            continue;
-        }
-
-        ls[i].accept_filter = ngx_palloc(cycle->pool, 16);
-        if (ls[i].accept_filter == NULL) {
-            return NGX_ERROR;
-        }
-
-        (void) ngx_cpystrn((u_char *) ls[i].accept_filter,
-                           (u_char *) af.af_name, 16);
-#endif
-
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined TCP_DEFER_ACCEPT)
-
-        timeout = 0;
-        olen = sizeof(int);
-
-        if (getsockopt(ls[i].fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, &olen)
-            == -1)
-        {
-            ngx_log_error(NGX_LOG_NOTICE, cycle->log, ngx_errno,
-                          "getsockopt(TCP_DEFER_ACCEPT) for %V failed, ignored",
-                          &ls[i].addr_text);
-            continue;
-        }
-
-        if (olen < sizeof(int) || timeout == 0) {
-            continue;
-        }
-
-        ls[i].deferred_accept = 1;
-#endif
     }
 
     return NGX_OK;
@@ -294,7 +202,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 continue;
             }
 
-            if (ls[i].fd != -1) {
+            if (ls[i].fd != -1) { //过滤掉已经正在监听的
                 continue;
             }
 
@@ -314,7 +222,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                               ngx_socket_n " %V failed", &ls[i].addr_text);
                 return NGX_ERROR;
             }
-						//set socket address reuseadble
+						//set socket address reuseadble允许重用本地地址
             if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
                            (const void *) &reuseaddr, sizeof(int))
                 == -1)
@@ -378,28 +286,6 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 continue;
             }
 
-#if (NGX_HAVE_UNIX_DOMAIN)
-
-            if (ls[i].sockaddr->sa_family == AF_UNIX) {
-                mode_t   mode;
-                u_char  *name;
-
-                name = ls[i].addr_text.data + sizeof("unix:") - 1;
-                mode = (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-
-                if (chmod((char *) name, mode) == -1) {
-                    ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
-                                  "chmod() \"%s\" failed", name);
-                }
-
-                if (ngx_test_config) {
-                    if (ngx_delete_file(name) == -1) {
-                        ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
-                                      ngx_delete_file_n " %s failed", name);
-                    }
-                }
-            }
-#endif
 						//listen(fd, backlog)
             if (listen(s, ls[i].backlog) == -1) {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
@@ -451,12 +337,6 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
     ngx_uint_t                 i;
     ngx_listening_t           *ls;
 
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined SO_ACCEPTFILTER)
-    struct accept_filter_arg   af;
-#endif
-#if (NGX_HAVE_DEFERRED_ACCEPT && defined TCP_DEFER_ACCEPT)
-    int                        timeout;
-#endif
 
     ls = cycle->listening.elts;
     for (i = 0; i < cycle->listening.nelts; i++) {
@@ -535,34 +415,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 
 #endif
 
-#if (NGX_HAVE_SETFIB)
-				//i do not find flag SO_SETFIB int SOL_SOCKET,and whatever ,i think it's useless maybe
-        if (ls[i].setfib != -1) {
-            if (setsockopt(ls[i].fd, SOL_SOCKET, SO_SETFIB,
-                           (const void *) &ls[i].setfib, sizeof(int))
-                == -1)
-            {
-                ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(SO_SETFIB, %d) %V failed, ignored",
-                              ls[i].setfib, &ls[i].addr_text);
-            }
-        }
-#endif
 
-#if 0
-        if (1) {
-            int tcp_nodelay = 1;
-
-            if (setsockopt(ls[i].fd, IPPROTO_TCP, TCP_NODELAY,
-                       (const void *) &tcp_nodelay, sizeof(int))
-                == -1)
-            {
-                ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(TCP_NODELAY) %V failed, ignored",
-                              &ls[i].addr_text);
-            }
-        }
-#endif
 
         if (ls[i].listen) {
 
@@ -580,84 +433,6 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
          * because code may prematurely continue cycle on failure
          */
 
-#if (NGX_HAVE_DEFERRED_ACCEPT)
-
-#ifdef SO_ACCEPTFILTER
-
-        if (ls[i].delete_deferred) {
-            if (setsockopt(ls[i].fd, SOL_SOCKET, SO_ACCEPTFILTER, NULL, 0)
-                == -1)
-            {
-                ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                              "setsockopt(SO_ACCEPTFILTER, NULL) "
-                              "for %V failed, ignored",
-                              &ls[i].addr_text);
-
-                if (ls[i].accept_filter) {
-                    ngx_log_error(NGX_LOG_ALERT, cycle->log, 0,
-                                  "could not change the accept filter "
-                                  "to \"%s\" for %V, ignored",
-                                  ls[i].accept_filter, &ls[i].addr_text);
-                }
-
-                continue;
-            }
-
-            ls[i].deferred_accept = 0;
-        }
-
-        if (ls[i].add_deferred) {
-            ngx_memzero(&af, sizeof(struct accept_filter_arg));
-            (void) ngx_cpystrn((u_char *) af.af_name,
-                               (u_char *) ls[i].accept_filter, 16);
-
-            if (setsockopt(ls[i].fd, SOL_SOCKET, SO_ACCEPTFILTER,
-                           &af, sizeof(struct accept_filter_arg))
-                == -1)
-            {
-                ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                              "setsockopt(SO_ACCEPTFILTER, \"%s\") "
-                              "for %V failed, ignored",
-                              ls[i].accept_filter, &ls[i].addr_text);
-                continue;
-            }
-
-            ls[i].deferred_accept = 1;
-        }
-
-#endif
-
-#ifdef TCP_DEFER_ACCEPT
-
-        if (ls[i].add_deferred || ls[i].delete_deferred) {
-
-            if (ls[i].add_deferred) {
-                timeout = (int) (ls[i].post_accept_timeout / 1000);
-
-            } else {
-                timeout = 0;
-            }
-
-            if (setsockopt(ls[i].fd, IPPROTO_TCP, TCP_DEFER_ACCEPT,
-                           &timeout, sizeof(int))
-                == -1)
-            {
-                ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                              "setsockopt(TCP_DEFER_ACCEPT, %d) for %V failed, "
-                              "ignored",
-                              timeout, &ls[i].addr_text);
-
-                continue;
-            }
-        }
-
-        if (ls[i].add_deferred) {
-            ls[i].deferred_accept = 1;
-        }
-
-#endif
-
-#endif /* NGX_HAVE_DEFERRED_ACCEPT */
     }
 
     return;
@@ -719,21 +494,6 @@ ngx_close_listening_sockets(ngx_cycle_t *cycle)
                           ngx_close_socket_n " %V failed", &ls[i].addr_text);
         }
 
-#if (NGX_HAVE_UNIX_DOMAIN)
-
-        if (ls[i].sockaddr->sa_family == AF_UNIX
-            && ngx_process <= NGX_PROCESS_MASTER
-            && ngx_new_binary == 0)
-        {
-            u_char *name = ls[i].addr_text.data + sizeof("unix:") - 1;
-
-            if (ngx_delete_file(name) == -1) {
-                ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_socket_errno,
-                              ngx_delete_file_n " %s failed", name);
-            }
-        }
-
-#endif
 
         ls[i].fd = (ngx_socket_t) -1;
     }
@@ -851,11 +611,11 @@ ngx_close_connection(ngx_connection_t *c)
         ngx_log_error(NGX_LOG_ALERT, c->log, 0, "connection already closed");
         return;
     }
-
+		//删除读事件的timer
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
     }
-
+    //删除写事件的timer
     if (c->write->timer_set) {
         ngx_del_timer(c->write);
     }
@@ -873,15 +633,6 @@ ngx_close_connection(ngx_connection_t *c)
         }
     }
 
-#if (NGX_THREADS)
-
-    /*
-     * we have to clean the connection information before the closing
-     * because another thread may reopen the same file descriptor
-     * before we clean the connection
-     */
-
-    ngx_mutex_lock(ngx_posted_events_mutex);
 
     if (c->read->prev) {
         ngx_delete_posted_event(c->read);
@@ -894,28 +645,6 @@ ngx_close_connection(ngx_connection_t *c)
     c->read->closed = 1;
     c->write->closed = 1;
 
-    if (c->single_connection) {
-        ngx_unlock(&c->lock);
-        c->read->locked = 0;
-        c->write->locked = 0;
-    }
-
-    ngx_mutex_unlock(ngx_posted_events_mutex);
-
-#else
-
-    if (c->read->prev) {
-        ngx_delete_posted_event(c->read);
-    }
-
-    if (c->write->prev) {
-        ngx_delete_posted_event(c->write);
-    }
-
-    c->read->closed = 1;
-    c->write->closed = 1;
-
-#endif
 
     ngx_reusable_connection(c, 0);
 
@@ -1054,27 +783,15 @@ ngx_connection_error(ngx_connection_t *c, ngx_err_t err, char *text)
     /* Winsock may return NGX_ECONNABORTED instead of NGX_ECONNRESET */
 
     if ((err == NGX_ECONNRESET
-#if (NGX_WIN32)
-         || err == NGX_ECONNABORTED
-#endif
         ) && c->log_error == NGX_ERROR_IGNORE_ECONNRESET)
     {
         return 0;
     }
 
-#if (NGX_SOLARIS)
-    if (err == NGX_EINVAL && c->log_error == NGX_ERROR_IGNORE_EINVAL) {
-        return 0;
-    }
-#endif
 
     if (err == 0
         || err == NGX_ECONNRESET
-#if (NGX_WIN32)
-        || err == NGX_ECONNABORTED
-#else
         || err == NGX_EPIPE
-#endif
         || err == NGX_ENOTCONN
         || err == NGX_ETIMEDOUT
         || err == NGX_ECONNREFUSED
