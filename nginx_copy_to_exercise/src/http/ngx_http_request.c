@@ -222,6 +222,7 @@ ngx_http_init_connection(ngx_connection_t *c)
         ngx_http_init_request(rev);
         return;
     }
+		//要是没有准备好，就立即添加timer并加到epoll中
 
     ngx_add_timer(rev, c->listening->post_accept_timeout);
 
@@ -252,7 +253,7 @@ ngx_http_init_request(ngx_event_t *rev)
 
     c = rev->data;
 
-    if (rev->timedout) {
+    if (rev->timedout) {//客户端请求接收超时就drop掉连接
         ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT, "client timed out");
 
         ngx_http_close_connection(c);

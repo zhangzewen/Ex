@@ -4100,6 +4100,8 @@ ngx_http_upstream_cache_status(ngx_http_request_t *r,
 static char *
 ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 {
+		//获取upstream服务器租的名字，即upstream命令的参数
+		
     char                          *rv;
     void                          *mconf;
     ngx_str_t                     *value;
@@ -4115,7 +4117,10 @@ ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
     value = cf->args->elts;
     u.host = value[1];
     u.no_resolve = 1;
-
+		//这个函数初始化一个ngx_http_upsteam_srv_conf_t类型，
+		//并存入umcf->upsteams数组里面
+		//注意：这个函数还有一个作用，就是在"proxy_pass" 的时候cong
+		//umcf->upstream找出match的upstream服务器组
     uscf = ngx_http_upstream_add(cf, &u, NGX_HTTP_UPSTREAM_CREATE
                                          |NGX_HTTP_UPSTREAM_WEIGHT
                                          |NGX_HTTP_UPSTREAM_MAX_FAILS
