@@ -11,8 +11,6 @@ make clean;
   --without-http_map_module       \
   --without-http_split_clients_module \
   --without-http_referer_module      \
-  --without-http_proxy_module        \
-  --without-http_fastcgi_module      \
   --without-http_uwsgi_module        \
   --without-http_scgi_module         \
   --without-http_memcached_module \
@@ -25,8 +23,5 @@ make clean;
 	--with-pcre=/root/tar/pcre-8.21 \
 	--with-debug \
 	--without-http-cache \
-	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_write_back_request_module \
-#	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_hello_world_module \
-#	--add-module=/root/Desktop/project/Http/trunk/nginx_copy_to_exercise/ngx_modules/ngx_http_echo_module 
 
 exit 0;
