@@ -269,5 +269,42 @@ int ez_conn::getpeername(const char **ip, int *port)
 	
 		if (::getpeername(sock_, (struct sockaddr *)&addr, &len) == -1)
 			return -1;
+		
+		if (!inet_ntop(AF_INET, &addr.sin_addr.s_addr, buf, sizeof(buf)))
+			return -1;
+
+		this->peer_ip_ = new std::string(buf);
+		this->peer_port_ = ntohs(addr.sin_port);
 	}
+
+	*ip = peer_ip_->c_str();
+	*port = peer_port_;
+	return 0;
+}
+
+
+int ez_conn::detach()
+{
+	assert(status_ != none && poll_);
+	assert(poll_->del(sock_) == 0);
+	poll_ = NULL;
+	return 0;
+}
+
+
+int ez_conn::attach(ez_poll *poll)
+{
+	assert(status_ != none && !poll_ && poll);
+
+	if (poll->add(sock_, this) != 0)
+		return -1;
+	
+	assert(poll->modr(sock_, true) == 0);
+	
+	if (outbuf_.get_buffer_length()) {
+		assert(poll->modw(sock_, true));
+	}
+
+	poll_ = poll;
+	return 0;
 }
