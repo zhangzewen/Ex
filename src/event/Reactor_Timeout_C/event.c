@@ -207,11 +207,12 @@ void timeout_process(struct event_base *base)
 	gettime(base, &now);
 	
 	while ((ev = min_heap_top(&base->timeheap))) {
-		if (evutil_timercmp(&ev->ev_timeout, &now, >)) {
+		if (evutil_timercmp(&ev->ev_timeout, &now, >)) { //还没有超时
 			break;
 		}
-	 /*delete this event from the I/O queues*/
-		event_de(ev);
+		//本事件已经超时
+	 /*delete this event from the I/O queues*/ 
+		event_del(ev);
 
 		event_active(ev, EV_TIMEOUT, 1);
 	}
@@ -482,6 +483,10 @@ int event_del(struct event *ev)
 		return (evsel->del(evbase, ev));
 	}
 
+	if (ev->ev_flags & EVLIST_TIMEOUT) {
+		event_queue_remove(base, ev, EVLIST_TIMEOUT);
+	}
+
 	return 0;	
 }
 
@@ -586,6 +591,9 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 		case EVLIST_ACTIVE:
 			base->event_count_active--;
 			list_del(&ev->active_list);
+			break;
+		case EVLIST_TIMEOUT:
+			min_heap_erase(&base->timeheap, ev);
 			break;
 
 		default:
