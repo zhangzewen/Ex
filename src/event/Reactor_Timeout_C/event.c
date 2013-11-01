@@ -78,6 +78,7 @@ struct event_base *event_base_new(void)
 	
 	gettime(base, &base->event_tv);
 	
+	rb_tree_create(&base->timer);
 	
 	INIT_LIST_HEAD(&base->eventqueue);
 	INIT_LIST_HEAD(&base->activequeue);
@@ -520,6 +521,9 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 			base->event_count_active++;
 			list_add_tail(&ev->active_list, &base->activequeue);
 			break;
+		case EVLIST_ACTIVE:
+			base->event_count_active++;
+			base->timer.insert(ev, &base->timer);	
 		default:
 			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
 	}
@@ -549,7 +553,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			break;
 		case EVLIST_TIMEOUT:
 			//min_heap_erase(&base->timeheap, ev);
-			RBTree_erase(&base->timer, ev);
+			base->timer.erase(ev, &base->timer);
 			break;
 
 		default:
