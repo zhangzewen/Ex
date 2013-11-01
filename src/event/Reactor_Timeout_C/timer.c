@@ -52,7 +52,7 @@ struct timeval timer_sub(struct timeval time_a, struct timeval time_b)
 	return ret;
 }
 
-void timer_sub(struct timerval *timer_a, struct timeval *timer_b, struct timer *ret)
+void timer_sub(const struct timerval *timer_a, const struct timeval *timer_b, struct timer *ret)
 {
 	timer_reset(ret);
 	ret.tv_usec = timer_a.tv_usec - timer_b.tv_usec;
@@ -64,7 +64,7 @@ void timer_sub(struct timerval *timer_a, struct timeval *timer_b, struct timer *
 	}	
 }
 
-void timer_sub(struct timeval *timer_a, struct timeval *timer_b, struct timer *ret)
+void timer_add(const struct timeval *timer_a, const struct timeval *timer_b, struct timer *ret)
 {
 	timer_reset(ret);
 	ret.tv_usec = timer_a.tv_usec + timer_b.tv_usec;

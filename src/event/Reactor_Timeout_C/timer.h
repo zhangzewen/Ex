@@ -7,17 +7,13 @@ extern struct timeval time_now;
 
 int timer_cmp(struct timeval *, struct timeval *);
 
-int timer_add(struct timeval *, struct timeval *, struct timeval *);
+int timer_add(const struct timeval *, const struct timeval *, struct timeval *);
 
-int timer_sub(struct timeval *, struct timeval *, struct timeval *);
+int timer_sub(const struct timeval *, const struct timeval *, struct timeval *);
 
-struct time_now();
+struct timeval* timer_now();
 
-struct gettime();
 
-int timer_add();
-
-int timer_del();
 
 void timer_reset(struct timeval *tv);
 #endif

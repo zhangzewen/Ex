@@ -8,6 +8,7 @@
 #include "evbuf.h"
 #include "list.h"
 #include "RBTree.h"
+#include "timer.h"
 
 struct eventop epollops = {
     .name = "epoll",
@@ -49,22 +50,7 @@ static int gettime(struct event_base *base, struct timeval *tp)
 		*tp = base->tv_cache;
 		return 0;
 	}
-	
-	//如果支持 monotonic,就用clock_gettime获取monotonic时间	
-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
-	if (use_monotonic) {
-		struct timespec ts;
-		if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1) {
-			return -1;
-		}
-
-		tp->tv_sec = ts.tv_sec;
-		tp->tv_usec = ts.tv_nsec / 1000;
-		return 0;
-	}
-#endif
-	//否则只能获取系统当前时间
-	return (evutil_gettimeofday(tp, NULL));
+	return (gettimeofday(tp, NULL));
 }
 
 
@@ -163,7 +149,7 @@ void timeout_process(struct event_base *base)
 
 	gettime(base, &now);
 	
-	while ((ev = base->timeout.min(&base->timeout))) {
+	while ((ev = base->timeout.min(base->timeout.root))) {
 		if (evutil_timercmp(&ev->ev_timeout, &now, >)) { //还没有超时
 			break;
 		}
@@ -192,9 +178,6 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 	struct event **pev;
 	unsigned int size;
 	struct timeval off;
-	if (use_monotonic) { //monotonic时间就直接返回，无需调整
-		return ;
-	}
 
 	gettime(base, tv);// tv <---- tv_cache
 	//根据前面的分析可以知道event_ev应该小于tv_cache
@@ -204,7 +187,8 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 		base->event_tv = *tv;
 		return ;
 	}
-
+#if 0
+	//之所以要注释掉这段代码，是因为我们暂且认为在程序运行期间，时间没有被人为的调整
 	//计算时间差
 	
 	evutil_timeersub(&base->event_tv, tv, &off);
@@ -220,6 +204,7 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 	}
 
 	base->event_tv = *tv; //更新event_tv为tv_cache
+#endif
 }
 /*
 	时间event_tv指示了dispatch()上次换回，也就是I/O事件就绪时的时间，第一次进入循环时，由于tv_cache被清空，因此gettime()执行系统调用获取当前系统时间，而后将会更细为tv_cache指示的时间
@@ -381,7 +366,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 		}
 
 		gettime(base, &now);
-		evutil_timeradd(&now, tv, &ev->ev_timeout);
+		timer_add(&now, tv, &ev->ev_timeout);
 		fprintf(stderr, "event_add: timeout in %ld seconds, call %p", tv->tv_sec, ev->ev_callback);
 		event_queue_insert(base, ev, EVLIST_TIMEOUT);
 	}
@@ -521,9 +506,9 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 			base->event_count_active++;
 			list_add_tail(&ev->active_list, &base->activequeue);
 			break;
-		case EVLIST_ACTIVE:
+		case EVLIST_TIMEOUT:
 			base->event_count_active++;
-			base->timer.insert(ev, &base->timer);	
+			base->timeout.insert(ev, base->timeout.root);	
 		default:
 			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
 	}
@@ -553,7 +538,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			break;
 		case EVLIST_TIMEOUT:
 			//min_heap_erase(&base->timeout, ev);
-			base->timer.erase(ev, &base->timer);
+			base->timeout.erase(ev, base->timeout.root);
 			break;
 
 		default:
