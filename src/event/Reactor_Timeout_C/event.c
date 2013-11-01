@@ -7,6 +7,7 @@
 #include "event.h"
 #include "evbuf.h"
 #include "list.h"
+#include "RBTree.h"
 
 struct eventop epollops = {
     .name = "epoll",
@@ -78,7 +79,7 @@ struct event_base *event_base_new(void)
 	
 	gettime(base, &base->event_tv);
 	
-	rb_tree_create(&base->timer);
+	rb_tree_create(&base->timeout);
 	
 	INIT_LIST_HEAD(&base->eventqueue);
 	INIT_LIST_HEAD(&base->activequeue);
@@ -156,13 +157,13 @@ void timeout_process(struct event_base *base)
 	struct timeval now;
 	struct event *ev;
 	
-	if (min_heap_empty(&base->timeheap)) {
+	if (base->timeout.empty(base->timeout.root)) {
 		return ;
 	}
 
 	gettime(base, &now);
 	
-	while ((ev = min_heap_top(&base->timeheap))) {
+	while ((ev = base->timeout.min(&base->timeout))) {
 		if (evutil_timercmp(&ev->ev_timeout, &now, >)) { //还没有超时
 			break;
 		}
@@ -210,8 +211,8 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 	
 	//调整定时事件最小堆
 	
-	pev = base->timeheap.p;
-	size = base->timeheap.n;
+	pev = base->timeout.p;
+	size = base->timeout.n;
 
 	for (; size-- > 0; ++pev) {
 		struct timeval *ev_tv = &(**pev).ev_timeout;
@@ -327,8 +328,8 @@ int event_add(struct event *ev, const struct timeval *tv)
 	failure on any step, we should not change any state.
 */	
 	if (tv != NULL && !(ev->ev_flags & EVLIST_TIMEOUT)) {
-		if (min_heap_reserve(&base->timeheap,
-			1 + min_heap_size(&base->timeheap)) == -1) {
+		if (min_heap_reserve(&base->timeout,
+			1 + min_heap_size(&base->timeout)) == -1) {
 			return -1;
 		}
 	}
@@ -402,7 +403,6 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_pncalls = NULL;
 	ev->buffer = evbuffer_new();
 	
-	min_heap_ele_init(ev);
 	
 	INIT_LIST_HEAD(&ev->event_list);
 	INIT_LIST_HEAD(&ev->active_list);
@@ -552,7 +552,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			list_del(&ev->active_list);
 			break;
 		case EVLIST_TIMEOUT:
-			//min_heap_erase(&base->timeheap, ev);
+			//min_heap_erase(&base->timeout, ev);
 			base->timer.erase(ev, &base->timer);
 			break;
 

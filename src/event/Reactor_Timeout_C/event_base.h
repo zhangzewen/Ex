@@ -58,7 +58,7 @@ struct event{
   short *ev_pncalls;
 
 	struct rb_node_t timer; //红黑树节点
-	unsigned int timeout; //是否timeout了，是：1，否：0
+	unsigned int istimeout; //是否timeout了，是：1，否：0
 
   void (*ev_callback)(int, short, void *arg);
   void *ev_arg;
@@ -87,7 +87,7 @@ struct event_base {
 	int event_gotterm;
 	int event_break;
 	
-	struct rb_tree_t timer; //维护一个红黑树来管理时间
+	struct rb_tree timeout; //维护一个红黑树来管理时间
 	struct timeval tv_cache;
 	struct timeval event_tv;
 

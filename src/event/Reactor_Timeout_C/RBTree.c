@@ -572,9 +572,15 @@ static rb_node_t *rb_erase_rebalance(rb_node_t *node, rb_node_t *parent, rb_node
 }
 
 
-void rb_tree_create(struct rb_tree_t *tree)
+void rb_tree_create(struct rb_tree *tree)
 {
+	tree->root = NULL;
 	tree->insert = rb_insert;
 	tree->min = rb_min;
 	tree->search = rb_search;
+}
+
+int rb_tree_empty(rb_node_t *root)
+{
+	return root != NULL;
 }
