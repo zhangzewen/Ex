@@ -78,7 +78,6 @@ struct event_base *event_base_new(void)
 	
 	gettime(base, &base->event_tv);
 	
-	min_heap_ctor(&base->timeheap);
 	
 	INIT_LIST_HEAD(&base->eventqueue);
 	INIT_LIST_HEAD(&base->activequeue);
@@ -93,50 +92,6 @@ struct event_base *event_base_new(void)
 	return (base);
 }
 
-#if 0
-void event_base_free(struct event_base *base)
-{
-	int i;
-	int n_deleted = 0;
-	struct event *ev;
-
-	if (base == NULL && current_base) {
-		base =  current_base;
-	}
-	
-	if (base == current_base) {
-		current_base = NULL;
-	}
-	
-
-	list_for_each_entry(ev, &base->eventqueue, list) {
-		if (!(ev->ev_flags & EVLIST_INTERNAL)) {
-			event_del(ev);
-			++n_deleted;
-		}
-	}
-
-
-	list_for_each_entry(ev, &base->activequeue, list) {
-		if (!(ev->ev_flags & EVLIST_INTERNAL)) {
-			event_del(ev);
-			++n_deleted;
-		}
-	}
-
-	if (n_deleted) {
-		fprintf(stderr,"%s : %d events were still set in base", __func__, n_deleted);
-	}
-
-	if (base->evsel->dealloc != NULL) {
-		base->evsel->dealloc(base, base->evbase);
-	}
-
-
-
-	free(base);
-}
-#endif
 
 
 static void event_process_active(struct event_base *base)
@@ -593,7 +548,8 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			list_del(&ev->active_list);
 			break;
 		case EVLIST_TIMEOUT:
-			min_heap_erase(&base->timeheap, ev);
+			//min_heap_erase(&base->timeheap, ev);
+			RBTree_erase(&base->timer, ev);
 			break;
 
 		default:
