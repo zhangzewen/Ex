@@ -13,7 +13,7 @@ int timer_sub(const struct timeval *, const struct timeval *, struct timeval *);
 
 struct timeval* timer_now();
 
-
+int timer_isset(struct timerval *tv);
 
 void timer_reset(struct timeval *tv);
 #endif

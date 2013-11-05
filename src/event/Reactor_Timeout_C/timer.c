@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/time.h>
 
 struct timeval time_now = { tv_sec: 0, tv_usec: 0};
 
@@ -75,4 +76,9 @@ void timer_add(const struct timeval *timer_a, const struct timeval *timer_b, str
 	ret.tv_usec %= 1000000;
 
 }
+int timer_isset(struct timerval *tv)
+{
+	return tv.tv_sec !=0 || tv.tv_usec != 0;
+}
+
 

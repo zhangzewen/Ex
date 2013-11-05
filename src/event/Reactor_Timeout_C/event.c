@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <sys/time.h>
 
 #include "http_epoll.h"
 #include "event.h"
@@ -29,6 +31,10 @@ static int event_haveevents(struct event_base *);
 
 static void event_process_actice(struct event_base *);
 
+
+
+static void event_add_timer(struct event_base *, struct event *);
+static void event_del_timer(struct event_base *, struct event *);
 
 
 struct event_base *event_init(void)
@@ -508,7 +514,7 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 			break;
 		case EVLIST_TIMEOUT:
 			base->event_count_active++;
-			base->timeout.insert(ev, base->timeout.root);	
+			event_add_timer(base, ev);
 		default:
 			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
 	}
@@ -538,7 +544,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			break;
 		case EVLIST_TIMEOUT:
 			//min_heap_erase(&base->timeout, ev);
-			base->timeout.erase(ev, base->timeout.root);
+			event_del_timer(base, ev);
 			break;
 
 		default:
@@ -551,4 +557,34 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 int event_haveevents(struct event_base *base)
 {
 	return base->event_count > 0;
+}
+
+static void event_add_timer(struct event_base *base, struct event *ev)
+{
+	uintptr_t key = 0;
+	
+	if (!timer_isset(&ev->ev_timeout)) {
+		return ;
+	}
+
+	key = ev->ev_timeout.tv_sec * 1000 + ev->ev_timeout.tv_usec / 1000; //取毫秒级别做key标示
+	
+	base->timeout.root = base->timeout.insert(kye, (void*)ev, base->timeout.root);
+	
+	
+		
+	
+}
+static void event_del_timer(struct event_base* base, struct event *ev)
+{
+	uintptr_t key = 0;	
+
+	if (ev->ev_timeout)	 {
+		return ;
+	}
+
+	key = ev->ev_timeout.tv_sec * 1000 + ev->ev_timeout.tv_usec / 1000;
+
+	base->timeout.root = base->timeout.erase(key, base->timeout.root);
+	return;
 }
