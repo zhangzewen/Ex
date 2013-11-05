@@ -161,8 +161,7 @@ int main(int argc, char *argv[])
 
 	event_add(&timeout, &tv);
 
-	event_dispatch()
+	event_dispatch();
 
-	return 0;
 	return 0;
 }

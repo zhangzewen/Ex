@@ -39,6 +39,7 @@ void event_active(struct event *, int, short);
 
 void timeout_process(struct event_base *base);
 
+#define evtimer_set(ev, cb, arg)  event_set(ev, -1, 0, cb, arg)
 
 #define event_initialized(ev) ((ev)->ev_flags & EVLIST_INIT)
 
