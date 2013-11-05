@@ -376,3 +376,23 @@ int rbtree_empty(rbtree_t *tree)
 {
 	return tree->root != NULL;
 }
+//找到最小节点，就在根节点最左边的左子树
+rbtree_node_t *rb_min(struct rbtree_node_st *root)
+{
+
+	if (NULL == root) {
+		return NULL;
+	}
+
+	rbtree_node_t *ptr = NULL;
+
+	ptr = root;
+
+	while(ptr) {
+		if (ptr->left) {
+			ptr = ptr->left;
+		}
+	}
+
+	return ptr;
+}

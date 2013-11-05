@@ -39,6 +39,7 @@ static void event_del_timer(struct event_base *, struct event *);
 
 static int timeout_next(struct event_base *base, struct timeval **tv_p)
 {
+#if 0
 	struct timeval now;
 	struct event *ev;
 	struct timeval *tv = *tv_p;
@@ -62,7 +63,7 @@ static int timeout_next(struct event_base *base, struct timeval **tv_p)
 	assert(tv->tv_sec >= 0);
 	
 	assert(tv->tv_usec >= 0);
-
+#endif
 	return 0;
 }
 struct event_base *event_init(void)
@@ -346,12 +347,14 @@ int event_add(struct event *ev, const struct timeval *tv)
 	prepare for timeout insertion further below, if we get a 
 	failure on any step, we should not change any state.
 */	
+#if 0
 	if (tv != NULL && !(ev->ev_flags & EVLIST_TIMEOUT)) {
 		if (min_heap_reserve(&base->timeout,
 			1 + min_heap_size(&base->timeout)) == -1) {
 			return -1;
 		}
 	}
+#endif
 	
 	if ((ev->ev_events & (EV_READ | EV_WRITE)) &&
 		!(ev->ev_flags & (EVLIST_INSERTED | EVLIST_ACTIVE))) {
