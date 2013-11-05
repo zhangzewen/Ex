@@ -1,5 +1,4 @@
-#include "http_timer.h"
-#include "http_error.h"
+#include "timer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -19,7 +18,7 @@ struct timeval timer_now()
 	int old_errno = errno;	
 	timer_reset(&current_time);
 
-	Gettimeofday(&current_time,NULL);
+	gettimeofday(&current_time,NULL);
 	errno = old_errno;
 	return current_time;
 }
@@ -38,47 +37,33 @@ int timer_cmp(struct timeval time_a, struct timeval time_b)
 	return 1;
 }
 
-struct timeval timer_sub(struct timeval time_a, struct timeval time_b)
-{
-	struct timeval ret;
-	timer_reset(&ret);
-	ret.tv_usec = time_b.tv_usec - time_a.tv_usec;
-	ret.tv_sec = time_b.tv_sec - time_a.tv_sec;
-	
-	if(ret.tv_usec < 0)
-	{
-		ret.tv_usec += 1000000;
-		ret.tv_sec++;
-	}
-	return ret;
-}
 
-void timer_sub(const struct timerval *timer_a, const struct timeval *timer_b, struct timer *ret)
+void timer_sub(const struct timeval *timer_a, const struct timeval *timer_b, struct timeval *ret)
 {
 	timer_reset(ret);
-	ret.tv_usec = timer_a.tv_usec - timer_b.tv_usec;
-	ret.tv_sec = timer_a.tv_sec - timer_b.tv_sec;
+	ret->tv_usec = timer_a->tv_usec - timer_b->tv_usec;
+	ret->tv_sec = timer_a->tv_sec - timer_b->tv_sec;
 
-	if (ret.tv_usec < 0) {
-		ret.tv_usec += 1000000;
-		ret.tv_sec--;
+	if (ret->tv_usec < 0) {
+		ret->tv_usec += 1000000;
+		ret->tv_sec--;
 	}	
 }
 
-void timer_add(const struct timeval *timer_a, const struct timeval *timer_b, struct timer *ret)
+void timer_add(const struct timeval *timer_a, const struct timeval *timer_b, struct timeval *ret)
 {
 	timer_reset(ret);
-	ret.tv_usec = timer_a.tv_usec + timer_b.tv_usec;
-	ret.tv_sec = timer_a.tv_sec + timer_b.tv_sec;
+	ret->tv_usec = timer_a->tv_usec + timer_b->tv_usec;
+	ret->tv_sec = timer_a->tv_sec + timer_b->tv_sec;
 	
-	ret.tv_sec += ret.tv_usec / 1000000;
+	ret->tv_sec += ret->tv_usec / 1000000;
 	
-	ret.tv_usec %= 1000000;
+	ret->tv_usec %= 1000000;
 
 }
-int timer_isset(struct timerval *tv)
+int timer_isset(const struct timeval *tv)
 {
-	return tv.tv_sec !=0 || tv.tv_usec != 0;
+	return tv->tv_sec !=0 || tv->tv_usec != 0;
 }
 
 

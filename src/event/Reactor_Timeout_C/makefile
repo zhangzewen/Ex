@@ -1,4 +1,4 @@
-server: main.o event.o http_epoll.o evbuf.o RBTree.o time.o
+server: main.o event.o http_epoll.o evbuf.o RBTree.o timer.o
 	gcc -g3 main.o event.o http_epoll.o evbuf.o RBTree.o timer.o -g3 -o server
 http_epoll.o: http_epoll.c http_epoll.h event_base.h 
 	gcc -c -g3 http_epoll.c -g -o http_epoll.o

@@ -37,6 +37,34 @@ static void event_add_timer(struct event_base *, struct event *);
 static void event_del_timer(struct event_base *, struct event *);
 
 
+static int timeout_next(struct event_base *base, struct timeval **tv_p)
+{
+	struct timeval now;
+	struct event *ev;
+	struct timeval *tv = *tv_p;
+
+	if ((ev = min_heap_top(&base->timeheap)) == NULL) {
+		*tv_p = NULL;
+		return 0;
+	}
+
+
+	if (gettime(base, &now) == -1)
+		return -1;
+
+	if (evutil_timercmp(&ev->ev_timeout, &now, <=)) {
+		evutil_timerclear(tv);
+		return 0;
+	}
+
+	evutil_timersub(&ev->ev_timeout, &now, tv);
+
+	assert(tv->tv_sec >= 0);
+	
+	assert(tv->tv_usec >= 0);
+
+	return 0;
+}
 struct event_base *event_init(void)
 {
 	struct event_base *base = event_base_new();
@@ -71,7 +99,7 @@ struct event_base *event_base_new(void)
 	
 	gettime(base, &base->event_tv);
 	
-	rb_tree_create(&base->timeout);
+	rbtree_init(&base->timeout);
 	
 	INIT_LIST_HEAD(&base->eventqueue);
 	INIT_LIST_HEAD(&base->activequeue);
@@ -569,7 +597,7 @@ static void event_add_timer(struct event_base *base, struct event *ev)
 
 	key = ev->ev_timeout.tv_sec * 1000 + ev->ev_timeout.tv_usec / 1000; //取毫秒级别做key标示
 	
-	base->timeout.root = base->timeout.insert(kye, (void*)ev, base->timeout.root);
+	base->timeout.root = base->timeout.insert(key, (void*)ev, base->timeout.root);
 	
 	
 		
@@ -579,7 +607,7 @@ static void event_del_timer(struct event_base* base, struct event *ev)
 {
 	uintptr_t key = 0;	
 
-	if (ev->ev_timeout)	 {
+	if (!timer_isset(&ev->ev_timeout))	 {
 		return ;
 	}
 
