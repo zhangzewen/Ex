@@ -35,6 +35,7 @@ static void event_process_actice(struct event_base *);
 
 static void event_add_timer(struct event_base *, struct event *);
 static void event_del_timer(struct event_base *, struct event *);
+static int gettime(struct event_base *base, struct timeval *tp);
 
 
 static int timeout_next(struct event_base *base, struct timeval **tv_p)
@@ -64,6 +65,27 @@ static int timeout_next(struct event_base *base, struct timeval **tv_p)
 	
 	assert(tv->tv_usec >= 0);
 #endif
+
+	struct timeval now;
+	struct event *ev;
+	struct timeval *tv = *tv_p;
+	rbtree_node_t *tmp;
+	
+	if ((tmp = base->timeout.min(base->timeout.root)) == NULL) {
+		*tv_p = NULL;
+		return 0;
+	}
+
+	if (gettime(base, &now) == -1)
+		return -1;
+/* 这还有一步，通过tmp找到ev*/
+	if (!timer_cmp(ev->ev_timeout, now)) {
+		timer_reset(tv);
+		return 0;
+	}
+
+	timer_add(&ev->ev_timeout, &now , tv);
+	
 	return 0;
 }
 struct event_base *event_init(void)

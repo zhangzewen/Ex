@@ -14,6 +14,7 @@
 #include "event.h"
 #include "event_base.h"
 
+#if 0
 static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
 	
 
@@ -132,4 +133,36 @@ int main(int argc, char *argv[])
 	
 	return 0;
 	
+}
+
+
+#endif
+
+static void timeout_cb(int fd, short event, void *arg)
+{
+	printf("timeout now!\n");
+}
+
+
+
+
+int main(int argc, char *argv[])
+{
+
+	struct event timeout;
+	struct timeval tv;
+
+	event_init();
+	
+	evtimer_set(&timeout, timeout_cb, &timeout);
+
+	tv.tv_sec = 2;
+	tv.tv_usec = 0;
+
+	event_add(&timeout, &tv);
+
+	event_dispatch()
+
+	return 0;
+	return 0;
 }
