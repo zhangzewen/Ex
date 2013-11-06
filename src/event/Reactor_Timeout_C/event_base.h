@@ -5,7 +5,6 @@
 #include "evbuf.h"
 
 #include "list.h"
-#include "evutil.h"
 #include "RBTree.h"
 /*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
 #define EVLIST_TIMEOUT 0X01 /*event在time堆中*/

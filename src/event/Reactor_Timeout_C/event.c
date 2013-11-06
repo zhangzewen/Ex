@@ -79,6 +79,7 @@ static int timeout_next(struct event_base *base, struct timeval **tv_p)
 	if (gettime(base, &now) == -1)
 		return -1;
 /* 这还有一步，通过tmp找到ev*/
+	ev =(struct event*)tmp->data;
 	if (!timer_cmp(ev->ev_timeout, now)) {
 		timer_reset(tv);
 		return 0;
@@ -242,7 +243,7 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 	//根据前面的分析可以知道event_ev应该小于tv_cache
 	//如果tv < event_tv表明用户向前调整时间了，需要校正时间
 	
-	if (evutil_timercmp(tv, &base->event_tv, >=)) {
+	if (timer_cmp(*tv, base->event_tv)) {
 		base->event_tv = *tv;
 		return ;
 	}
@@ -310,7 +311,7 @@ int event_base_loop(struct event_base *base, int flags)
 				if we have active events, we just poll new events
 				without waiting
 			*/
-			evutil_timerclear(&tv);
+			timer_reset(&tv);
 		}
 				
 		if (!event_haveevents(base)) {
@@ -561,7 +562,6 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 	switch(queue) {
 		case EVLIST_INSERTED:
 			list_add_tail(&ev->event_list, &base->eventqueue);
-			//TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next);
 			break;
 		case EVLIST_ACTIVE:
 			base->event_count_active++;
