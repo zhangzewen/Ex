@@ -387,12 +387,14 @@ rbtree_node_t *rb_min(struct rbtree_node_st *root)
 	}
 
 	rbtree_node_t *ptr = NULL;
+	rbtree_node_t *current = NULL;
 
 	ptr = root;
 
 	while(ptr) {
-			ptr = ptr->left;
+		current = root;
+		ptr = ptr->left;
 	}
 
-	return ptr;
+	return current;
 }
