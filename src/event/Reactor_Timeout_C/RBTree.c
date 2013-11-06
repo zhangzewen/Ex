@@ -391,9 +391,7 @@ rbtree_node_t *rb_min(struct rbtree_node_st *root)
 	ptr = root;
 
 	while(ptr) {
-		if (ptr->left) {
 			ptr = ptr->left;
-		}
 	}
 
 	return ptr;
