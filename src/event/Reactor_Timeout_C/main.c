@@ -149,6 +149,7 @@ static void timeout_cb(int fd, short event, void *arg)
 int main(int argc, char *argv[])
 {
 
+	fprintf(stderr, "=====================begin=================\n");
 	struct event timeout;
 	struct timeval tv;
 

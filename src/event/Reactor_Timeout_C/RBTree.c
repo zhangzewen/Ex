@@ -370,6 +370,7 @@ void rbtree_init(rbtree_t *tree)
 	tree->insert = rb_insert;
 	tree->min = rb_min;
 	tree->search = rb_search;
+	tree->erase = rb_erase;
 }
 
 int rbtree_empty(rbtree_t *tree)

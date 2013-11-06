@@ -117,7 +117,7 @@ struct event_base *event_base_new(void)
 	struct event_base *base;
 	
 	if ((base = calloc(1, sizeof(struct event_base))) == NULL) {
-		fprintf(stderr, "%s: calloc", __func__);
+		fprintf(stderr, "%s: calloc\n", __func__);
 	}
 	
 	gettime(base, &base->event_tv);
@@ -132,7 +132,7 @@ struct event_base *event_base_new(void)
 	base->evbase = base->evsel->init(base);
 
 	if(base->evbase == NULL) {
-		fprintf(stderr, "%s: no event mechanism available", __func__);
+		fprintf(stderr, "%s: no event mechanism available\n", __func__);
 	}
 	return (base);
 }
@@ -312,7 +312,7 @@ int event_base_loop(struct event_base *base, int flags)
 		}
 				
 		if (!event_haveevents(base)) {
-			fprintf(stderr, "%s: no events registered.", __func__);
+			fprintf(stderr, "%s: no events registered.\n", __func__);
 			return 1;
 		}
 
@@ -351,7 +351,7 @@ int event_base_loop(struct event_base *base, int flags)
 	//退出时也要清空时间缓存
 	base->tv_cache.tv_sec = 0;
 
-	fprintf(stderr, "%s: asked to terminate loop.", __func__);
+	fprintf(stderr, "%s: asked to terminate loop.\n", __func__);
 
 	return 0;
 }
@@ -426,7 +426,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 
 		gettime(base, &now);
 		timer_add(&now, tv, &ev->ev_timeout);
-		fprintf(stderr, "event_add: timeout in %ld seconds, call %p", tv->tv_sec, ev->ev_callback);
+		fprintf(stderr, "event_add: timeout in %ld seconds, call %p\n", tv->tv_sec, ev->ev_callback);
 		event_queue_insert(base, ev, EVLIST_TIMEOUT);
 	}
 	
@@ -568,8 +568,9 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 		case EVLIST_TIMEOUT:
 			base->event_count_active++;
 			event_add_timer(base, ev);
+			break;
 		default:
-			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
+			fprintf(stderr, "%s: unknown queue %x\n", __func__, queue);
 	}
 }
 
@@ -578,7 +579,7 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 {
 	if (!(ev->ev_flags & queue)) {
-		fprintf(stderr, "%s: %p(fd %d) not no queue %x", __func__, ev, ev->ev_fd, queue);
+		fprintf(stderr, "%s: %p(fd %d) not no queue %x\n", __func__, ev, ev->ev_fd, queue);
 	}
 
 	if (~ev->ev_flags & EVLIST_INTERNAL) {
@@ -601,7 +602,7 @@ void event_queue_remove(struct event_base *base, struct event *ev, int queue)
 			break;
 
 		default:
-			fprintf(stderr, "%s: unknown queue %x", __func__, queue);
+			fprintf(stderr, "%s: unknown queue %x\n", __func__, queue);
 	}
 }
 
