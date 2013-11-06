@@ -56,9 +56,11 @@ void timer_add(const struct timeval *timer_a, const struct timeval *timer_b, str
 	ret->tv_usec = timer_a->tv_usec + timer_b->tv_usec;
 	ret->tv_sec = timer_a->tv_sec + timer_b->tv_sec;
 	
-	ret->tv_sec += ret->tv_usec / 1000000;
 	
-	ret->tv_usec %= 1000000;
+	if (ret->tv_usec >= 1000000) {
+		ret->tv_usec -= 1000000;
+		ret->tv_sec += 1;
+	}
 
 }
 int timer_isset(const struct timeval *tv)
