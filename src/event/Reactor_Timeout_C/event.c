@@ -199,6 +199,7 @@ void timeout_process(struct event_base *base)
 {
 	struct timeval now;
 	struct event *ev;
+	struct rbtree_node_st *tmp;
 	
 	if (base->timeout.empty(base->timeout.root)) {
 		return ;
@@ -206,8 +207,9 @@ void timeout_process(struct event_base *base)
 
 	gettime(base, &now);
 	
-	while ((ev = base->timeout.min(base->timeout.root))) {
-		if (evutil_timercmp(&ev->ev_timeout, &now, >)) { //还没有超时
+	while ((tmp = base->timeout.min(base->timeout.root))) {
+		ev = (struct event *)tmp->data;
+		if (!timer_cmp(ev->ev_timeout, now)) { //还没有超时
 			break;
 		}
 		//本事件已经超时

@@ -24,7 +24,7 @@ struct rbtree_st{
 	struct rbtree_node_st* (*search)(uintptr_t key, struct rbtree_node_st *root);
 	struct rbtree_node_st* (*erase)(uintptr_t key, struct rbtree_node_st *root);
 	struct rbtree_node_st* (*min)(struct rbtree_node_st *root);
-	int (*empty)(struct rbtree_node_st *root);
+	int (*empty)(rbtree_node_t *root);
 
 };
 
@@ -34,7 +34,7 @@ struct rbtree_node_st *rb_insert(uintptr_t key, void* data, struct rbtree_node_s
 struct rbtree_node_st *rb_search(uintptr_t key, struct rbtree_node_st *root);
 struct rbtree_node_st *rb_erase(uintptr_t key, struct rbtree_node_st *root);
 struct rbtree_node_st *rb_min(struct rbtree_node_st *root);
-int rbtree_empty(rbtree_t *tree);
+int rbtree_empty(rbtree_node_t *root);
 
 
 #endif

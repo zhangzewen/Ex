@@ -371,11 +371,12 @@ void rbtree_init(rbtree_t *tree)
 	tree->min = rb_min;
 	tree->search = rb_search;
 	tree->erase = rb_erase;
+	tree->empty = rbtree_empty;
 }
 
-int rbtree_empty(rbtree_t *tree)
+int rbtree_empty(rbtree_node_t *root)
 {
-	return tree->root != NULL;
+	return root != NULL;
 }
 //找到最小节点，就在根节点最左边的左子树
 rbtree_node_t *rb_min(struct rbtree_node_st *root)
