@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 	
 	evtimer_set(&timeout, timeout_cb, &timeout);
 
-	tv.tv_sec = 2;
+	tv.tv_sec = 10;
 	tv.tv_usec = 0;
 
 	event_add(&timeout, &tv);

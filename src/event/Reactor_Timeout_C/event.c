@@ -202,12 +202,34 @@ void timeout_process(struct event_base *base)
 	struct event *ev;
 	struct rbtree_node_st *tmp;
 	
+
 	if (base->timeout.empty(base->timeout.root)) {
 		return ;
 	}
-
+#if 0 
+	fprintf(stderr, "[%s:%d]:base->tv_cache->tv_sec = %lld,base->tv_cache->tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+#endif
 	gettime(base, &now);
-	
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache->tv_sec = %lld,base->tv_cache->tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+	fprintf(stderr, "[%s:%d]:now.tv_sec = %lld, now.tv_usec = %lld\n",
+					__func__,
+					__LINE__,
+					now.tv_sec,
+					now.tv_usec);
+#endif
 	while ((tmp = base->timeout.min(base->timeout.root))) {
 		ev = (struct event *)tmp->data;
 		if (!timer_cmp(ev->ev_timeout, now)) { //还没有超时
@@ -238,14 +260,42 @@ static void timeout_correct(struct event_base *base, struct timeval *tv)
 	struct event **pev;
 	unsigned int size;
 	struct timeval off;
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache->tv_sec = %lld,base->tv_cache->tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
 
+	fprintf(stderr, "[%s:%d]:tv->tv_sec = %lld, tv->tv_usec = %lld",
+					__func__,
+					__LINE__,
+					tv->tv_sec,
+					tv->tv_usec);
+#endif
 	gettime(base, tv);// tv <---- tv_cache
 	//根据前面的分析可以知道event_ev应该小于tv_cache
-	//如果tv < event_tv表明用户向前调整时间了，需要校正时间
-	
-	if (timer_cmp(*tv, base->event_tv)) {
-		base->event_tv = *tv;
-		return ;
+	//如果tv < event_tv表明用户向前调整时间了，需要校正时间	
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache->tv_sec = %lld,base->tv_cache->tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+	fprintf(stderr, "[%s:%d]:tv->tv_sec = %lld, tv->tv_usec = %lld",
+					__func__,
+					__LINE__,
+					tv->tv_sec,
+					tv->tv_usec);
+#endif
+	                                                       	
+	if (timer_cmp(*tv, base->event_tv)) {                  	
+		base->event_tv = *tv;                                	
+		return ;                                             	
 	}
 #if 0
 	//之所以要注释掉这段代码，是因为我们暂且认为在程序运行期间，时间没有被人为的调整
@@ -286,8 +336,15 @@ int event_base_loop(struct event_base *base, int flags)
 	/*clear time cache*/
 	//清空时间缓存
 	base->tv_cache.tv_sec = 0;
-
-
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+#endif
 	done = 0;
 	
 	while(!done) {
@@ -302,10 +359,38 @@ int event_base_loop(struct event_base *base, int flags)
 		}
 
 		timeout_correct(base, &tv);//时间矫正
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+	fprintf(stderr, "[%s:%d]:tv.tv_sec = %lld, tv.tv_usec = %lld\n",
+					__func__,
+					__LINE__,
+					tv.tv_sec,
+					tv.tv_usec);
+#endif
 		tv_p = &tv;
 
-		if (!base->event_count_active && !(flags & EVLOOP_NONBLOCK)) {
+		if (!base->event_count_active) {
 			timeout_next(base, &tv_p);
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+	fprintf(stderr, "[%s:%d]:tv_p->tv_sec = %lld, tv_p->tv_usec = %lld\n",
+					__func__,
+					__LINE__,
+					tv_p->tv_sec,
+					tv_p->tv_usec);
+#endif
 		} else {
 			/*
 				if we have active events, we just poll new events
@@ -323,6 +408,15 @@ int event_base_loop(struct event_base *base, int flags)
 		//更新event_tv到ev_cache指示的时间或者当前时间
 		//event_ev <<---- tv_cache
 		gettime(base, &base->event_tv);
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+#endif
 		/*clear time cache*/
 		//清除时间缓存 -- 时间点1
 		base->tv_cache.tv_sec = 0;
@@ -337,6 +431,15 @@ int event_base_loop(struct event_base *base, int flags)
 		//缓存tv_cache存储了当前时间的值 --时间点2
 		//tv_cache < ----now
 		gettime(base, &base->tv_cache);
+#if 0
+	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
+					 __func__,
+					 __LINE__,
+					base->tv_cache.tv_sec,
+					base->tv_cache.tv_usec,
+					base->event_tv.tv_sec,
+					base->event_tv.tv_usec);
+#endif
 
 		timeout_process(base);
 
@@ -367,6 +470,14 @@ int event_add(struct event *ev, const struct timeval *tv)
 	struct epoll_loop *evbase =  base->evbase;
 
 	int res = 0;
+	
+	fprintf(stderr, "event_add: event : %p, %s%s%scall %p\n",
+					 ev,
+					 ev->ev_events&EV_READ ? "EV_READ" : " ",
+					 ev->ev_events&EV_WRITE ? "EV_WRITE" : " ",
+					 tv ? "EV_TIMEOUT" : " ",
+					 ev->ev_callback
+					);
 
 /*
 	prepare for timeout insertion further below, if we get a 
@@ -428,7 +539,29 @@ int event_add(struct event *ev, const struct timeval *tv)
 		}
 
 		gettime(base, &now);
+		
+#if 0
+		fprintf(stderr, "[%s]:%d:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, now.tv_sec = %lld, now.tv_usec = %lld\n",
+						 __func__,
+						 __LINE__,
+						base->tv_cache.tv_sec,
+						base->tv_cache.tv_usec,
+						now.tv_sec,
+						now.tv_usec);
+#endif
+		
 		timer_add(&now, tv, &ev->ev_timeout);
+#if 0
+		fprintf(stderr, "[%s]:%d:tv->tv_sec = %lld,tv->tv_usec = %lld, now.tv_sec = %lld, now.tv_usec = %lld,ev->ev_timeout.tv_sec = %lld, ev->ev_timeout.tv_usec = %lld\n",
+						 __func__,
+						 __LINE__,
+						tv->tv_sec,
+						tv->tv_usec,
+						now.tv_sec,
+						now.tv_usec,
+						ev->ev_timeout.tv_sec,
+						ev->ev_timeout.tv_usec);
+#endif
 		fprintf(stderr, "event_add: timeout in %ld seconds, call %p\n", tv->tv_sec, ev->ev_callback);
 		event_queue_insert(base, ev, EVLIST_TIMEOUT);
 	}
