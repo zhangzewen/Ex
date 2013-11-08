@@ -701,7 +701,6 @@ void event_queue_insert(struct event_base *base, struct event *ev, int queue)
 			list_add_tail(&ev->active_list, &base->activequeue);
 			break;
 		case EVLIST_TIMEOUT:
-			base->event_count_active++;
 			event_add_timer(base, ev);
 			break;
 		default:
