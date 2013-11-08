@@ -47,6 +47,7 @@ struct epoll_loop{
 };
 
 struct event{
+	char *name;
   struct event_base *ev_base;
 	struct timeval ev_timeout;
 

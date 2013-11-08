@@ -487,7 +487,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 	struct epoll_loop *evbase =  base->evbase;
 
 	int res = 0;
-	
+#if 0	
 	fprintf(stderr, "event_add: event : %p, %s%s%scall %p\n",
 					 ev,
 					 ev->ev_events&EV_READ ? "EV_READ" : " ",
@@ -495,6 +495,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 					 tv ? "EV_TIMEOUT" : " ",
 					 ev->ev_callback
 					);
+#endif
 
 /*
 	prepare for timeout insertion further below, if we get a 
@@ -579,7 +580,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 						ev->ev_timeout.tv_sec,
 						ev->ev_timeout.tv_usec);
 #endif
-		fprintf(stderr, "event_add: timeout in %ld seconds, call %p\n", tv->tv_sec, ev->ev_callback);
+	//	fprintf(stderr, "event_add: timeout in %ld seconds, call %p\n", tv->tv_sec, ev->ev_callback);
 		event_queue_insert(base, ev, EVLIST_TIMEOUT);
 	}
 	
@@ -587,7 +588,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 }
 
 
-void event_set(struct event *ev, int fd, short events, void (*callback)(int, short, void *), void *arg)
+void event_set(struct event *ev, int fd, short events, void (*callback)(int, short, void *), void *arg, char *name)
 {
 	ev->ev_base = current_base;
 	ev->ev_callback = callback;
@@ -598,6 +599,7 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_flags = EVLIST_INIT;
 	ev->ev_ncalls = 0;
 	ev->ev_pncalls = NULL;
+	ev->name = name;
 	ev->buffer = evbuffer_new();
 	
 	

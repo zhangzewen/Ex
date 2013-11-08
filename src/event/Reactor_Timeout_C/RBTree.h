@@ -14,6 +14,7 @@ typedef struct rbtree_st rbtree_t;
 struct rbtree_node_st{
 	uintptr_t key;
 	void *data;
+	char *name;
 	color_t color;
 	struct rbtree_node_st *left, *right, *parent;
 };

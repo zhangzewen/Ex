@@ -1,11 +1,13 @@
 #include "RBTree.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "event_base.h"
 
 static rbtree_node_t *rb_new_node(uintptr_t key, void* data)
 {
 	rbtree_node_t *node = (struct rbtree_node_st *)malloc(sizeof(struct rbtree_node_st));
 	
+	struct event *ev = (struct event *)data;
 	if (!node) {
 		printf("malloc error!\n");
 		exit(-1);
@@ -13,6 +15,7 @@ static rbtree_node_t *rb_new_node(uintptr_t key, void* data)
 	
 	node->key = key;
 	node->data = data;
+	node->name = ev->name;
 	return node;
 }
 
@@ -392,9 +395,10 @@ rbtree_node_t *rb_min(struct rbtree_node_st *root)
 	ptr = root;
 
 	while(ptr) {
-		current = root;
+		current = ptr;
 		ptr = ptr->left;
 	}
 
 	return current;
 }
+
