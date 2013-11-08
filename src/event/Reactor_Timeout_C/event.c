@@ -80,13 +80,32 @@ static int timeout_next(struct event_base *base, struct timeval **tv_p)
 		return -1;
 /* 这还有一步，通过tmp找到ev*/
 	ev =(struct event*)tmp->data;
+	
+#if 0
+	fprintf(stderr, "[%s:%d]:ev->ev_timeout.tv_sec = %lld, ev->ev_timeout.tv_usec = %lld",
+					__func__,
+					__LINE__,
+					ev->ev_timeout.tv_sec,
+					ev->ev_timeout.tv_usec);
+	fprintf(stderr, "[%s:%d]:now.tv_sec = %lld, now.tv_usec = %lld",
+					__func__,
+					__LINE__,
+					now.tv_sec,
+					now.tv_usec);
+#endif
 	if (!timer_cmp(ev->ev_timeout, now)) {
 		timer_reset(tv);
 		return 0;
 	}
 
-	timer_add(&ev->ev_timeout, &now , tv);
-	
+	timer_sub(&ev->ev_timeout, &now , tv);
+#if 0
+	fprintf(stderr, "[%s:%d]:tv.tv_sec = %lld, tv.tv_usec = %lld",
+					__func__,
+					__LINE__,
+					tv->tv_sec,
+					tv->tv_usec);
+#endif
 	return 0;
 }
 struct event_base *event_init(void)
@@ -232,7 +251,7 @@ void timeout_process(struct event_base *base)
 #endif
 	while ((tmp = base->timeout.min(base->timeout.root))) {
 		ev = (struct event *)tmp->data;
-		if (!timer_cmp(ev->ev_timeout, now)) { //还没有超时
+		if (!timer_cmp(now, ev->ev_timeout)) { //还没有超时
 			break;
 		}
 		//本事件已经超时
@@ -375,7 +394,7 @@ int event_base_loop(struct event_base *base, int flags)
 #endif
 		tv_p = &tv;
 
-		if (!base->event_count_active) {
+		if (!base->event_count_active && !(flags & EVLOOP_NONBLOCK)) {
 			timeout_next(base, &tv_p);
 #if 0
 	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
@@ -445,13 +464,11 @@ int event_base_loop(struct event_base *base, int flags)
 
 		if (base->event_count_active) {
 			event_process_active(base);
-#if 0
 			if (!base->event_count_active && flags) {
 				done = 1;
 			}else if(flags & EVLOOP_NONBLOCK) {
 				done = 1;
 			}
-#endif
 		}
 	}
 	//退出时也要清空时间缓存
@@ -626,7 +643,6 @@ int event_del(struct event *ev)
 	return 0;	
 }
 
-__attribute__((unused))
 void event_active(struct event *ev, int res, short ncalls)
 {
 	//当事件处在激活队列中，可能会有不同是事件，把这些事件都加在一起
