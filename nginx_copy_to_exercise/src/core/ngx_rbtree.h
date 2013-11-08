@@ -36,7 +36,7 @@ typedef void (*ngx_rbtree_insert_pt) (ngx_rbtree_node_t *root,
 
 struct ngx_rbtree_s {
     ngx_rbtree_node_t     *root;
-    ngx_rbtree_node_t     *sentinel;
+    ngx_rbtree_node_t     *sentinel; //其实就是空节点，在红黑树中空节点是黑色的
     ngx_rbtree_insert_pt   insert;
 };
 
