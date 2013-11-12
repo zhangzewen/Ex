@@ -571,52 +571,6 @@ ngx_event_process_init(ngx_cycle_t *cycle)
         break;
     }
 
-#if !(NGX_WIN32)
-
-    if (ngx_timer_resolution && !(ngx_event_flags & NGX_USE_TIMER_EVENT)) {
-        struct sigaction  sa;
-        struct itimerval  itv;
-
-        ngx_memzero(&sa, sizeof(struct sigaction));
-        sa.sa_handler = ngx_timer_signal_handler;
-        sigemptyset(&sa.sa_mask);
-
-        if (sigaction(SIGALRM, &sa, NULL) == -1) {
-            ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                          "sigaction(SIGALRM) failed");
-            return NGX_ERROR;
-        }
-
-        itv.it_interval.tv_sec = ngx_timer_resolution / 1000;
-        itv.it_interval.tv_usec = (ngx_timer_resolution % 1000) * 1000;
-        itv.it_value.tv_sec = ngx_timer_resolution / 1000;
-        itv.it_value.tv_usec = (ngx_timer_resolution % 1000 ) * 1000;
-
-        if (setitimer(ITIMER_REAL, &itv, NULL) == -1) {
-            ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                          "setitimer() failed");
-        }
-    }
-
-    if (ngx_event_flags & NGX_USE_FD_EVENT) {
-        struct rlimit  rlmt;
-
-        if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
-            ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                          "getrlimit(RLIMIT_NOFILE) failed");
-            return NGX_ERROR;
-        }
-
-        cycle->files_n = (ngx_uint_t) rlmt.rlim_cur;
-
-        cycle->files = ngx_calloc(sizeof(ngx_connection_t *) * cycle->files_n,
-                                  cycle->log);
-        if (cycle->files == NULL) {
-            return NGX_ERROR;
-        }
-    }
-
-#endif
 
     cycle->connections =
         ngx_alloc(sizeof(ngx_connection_t) * cycle->connection_n, cycle->log);

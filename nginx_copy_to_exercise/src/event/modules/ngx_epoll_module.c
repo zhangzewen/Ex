@@ -253,6 +253,18 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
 
     events = (uint32_t) event;
 
+		/*
+		首先， 
+    man epoll: 
+    Q:  What  happens  if you register the same file descriptor on an epoll  instance twice? 
+    A: You will probably get EEXIST.  However, it is possible to add a duplicate  (dup(2), dup2(2), fcntl(2) F_DUPFD) descriptor to the same epoll instance. This can be a useful technique
+		 for filtering events, f the duplicate file descriptors are registered with different events masks.*/  
+  
+    /*所以nginx这里就是为了避免这种情况，当要在epoll中加入对一个fd读事件(即NGX_READ_EVENT)的监听时，nginx先看一下与这个fd相关的写事件的状态，
+		即e=c->write，如果此时e->active为1，说明该fd之前已经以NGX_WRITE_EVENT方式被加到epoll中了，此时只需要使用mod方式，将我们的需求加进去，
+		否则才使用add方式，将该fd注册到epoll中。反之处理NGX_WRITE_EVENT时道理是一样的。
+		*/
+
     if (event == NGX_READ_EVENT) {
         e = c->write;
         prev = EPOLLOUT;
@@ -267,13 +279,13 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
         events = EPOLLOUT;
 #endif
     }
-
+//根据active标志位确定是否为活跃事件，以决定到底是修改还是添加事件
     if (e->active) {
-        op = EPOLL_CTL_MOD;
+        op = EPOLL_CTL_MOD; //是活跃事件，修改事件
         events |= prev;
 
     } else {
-        op = EPOLL_CTL_ADD;
+        op = EPOLL_CTL_ADD;//不是活跃事件，添加事件
     }
 
     ee.events = events | (uint32_t) flags;
@@ -434,6 +446,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "epoll timer: %M", timer);
 
+		//调用epoll_wait获取事件，timer参数实在process_events调用时传入
     events = epoll_wait(ep, event_list, (int) nevents, timer);
 
     err = (events == -1) ? ngx_errno : 0;
@@ -474,10 +487,12 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 
     for (i = 0; i < events; i++) {
         c = event_list[i].data.ptr;
-
+				//将地址的最后一位取出来，用instance变量标示
         instance = (uintptr_t) c & 1;
+				//无论是32位机器还是64位机器，其地址的最后1位肯定是0，此行的作用是还原ngx_connection_t的真正地址
         c = (ngx_connection_t *) ((uintptr_t) c & (uintptr_t) ~1);
 
+				//取出读事件
         rev = c->read;
 
         if (c->fd == -1 || rev->instance != instance) {

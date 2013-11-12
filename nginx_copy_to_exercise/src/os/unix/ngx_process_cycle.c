@@ -732,51 +732,6 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 
     ngx_setproctitle("worker process");
 
-#if (NGX_THREADS)
-    {
-    ngx_int_t         n;
-    ngx_err_t         err;
-    ngx_core_conf_t  *ccf;
-
-    ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
-
-    if (ngx_threads_n) {
-        if (ngx_init_threads(ngx_threads_n, ccf->thread_stack_size, cycle)
-            == NGX_ERROR)
-        {
-            /* fatal */
-            exit(2);
-        }
-
-        err = ngx_thread_key_create(&ngx_core_tls_key);
-        if (err != 0) {
-            ngx_log_error(NGX_LOG_ALERT, cycle->log, err,
-                          ngx_thread_key_create_n " failed");
-            /* fatal */
-            exit(2);
-        }
-
-        for (n = 0; n < ngx_threads_n; n++) {
-
-            ngx_threads[n].cv = ngx_cond_init(cycle->log);
-
-            if (ngx_threads[n].cv == NULL) {
-                /* fatal */
-                exit(2);
-            }
-
-            if (ngx_create_thread((ngx_tid_t *) &ngx_threads[n].tid,
-                                  ngx_worker_thread_cycle,
-                                  (void *) &ngx_threads[n], cycle->log)
-                != 0)
-            {
-                /* fatal */
-                exit(2);
-            }
-        }
-    }
-    }
-#endif
 
     for ( ;; ) {
 
