@@ -27,13 +27,17 @@ typedef struct {
 
 
 struct ngx_event_s {
+		//事件相关的对象，通常data都是指向ngx_connection_t连接对象，开启文件异步I/O时，它可能会指向ngx_event_aio_t结构体
     void            *data;
 
+		//标志位，为1时表示事件是可写的
     unsigned         write:1;
-
+		//标志位，为1时表示为此事件可以建立新的连接，通常情况下，在ngx_cycle_t中的listening动态数组中，每一个监听对象ngx_listening_t对应的读事件中的accept标志位才会是1
     unsigned         accept:1;
 
     /* used to detect the stale events in kqueue, rtsig, and epoll */
+		//这个标志位用于区分当前事件是否是过期的，它仅仅是给事件驱动模块使用的，。当看是处理一批事件时，处理前面的事件可能会关闭一些连接，而这些连接有可能影响这批事件中还未处理到的后面的事件
+		//可通过instance标志位来避免处理后面的过期事件
     unsigned         instance:1;
 
     /*
