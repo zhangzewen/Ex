@@ -62,7 +62,7 @@ sds sdsnew(const char *init) {
     return sdsnewlen(init, initlen);
 }
 
-sds sdsdup(const sds s) {
+sds sdsdup(const sds s) { //strdup
     return sdsnewlen(s, sdslen(s));
 }
 

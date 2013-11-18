@@ -1,9 +1,10 @@
 CXX = gcc
 CXXFLAGS +=-g3 -Wall -Wextra -lrt
+LDFLAGS = ../deps/jemalloc/lib/libjemalloc.a -ldl -lpthread
  
-REDIS_ROOT =/root/tar/redis-2.6.16/src
+REDIS_ROOT =/root/Desktop/project/Http/trunk/redis
  
-TARGETS =sting_ex
+TARGETS =string_ex
 TARGETS_C_FILE= $(TARGETS).c
  
 CLEANUP = rm -f $(TARGETS) *.o
@@ -14,11 +15,11 @@ clean:
 	$(CLEANUP)
  
 CORE_INCS =-I. \
--I$(REDIS_ROOT)/ \
--I$(REDIS_ROOT)/compat/sys \
+-I$(REDIS_ROOT)/src \
+-I/root/Desktop/project/Http/trunk/redis/deps/jemalloc/include \
  
-REDIS_SDS =$(REDIS_ROOT)/sds.o
-REDIS_ZMALLOC =$(REDIS_ROOT)/zmalloc.o
+REDIS_SDS =$(REDIS_ROOT)/src/sds.o
+REDIS_ZMALLOC =$(REDIS_ROOT)/src/zmalloc.o
  
 $(TARGETS):$(TARGETS_C_FILE)
-	$(CXX) $(CXXFLAGS) $(CORE_INCS) $(REDIS_SDS) $(REDIS_ZMALLOC) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(CORE_INCS) $(REDIS_SDS) $(REDIS_ZMALLOC) $^ $(LDFLAGS) -o $@
