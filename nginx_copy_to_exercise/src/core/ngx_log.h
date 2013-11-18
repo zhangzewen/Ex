@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//ngx_log_error日志接口level参数的取值范围
 #define NGX_LOG_STDERR            0
 #define NGX_LOG_EMERG             1
 #define NGX_LOG_ALERT             2
@@ -22,7 +22,7 @@
 #define NGX_LOG_NOTICE            6
 #define NGX_LOG_INFO              7
 #define NGX_LOG_DEBUG             8
-
+//ngx_log_debug日志结构level参数的取值范围
 #define NGX_LOG_DEBUG_CORE        0x010
 #define NGX_LOG_DEBUG_ALLOC       0x020
 #define NGX_LOG_DEBUG_MUTEX       0x040

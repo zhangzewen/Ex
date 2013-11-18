@@ -472,7 +472,7 @@ ngx_http_process_request_line(ngx_event_t *rev)
 
     rc = NGX_AGAIN;
 
-    for ( ;; ) {
+    for ( ;; ) { //循环读取，当给的buff不够用的时候，需要分配大的buffer，此时buff中有未解析完的buf
 
         if (rc == NGX_AGAIN) {
             n = ngx_http_read_request_header(r);

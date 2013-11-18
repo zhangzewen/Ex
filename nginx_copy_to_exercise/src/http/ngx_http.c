@@ -597,11 +597,13 @@ ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_http_core_loc_conf_t    *clcf;
     ngx_http_core_srv_conf_t   **cscfp;
 
+		//从ngx_http_core_main_conf_t的servers动态数组中可以获取所有的ngx_http_core_srv_conf_t结构体
     cscfp = cmcf->servers.elts;
+		//ctx是在http{}块下的全局ngx_http_conf_ctx_t结构体
     ctx = (ngx_http_conf_ctx_t *) cf->ctx;
     saved = *ctx;
     rv = NGX_CONF_OK;
-
+		//遍历所有的server块下对应的ngx_http_core_srv_conf_t结构体
     for (s = 0; s < cmcf->servers.nelts; s++) {
 
         /* merge the server{}s' srv_conf's */

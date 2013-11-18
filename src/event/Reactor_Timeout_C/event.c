@@ -498,6 +498,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 #endif
 
 /*
+	这个没有弄懂，或许看看min_heap的实现
 	prepare for timeout insertion further below, if we get a 
 	failure on any step, we should not change any state.
 */	

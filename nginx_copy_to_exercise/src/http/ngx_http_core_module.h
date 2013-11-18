@@ -152,8 +152,8 @@ struct ngx_http_phase_handler_s {
 
 typedef struct {
     ngx_http_phase_handler_t  *handlers; //为执行链，实际上它是一个数组，而每个元素之间又被串成链表，从而允许执行流程向前或者向后的阶段跳转
-    ngx_uint_t                 server_rewrite_index;
-    ngx_uint_t                 location_rewrite_index;
+    ngx_uint_t                 server_rewrite_index; //表示NGX_HTTP_SERVER_REWRITE_PHASE阶段第1个ngx_http_phase_handler_t处理方法在handlers数组中的序号，用于在执行HTTP请求的任何阶段中快速跳转到NGX_HTTP_SERVER_REWRITE_PHASE阶段处理请求
+    ngx_uint_t                 location_rewrite_index; //表示NGX_HTTP_REWRITE_PHASE阶段第1个ngx_http_phase_handler_t处理方法在handlers数组中的序号，用于在执行HTTP请求的任何阶段中快速跳转到NGX_HTTP_REWRITE_PHASE阶段处理请求
 } ngx_http_phase_engine_t;
 
 
@@ -327,6 +327,7 @@ struct ngx_http_core_loc_conf_s {
 #endif
 
     /* pointer to the modules' loc_conf */
+		//指向所属location块内ngx_http_conf_ctx_t结构体中的loc_conf指针数组，它保存着当前location块内所有HTTP模块create_loc_conf方法产生的结构体
     void        **loc_conf;
 
     uint32_t      limit_except;
@@ -429,6 +430,7 @@ struct ngx_http_core_loc_conf_s {
     ngx_uint_t    types_hash_max_size;
     ngx_uint_t    types_hash_bucket_size;
 
+		//将同一个server块内多个表达式location块的ngx_http_core_loc_conf结构体以双向链表方式组织起来，该location指针将指向ngx_http_location_queue_t结构体
     ngx_queue_t  *locations;
 
 #if 0
@@ -438,10 +440,12 @@ struct ngx_http_core_loc_conf_s {
 
 
 typedef struct {
+		//相当于struct list_head list
     ngx_queue_t                      queue;
+		//如果location中的字符串可以精确匹配（包括正则表达式），exact将指向对应的ngx_http_core_loc_conf_t结构体，否则为NULL
     ngx_http_core_loc_conf_t        *exact;
     ngx_http_core_loc_conf_t        *inclusive;
-    ngx_str_t                       *name;
+    ngx_str_t                       *name;//指向location的名称
     u_char                          *file_name;
     ngx_uint_t                       line;
     ngx_queue_t                      list;
