@@ -255,15 +255,17 @@ typedef void (*ngx_http_upstream_handler_pt)(ngx_http_request_t *r,
 
 
 struct ngx_http_upstream_s {
+		//处理读事件的回调方法，每一个阶段都有不同的read_event_handler
     ngx_http_upstream_handler_pt     read_event_handler;
+		//处理写事件的回调方法，每一个阶段都有不同的write_event_handler
     ngx_http_upstream_handler_pt     write_event_handler;
-
+		//表示主动向上游服务器发起的连接
     ngx_peer_connection_t            peer;
 
     ngx_event_pipe_t                *pipe;
 
     ngx_chain_t                     *request_bufs;
-
+		//定义了向下游发送响应的方式
     ngx_output_chain_ctx_t           output;
     ngx_chain_writer_ctx_t           writer;
 

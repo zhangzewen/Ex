@@ -235,7 +235,7 @@ ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     /* parse inside the http{} block */
 
     cf->module_type = NGX_HTTP_MODULE;
-    cf->cmd_type = NGX_HTTP_MAIN_CONF;
+    cf->cmd_type = NGX_HTTP_MAIN_CONF; //这两个个主要的作用是在查找命令时候过滤的作用，可以看command结构体中的type属性，具体看代码 /src/core/ngx_conf_file.c:ngx_conf_handler:366
     rv = ngx_conf_parse(cf, NULL);
 
     if (rv != NGX_CONF_OK) {

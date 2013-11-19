@@ -28,7 +28,8 @@ int SetNoblock(int fd)
 
 	return 0;
 }
-
+//这里面的逻辑和nginx类似，应为这个水平触发，所以不需要重新添加事件（边缘触发需要添加read事件），如有数据会一直触发
+//因该封装一个解析函数，
 void ServerRead(int fd, short events, void *arg)
 {
 	struct event *ev = (struct event *)arg;

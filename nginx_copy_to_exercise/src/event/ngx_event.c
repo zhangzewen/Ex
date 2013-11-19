@@ -538,7 +538,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
     ecf = ngx_event_get_conf(cycle->conf_ctx, ngx_event_core_module);
 
-    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) {
+    if (ccf->master && ccf->worker_processes > 1 && ecf->accept_mutex) { //当使用了master模式并且worker的进程数量大于1时，才正式打开锁
         ngx_use_accept_mutex = 1;
         ngx_accept_mutex_held = 0;
         ngx_accept_mutex_delay = ecf->accept_mutex_delay;
@@ -548,7 +548,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     }
 
 
-    if (ngx_event_timer_init(cycle->log) == NGX_ERROR) {
+    if (ngx_event_timer_init(cycle->log) == NGX_ERROR) { //初始化定时器
         return NGX_ERROR;
     }
 
@@ -570,7 +570,53 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
         break;
     }
+#if !(NGX_WIN32)
+		
+		if (ngx_timer_resolution && !(ngx_event_flags & NGX_USE_TIMER_EVENT)) {
+			struct sigaction sa;
+			struct itimerval itv;
 
+			ngx_memzero(&sa, sizeof(struct sigaction));
+			sa.sa_handler = ngx_timer_signal_handler;
+			sigemptyset(&sa.sa_mask);
+
+			if (sigaction(SIGALRM, &sa, NULL) == -1) {
+				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
+											"sigaction(SIGALRM) failed");
+				return NGX_ERROR;
+			}
+
+			itv.it_interval.tv_sec = ngx_timer_resolution / 1000;
+			itv.it_interval.tv_usec = (ngx_timer_resolution % 1000) * 1000;
+
+			itv.it_value.tv_sec = ngx_timer_resolution / 1000;
+			itv.it_value.tv_usec = (ngx_timer_resolution % 1000) * 1000;
+
+
+			if (setitimer(ITIMER_REAL, &itv, NULL) == -1) {
+				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
+											"setitimer() failed");
+			}
+		}
+
+		if (ngx_event_flags & NGX_USE_FD_EVENT) {
+			struct rlimit rlmt;
+
+			if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
+				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
+											"getrilimit(RLIMIT_NOFILE) failed");
+				return NGX_ERROR;
+			}
+
+			cycle->files_n = (ngx_uint_t) rlmt.rlim_cur;
+			cycle->files = ngx_calloc(sizeof(ngx_connection_t *) * cycle->files_n,
+																cycle->log);
+
+			if (cycle->files == NULL) {
+				return NGX_ERROR;
+			}
+		}
+#endif
 
     cycle->connections =
         ngx_alloc(sizeof(ngx_connection_t) * cycle->connection_n, cycle->log);
@@ -589,7 +635,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
     rev = cycle->read_events;
     for (i = 0; i < cycle->connection_n; i++) {
         rev[i].closed = 1;
-        rev[i].instance = 1;
+        rev[i].instance = 1; //标志位，区分事件是否过期
     }
 
     cycle->write_events = ngx_alloc(sizeof(ngx_event_t) * cycle->connection_n,

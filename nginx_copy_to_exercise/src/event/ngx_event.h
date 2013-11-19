@@ -61,13 +61,13 @@ struct ngx_event_s {
 
     unsigned         timedout:1;
     unsigned         timer_set:1;
-
+		//标志位，delayed为1时表示需要延迟处理这个事件，它仅限于限速功能
     unsigned         delayed:1;
 
     unsigned         read_discarded:1;
 
     unsigned         unexpected_eof:1;
-
+		//标志位，为1表示延迟建立TCP连接，也就是说，TCP三次握手后并不建立连接，而是要等到真正收到数据包后才建立TCP连接
     unsigned         deferred_accept:1;
 
     /* the pending eof reported by kqueue or in aio chain operation */
