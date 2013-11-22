@@ -3,7 +3,7 @@
 
 #include "http_buffer.h"
 typedef struct http_request_st http_request_t;
-
+#if 0
 typedef struct http_connection_st http_connection_t;
 
 struct http_connection_st{
@@ -13,10 +13,10 @@ struct http_connection_st{
 	int fd;
 	
 };
-
+#endif
 
 struct http_request_st{
-	http_connection_t *c;
+	//http_connection_t *c;
 	
 	char *method_start;
 	char *method_end;

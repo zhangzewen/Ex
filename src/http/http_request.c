@@ -13,9 +13,9 @@ http_request_t* init_request()
 		return NULL;
 	}
 
-	r->buffer.start = (http_buffer_t *)malloc(sizeof(http_buffer_t) * BUFFSIZE);
+	r->buffer.start = (char *)malloc(sizeof(char) * BUFFSIZE);
 
-	if (NULL == r->buffer) {
+	if (NULL == r->buffer.start) {
 		free(r);
 		return NULL;
 	}
