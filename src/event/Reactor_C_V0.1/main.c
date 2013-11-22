@@ -39,7 +39,7 @@ void ServerRead(int fd, short events, void *arg)
 	int nread = 0;
 	
 	//nread = read(fd, buff, sizeof(buff) - 1);
-	nread = evbuffer_read(ev->buffer, fd, 16);
+	nread = buffer_read(ev->buffer, fd, 16);
 	printf("\n----------------------------------------\n");
 	printf("ev->buffer->off: %d", ev->buffer->off);
 	printf("\n----------------------------------------\n");

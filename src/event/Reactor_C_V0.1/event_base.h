@@ -2,7 +2,7 @@
 #define __EVENT_BASE_H_INCLUDED__
 
 #include <sys/time.h>
-#include "evbuf.h"
+#include "http_buffer.h"
 
 #include "list.h"
 /*以下这几个宏定义是给ev_flags标记的，表明事件当前的状态*/
@@ -43,7 +43,7 @@ struct event{
   struct event_base *ev_base;
 
   int ev_fd;
-	struct evbuffer *buffer;	
+	http_buffer_t *buffer;	
   short ev_events;
   short ev_ncalls;
   short *ev_pncalls;
