@@ -41,19 +41,12 @@ int http_buffer_write(int fd, http_buffer_t buffer)
 
 #include <stdio.h>
 #include <stdarg.h>
-
-#define EVBUFFER_READ 0X01
-#define EVBUFFER_WRITE	0X02
-#define EVBUFFER_EOF	0X10
-#define EVBUFFER_ERROR	0X20
-#define EVBUFFER_TIMEOUT	0X40
-
 typedef struct http_buffer_st http_buffer_t;
 struct http_buffer_st{
-	unsigned char *pos;
-	unsigned char *start;
-	unsigned char *end;
-	unsigned char *last;
+	char *pos;
+	char *start;
+	char *end;
+	char *last;
 	
 	size_t misalign;
 	size_t totallen;
