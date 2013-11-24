@@ -34,8 +34,7 @@ struct http_request_st{
 	char *value_end;
 	http_buffer_t *buffer;
 	
-	
-	int parse_stat;
+	int parse_state;
 
 };
 

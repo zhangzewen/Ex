@@ -10,6 +10,41 @@
 #include <string.h>
 #include "http_buffer.h"
 
+static void do_method(const char *start, const char *end)
+{
+  char buff[BUFSIZ] = {0};
+  strncpy(buff, start, end - start);
+
+  printf("method = %s\n", buff);
+}
+
+static void do_path(const char *start, const char *end)
+{
+  char buff[BUFSIZ] = {0};
+  strncpy(buff, start, end - start);
+
+  printf("path = %s\n", buff);
+}
+
+static void do_version(const char *start, const char *end)
+{
+  char buff[BUFSIZ] = {0};
+  strncpy(buff, start, end - start);
+
+  printf("version = %s\n", buff);
+}
+
+static void do_kv(const char *key_start, const char *key_end, const char *value_start, const char *value_end)
+{
+  char buff[BUFSIZ] = {0};
+  strncpy(buff, key_start, key_end - key_start);
+  strncat(buff, ": ", strlen(": "));
+
+  strncat(buff, value_start, value_end - value_start);
+  
+  printf("K/V -- >%s\n", buff);
+}
+
 int parse_http_request_line(http_request_t *r)
 {
     char  ch;
@@ -30,9 +65,9 @@ int parse_http_request_line(http_request_t *r)
 				sw_done
     } state;
 
-    state = sw_start;
+    state = (r->parse_state == -1)? sw_start: r->parse_state;
 
-		for (p = r->buffer->pos; p != r->buffer->end; p++) {
+		for (p = r->buffer->pos; p != r->buffer->last; p++) {
 			ch = *p;
 
 			switch (state) {
@@ -55,7 +90,7 @@ int parse_http_request_line(http_request_t *r)
 				case sw_method:
 					if (ch == ' ') {
 						r->method_end = p;
-
+						do_method(r->method_start, r->method_end);
 						state = sw_spaces_before_uri;
 						break;
 					}
@@ -78,6 +113,7 @@ int parse_http_request_line(http_request_t *r)
 					if (ch == ' ') {
 						state = sw_spaces_before_version;
 						r->path_end = p;
+						do_path(r->path_start, r->path_end);
 					} 
 					
 					if (count > 1024) {
@@ -100,6 +136,7 @@ int parse_http_request_line(http_request_t *r)
 					if (ch == '\r') {
 						state = sw_request_line_parse_almost_done;
 						r->version_end = p;
+						do_version(r->version_start, r->version_end);
 					}	
 
 					break;
@@ -131,8 +168,10 @@ int parse_http_request_line(http_request_t *r)
 					break;
 
 			}
+			
 		}
 
+		r->parse_state = state;
 		r->buffer->pos = p;
 
 		return 0;

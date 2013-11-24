@@ -29,9 +29,8 @@ http_request_t* init_request()
 	
 	r->value_start = NULL;
 	r->value_end = NULL;
+	r->parse_state = -1;
 	
-	r->buffer = NULL;
-
 	return r;	
 }
 
