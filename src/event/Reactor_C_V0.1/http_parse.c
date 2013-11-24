@@ -49,6 +49,7 @@ int parse_http_request_line(http_request_t *r)
 {
     char  ch;
     char  *p;
+		char c;
 		char *tmp;
 		int count = 0;
     enum {
@@ -61,6 +62,16 @@ int parse_http_request_line(http_request_t *r)
 				sw_version,
 				sw_request_line_parse_almost_done,
 				sw_request_line_parse_done,
+				sw_key,
+				sw_key_end,
+				sw_separator,
+				sw_value,
+				sw_kv_almost_done,
+				sw_kv_done,
+#if 0
+				sw_request_header_almost_done,
+				sw_request_header_done
+#endif
 				sw_almost_done,
 				sw_done
     } state;
@@ -151,9 +162,72 @@ int parse_http_request_line(http_request_t *r)
 						tmp = p;
 						state = sw_almost_done;
 					} else {
-						return -1;
+						state = sw_key;
+						r->key_start = p;
 					}
 					break;
+
+				case sw_key:
+					if (ch == ':') {
+						state = sw_separator;
+						r->key_end = p;
+						break;
+					}
+					
+					c = ch | 0x20;
+					
+					if (c >= 'a' && ch <= 'z') {
+						state = sw_key;
+					}
+
+					break;
+	
+				case sw_separator:
+					if (ch == ' ' || ch == '\t') {
+						state = sw_separator;
+						break;
+					}
+
+					state = sw_value;
+					r->value_start = p;
+					break;
+				case sw_value:
+
+					if (ch == '\r') {
+						r->value_end = p;
+						tmp = p;
+						do_kv(r->key_start, r->key_end, r->value_start, r->value_end);
+						state = sw_kv_almost_done;
+						break;
+					}
+					state = sw_value;
+					break;
+				case sw_kv_almost_done:
+					if (ch == '\n' && *tmp == '\r') {
+						state = sw_kv_done;
+					}
+					break;
+
+				case sw_kv_done:
+					if (ch != '\r' && ch != '\n') {
+						state = sw_key;
+						r->key_start = p;
+						p--;
+						r->key_end = NULL;
+						r->value_start = NULL;
+						r->value_end = NULL;
+						break;
+					}else if (ch == '\r'){
+						state = sw_almost_done; 
+						tmp = p;
+					}
+					break;
+#if 0
+				case sw_request_header_almost_done:
+					break;
+				case sw_request_header_done:	
+					break;
+#endif
 				case sw_almost_done:
 					if (ch == '\n' && *tmp == '\r') {
 						state = sw_done;
@@ -173,7 +247,11 @@ int parse_http_request_line(http_request_t *r)
 
 		r->parse_state = state;
 		r->buffer->pos = p;
-
+		
+		if (r->parse_state != sw_done) {
+			return EAGAIN;	
+		}
+		
 		return 0;
 }
 

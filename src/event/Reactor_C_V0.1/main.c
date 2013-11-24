@@ -35,7 +35,10 @@ int SetNoblock(int fd)
 void ServerRead(int fd, short events, void *arg)
 {
 	struct event *ev = (struct event *)arg;
+	
+	int ret = 0;
 
+	char request[BUFSIZ] = {0};
 	http_connection_t *c;
 	http_request_t *r;
 	
@@ -44,16 +47,26 @@ void ServerRead(int fd, short events, void *arg)
 	
 	int nread = 0;
 	
-	//nread = read(fd, buff, sizeof(buff) - 1);
-	nread = buffer_read(r->buffer, fd, 2);
-	printf("\n----------------------------------------\n");
-	printf("ev->buffer->off: %d", r->buffer->off);
-	parse_http_request_line(r);
-	printf("\n----------------------------------------\n");
-
+	nread = buffer_read(r->buffer, fd, 12);
 	if (nread  == -1) {
 		event_del(&ev);
 	}
+	printf("\n----------------------------------------\n");
+	//printf("ev->buffer->off: %d", r->buffer->off);
+	ret = parse_http_request_line(r);
+	printf("\n----------------------------------------\n");
+
+
+	if (ret == EAGAIN) {
+		return;
+	} else if (ret == -1) {
+		//释放资源
+		return  -1;
+	}
+	printf("\n----------------------------------------\n");
+	strncpy(request, r->buffer->start, r->buffer->end - r->buffer->start);
+	printf("%s", request);
+	printf("\n----------------------------------------\n");
 	
 	write(fd ,return_ok, sizeof(return_ok));
 	//close(fd);
