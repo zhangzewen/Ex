@@ -51,10 +51,10 @@ void ServerRead(int fd, short events, void *arg)
 	if (nread  == -1) {
 		event_del(&ev);
 	}
-	printf("\n----------------------------------------\n");
+	//printf("\n----------------------------------------\n");
 	//printf("ev->buffer->off: %d", r->buffer->off);
 	ret = parse_http_request_line(r);
-	printf("\n----------------------------------------\n");
+	//printf("\n----------------------------------------\n");
 
 
 	if (ret == EAGAIN) {
@@ -69,7 +69,7 @@ void ServerRead(int fd, short events, void *arg)
 	printf("\n----------------------------------------\n");
 	
 	write(fd ,return_ok, sizeof(return_ok));
-	//close(fd);
+	close(fd);
 
 //	event_del(&ev);
 }

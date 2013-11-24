@@ -33,6 +33,7 @@ struct http_request_st{
 	char *value_start;
 	char *value_end;
 	http_buffer_t *buffer;
+	char *tmp;
 	
 	int parse_state;
 

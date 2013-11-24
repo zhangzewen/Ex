@@ -50,7 +50,6 @@ int parse_http_request_line(http_request_t *r)
     char  ch;
     char  *p;
 		char c;
-		char *tmp;
 		int count = 0;
     enum {
         sw_start = 0,
@@ -159,7 +158,7 @@ int parse_http_request_line(http_request_t *r)
 
 				case sw_request_line_parse_done:
 					if (ch == '\r') {
-						tmp = p;
+						r->tmp = p;
 						state = sw_almost_done;
 					} else {
 						state = sw_key;
@@ -195,7 +194,7 @@ int parse_http_request_line(http_request_t *r)
 
 					if (ch == '\r') {
 						r->value_end = p;
-						tmp = p;
+						r->tmp = p;
 						do_kv(r->key_start, r->key_end, r->value_start, r->value_end);
 						state = sw_kv_almost_done;
 						break;
@@ -203,7 +202,7 @@ int parse_http_request_line(http_request_t *r)
 					state = sw_value;
 					break;
 				case sw_kv_almost_done:
-					if (ch == '\n' && *tmp == '\r') {
+					if (ch == '\n' && *r->tmp == '\r') {
 						state = sw_kv_done;
 					}
 					break;
@@ -219,7 +218,7 @@ int parse_http_request_line(http_request_t *r)
 						break;
 					}else if (ch == '\r'){
 						state = sw_almost_done; 
-						tmp = p;
+						r->tmp = p;
 					}
 					break;
 #if 0
@@ -229,7 +228,7 @@ int parse_http_request_line(http_request_t *r)
 					break;
 #endif
 				case sw_almost_done:
-					if (ch == '\n' && *tmp == '\r') {
+					if (ch == '\n' && *r->tmp == '\r') {
 						state = sw_done;
 					} else {
 						return -1;
