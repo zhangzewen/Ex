@@ -234,7 +234,7 @@ int event_add(struct event *ev, const struct timeval *tv)
 }
 
 
-void event_set(struct event *ev, int fd, short events, void (*callback)(int, short, void *), void *arg)
+void event_set(struct event *ev, int fd, short events, void (*callback)(int, short, void *), void *arg, void *data)
 {
 	ev->ev_base = current_base;
 	ev->ev_callback = callback;
@@ -245,7 +245,8 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_flags = EVLIST_INIT;
 	ev->ev_ncalls = 0;
 	ev->ev_pncalls = NULL;
-	ev->buffer = buffer_new();
+	//ev->buffer = buffer_new();
+	ev->data = (data == NULL) ? NULL : data;
 	INIT_LIST_HEAD(&ev->event_list);
 	INIT_LIST_HEAD(&ev->active_list);
 }

@@ -44,4 +44,21 @@ http_request_t* init_request()
 	return r;	
 }
 
+http_connection_t *init_connection()
+{
+	http_connection_t *c;
+	
+	c = (http_connection_t *)malloc(sizeof(http_connection_t));
+	
+	if (NULL == c) {
+		return NULL;
+	}
 
+	c->read = NULL;
+	c->write = NULL;
+	c->r = NULL;
+
+	c->fd = -1;
+	
+	return c;
+}

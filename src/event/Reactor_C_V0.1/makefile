@@ -1,4 +1,4 @@
-server: main.o event.o http_epoll.o http_buffer.o
+server: main.o event.o http_epoll.o http_buffer.o http_parse.o http_request.o
 	gcc -g3 main.o event.o http_epoll.o http_buffer.o -g -o server
 http_epoll.o: http_epoll.c http_epoll.h event_base.h 
 	gcc -c -g3 http_epoll.c -g -o http_epoll.o
@@ -10,7 +10,7 @@ http_request.o: http_request.c http_request.h http_buffer.h
 	gcc -c -g3 http_request.c -o http_request.o
 http_parse.o: http_parse.h http_request.h http_buffer.h
 	gcc -c -g3 http_parse.h -o http_parse.o
-main.o: main.c event.h http_buffer.h
+main.o: main.c event.h http_buffer.h http_request.h
 	gcc -c -g3 main.c -g -o main.o
 clean:
 	rm -fr *.o

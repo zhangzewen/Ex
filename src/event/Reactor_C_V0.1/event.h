@@ -29,7 +29,7 @@ int event_base_loop(struct event_base *, int);
 
 
 
-void event_set(struct event *, int , short , void (*)(int, short, void *), void *);
+void event_set(struct event *, int , short , void (*)(int, short, void *), void *, void *);
 
 
 int event_add(struct event *ev, const struct timeval *timeout);

@@ -43,7 +43,7 @@ struct event{
   struct event_base *ev_base;
 
   int ev_fd;
-	http_buffer_t *buffer;	
+	void *data;
   short ev_events;
   short ev_ncalls;
   short *ev_pncalls;

@@ -9,7 +9,8 @@
 #include <arpa/inet.h>
 
 #include "http_epoll.h"
-#include "evbuf.h"
+#include "http_buffer.h"
+#include "http_request.h"
 #include "http_parse.h"
 
 static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
@@ -33,6 +34,7 @@ int SetNoblock(int fd)
 //因该封装一个解析函数，
 void ServerRead(int fd, short events, void *arg)
 {
+#if 0
 	struct event *ev = (struct event *)arg;
 	
 	
@@ -52,6 +54,7 @@ void ServerRead(int fd, short events, void *arg)
 	//close(fd);
 
 //	event_del(&ev);
+#endif
 }
 
 void ServerAccept(int fd, short events, void *arg)
