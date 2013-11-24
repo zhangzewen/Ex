@@ -10,8 +10,8 @@
 
 #include "http_epoll.h"
 #include "http_buffer.h"
-#include "http_request.h"
 #include "http_parse.h"
+#include "http_request.h"
 
 static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
 	
@@ -34,16 +34,20 @@ int SetNoblock(int fd)
 //因该封装一个解析函数，
 void ServerRead(int fd, short events, void *arg)
 {
-#if 0
 	struct event *ev = (struct event *)arg;
+
+	http_connection_t *c;
+	http_request_t *r;
 	
+	c = (http_connection_t *)ev->data;
+	r = c->r;
 	
 	int nread = 0;
 	
 	//nread = read(fd, buff, sizeof(buff) - 1);
-	nread = buffer_read(ev->buffer, fd, 16);
+	nread = buffer_read(r->buffer, fd, 16);
 	printf("\n----------------------------------------\n");
-	printf("ev->buffer->off: %d", ev->buffer->off);
+	printf("ev->buffer->off: %d", r->buffer->off);
 	printf("\n----------------------------------------\n");
 
 	if (nread  == -1) {
@@ -54,7 +58,6 @@ void ServerRead(int fd, short events, void *arg)
 	//close(fd);
 
 //	event_del(&ev);
-#endif
 }
 
 void ServerAccept(int fd, short events, void *arg)
@@ -62,10 +65,13 @@ void ServerAccept(int fd, short events, void *arg)
 	int cfd;
 	struct sockaddr_in addr;
 	struct event *cli_ev;
+	http_connection_t *c;
 	socklen_t addrlen = sizeof(addr);
 	cli_ev = calloc(1, sizeof(struct event));
 	int yes = 1;
 	int retval;
+	
+	c = init_connection();
 
 	cfd = accept(fd ,(struct sockaddr *)&addr, &addrlen);
 	
@@ -79,7 +85,13 @@ void ServerAccept(int fd, short events, void *arg)
 		return;
 	}
 
-	event_set(cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, (void *)cli_ev);
+	event_set(cli_ev, cfd, EV_READ | EV_PERSIST, ServerRead, (void *)cli_ev, (void *)c);
+	c->read = cli_ev;
+	c->fd = fd;
+	c->buffer = buffer_new();
+	c->r = init_request();
+	
+	c->r->buffer = c->buffer;
 	event_add(cli_ev, NULL);
 }
 

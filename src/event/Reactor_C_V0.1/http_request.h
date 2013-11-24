@@ -2,12 +2,14 @@
 #define _HTTP_REQUEST_H_INCLUDED_
 
 #include "http_buffer.h"
+
 typedef struct http_request_st http_request_t;
 typedef struct http_connection_st http_connection_t;
 
 struct http_connection_st{
 	struct event *read; //accept后读事件
 	struct event *write;//这个暂时做NULL处理
+	http_buffer_t *buffer;
 	int fd;
 	
 	http_request_t *r;
@@ -30,8 +32,8 @@ struct http_request_st{
 
 	char *value_start;
 	char *value_end;
+	http_buffer_t *buffer;
 	
-	http_buffer_t buffer;
 	
 	int parse_stat;
 
@@ -39,7 +41,7 @@ struct http_request_st{
 
 http_request_t* init_request();
 
-http_connection_t *init_connection();
+http_connection_t* init_connection();
 
 #if 0
 void http_init_connection(http_connection_t *c); //初始化connection

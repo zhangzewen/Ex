@@ -32,7 +32,7 @@ int parse_http_request_line(http_request_t *r)
 
     state = sw_start;
 
-		for (p = r->buffer.pos; p != r->buffer.end; p++) {
+		for (p = r->buffer->pos; p != r->buffer->end; p++) {
 			ch = *p;
 
 			switch (state) {
@@ -133,7 +133,7 @@ int parse_http_request_line(http_request_t *r)
 			}
 		}
 
-		r->buffer.pos = p;
+		r->buffer->pos = p;
 
 		return 0;
 }

@@ -13,17 +13,6 @@ http_request_t* init_request()
 		return NULL;
 	}
 
-	r->buffer.start = (char *)malloc(sizeof(char) * BUFFSIZE);
-
-	if (NULL == r->buffer.start) {
-		free(r);
-		return NULL;
-	}
-	
-	r->buffer.pos = r->buffer.start;	
-	r->buffer.last = r->buffer.start;
-	r->buffer.end = r->buffer.start + BUFFSIZE;
-	
 	r->c = NULL;
 
 	r->method_start = NULL;
@@ -40,6 +29,8 @@ http_request_t* init_request()
 	
 	r->value_start = NULL;
 	r->value_end = NULL;
+	
+	r->buffer = NULL;
 
 	return r;	
 }
