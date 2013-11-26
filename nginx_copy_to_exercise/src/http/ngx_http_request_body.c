@@ -37,10 +37,10 @@ ngx_http_read_client_request_body(ngx_http_request_t *r,
     ngx_http_request_body_t   *rb;
     ngx_http_core_loc_conf_t  *clcf;
 
-    r->main->count++;
+    r->main->count++; //原始请求的引用计数加1
 
-    if (r->request_body || r->discard_body) {
-        post_handler(r);
+    if (r->request_body || r->discard_body) {//已经做过放弃包体或者接收包体的操作
+        post_handler(r);//直接调用方法
         return NGX_OK;
     }
 

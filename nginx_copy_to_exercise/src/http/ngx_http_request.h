@@ -283,8 +283,11 @@ typedef struct {
     ngx_chain_t                      *bufs;
 		//直接接收HTTP包体的缓存
     ngx_buf_t                        *buf;
+	//根据content-length头部和已接收到的包体长度，计算出还需要接收的包体长度
     off_t                             rest;
+	//该缓冲区链表存放着将要写入文件的包体
     ngx_chain_t                      *to_write;
+		//HTTP包体接收完毕后执行的回调方法，也就是ngx_http_read_client_request_body方法传递的第2个参数
     ngx_http_client_body_handler_pt   post_handler;
 } ngx_http_request_body_t;
 
@@ -318,8 +321,11 @@ typedef void (*ngx_http_cleanup_pt)(void *data);
 typedef struct ngx_http_cleanup_s  ngx_http_cleanup_t;
 
 struct ngx_http_cleanup_s {
+	//由HTTP模块提供的清理资源的回调方法
     ngx_http_cleanup_pt               handler;
+	//希望给上面的handler方法传递的参数
     void                             *data;
+	//一个请求可能会有多个ngx_http_cleanup_t清理方法，这些清理方法间就是通过next连接起来
     ngx_http_cleanup_t               *next;
 };
 
