@@ -363,6 +363,7 @@ RFC 2616                        HTTP/1.1                       June 1999
    The Hypertext Transfer Protocol (HTTP) is an application-level
    protocol for distributed, collaborative, hypermedia information
    systems. HTTP has been in use by the World-Wide Web global
+		超文本传输协议一个应用程序级协议，用于分布式，，协作式，超媒体信息系统。
    information initiative since 1990. The first version of HTTP,
    referred to as HTTP/0.9, was a simple protocol for raw data transfer
    across the Internet. HTTP/1.0, as defined by RFC 1945 [6], improved
@@ -852,10 +853,10 @@ RFC 2616                        HTTP/1.1                       June 1999
        DIGIT          = <any US-ASCII digit "0".."9">
        CTL            = <any US-ASCII control character
                         (octets 0 - 31) and DEL (127)>
-       CR             = <US-ASCII CR, carriage return (13)>
-       LF             = <US-ASCII LF, linefeed (10)>
+       CR             = <US-ASCII CR, carriage return (13)> '\r'
+       LF             = <US-ASCII LF, linefeed (10)> '\n'
        SP             = <US-ASCII SP, space (32)>
-       HT             = <US-ASCII HT, horizontal-tab (9)>
+       HT             = <US-ASCII HT, horizontal-tab (9)> '\t'
        <">            = <US-ASCII double-quote mark (34)>
 
    HTTP/1.1 defines the sequence CR LF as the end-of-line marker for all
