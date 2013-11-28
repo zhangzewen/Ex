@@ -59,6 +59,10 @@ static u_char *ngx_http_log_error(ngx_log_t *log, u_char *buf, size_t len);
 static u_char *ngx_http_log_error_handler(ngx_http_request_t *r,
     ngx_http_request_t *sr, u_char *buf, size_t len);
 
+#if (NGX_HTTP_SSL)
+static void ngx_http_ssl_handshake(ngx_event_t *rev);
+static void ngx_http_ssl_handshake_handler(ngx_connection_t *c);
+#endif
 
 
 static char *ngx_http_client_errors[] = {
@@ -209,6 +213,9 @@ ngx_http_init_connection(ngx_connection_t *c)
     rev->handler = ngx_http_init_request;
     c->write->handler = ngx_http_empty_handler;
 
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
+#endif
 
     if (rev->ready) {
 				//如果接收准备好了，则直接调用ngx_http_init_request，如果使用mutex锁，则post这个event，然后返回
@@ -227,6 +234,9 @@ ngx_http_init_connection(ngx_connection_t *c)
     ngx_add_timer(rev, c->listening->post_accept_timeout);
 
     if (ngx_handle_read_event(rev, 0) != NGX_OK) {
+#if (NGX_STAT_STUB)
+        (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
+#endif
         ngx_http_close_connection(c);
         return;
     }
@@ -249,7 +259,14 @@ ngx_http_init_request(ngx_event_t *rev)
     ngx_http_core_srv_conf_t   *cscf;
     ngx_http_core_loc_conf_t   *clcf;
     ngx_http_core_main_conf_t  *cmcf;
+#if (NGX_HAVE_INET6)
+    struct sockaddr_in6        *sin6;
+    ngx_http_in6_addr_t        *addr6;
+#endif
 
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
+#endif
 
     c = rev->data;
 
@@ -320,6 +337,24 @@ ngx_http_init_request(ngx_event_t *rev)
 
         switch (c->local_sockaddr->sa_family) {
 
+#if (NGX_HAVE_INET6)
+        case AF_INET6:
+            sin6 = (struct sockaddr_in6 *) c->local_sockaddr;
+
+            addr6 = port->addrs;
+
+            /* the last address is "*" */
+
+            for (i = 0; i < port->naddrs - 1; i++) {
+                if (ngx_memcmp(&addr6[i].addr6, &sin6->sin6_addr, 16) == 0) {
+                    break;
+                }
+            }
+
+            addr_conf = &addr6[i].conf;
+
+            break;
+#endif
 
         default: /* AF_INET */
             sin = (struct sockaddr_in *) c->local_sockaddr;
@@ -343,6 +378,12 @@ ngx_http_init_request(ngx_event_t *rev)
 
         switch (c->local_sockaddr->sa_family) {
 
+#if (NGX_HAVE_INET6)
+        case AF_INET6:
+            addr6 = port->addrs;
+            addr_conf = &addr6[0].conf;
+            break;
+#endif
 
         default: /* AF_INET */
             addr = port->addrs;
@@ -363,6 +404,41 @@ ngx_http_init_request(ngx_event_t *rev)
     rev->handler = ngx_http_process_request_line;
     r->read_event_handler = ngx_http_block_reading;
 
+#if (NGX_HTTP_SSL)
+
+    {
+    ngx_http_ssl_srv_conf_t  *sscf;
+
+    sscf = ngx_http_get_module_srv_conf(r, ngx_http_ssl_module);
+    if (sscf->enable || addr_conf->ssl) {
+
+        if (c->ssl == NULL) {
+
+            c->log->action = "SSL handshaking";
+
+            if (addr_conf->ssl && sscf->ssl.ctx == NULL) {
+                ngx_log_error(NGX_LOG_ERR, c->log, 0,
+                              "no \"ssl_certificate\" is defined "
+                              "in server listening on SSL port");
+                ngx_http_close_connection(c);
+                return;
+            }
+
+            if (ngx_ssl_create_connection(&sscf->ssl, c, NGX_SSL_BUFFER)
+                != NGX_OK)
+            {
+                ngx_http_close_connection(c);
+                return;
+            }
+
+            rev->handler = ngx_http_ssl_handshake;
+        }
+
+        r->main_filter_need_in_memory = 1;
+    }
+    }
+
+#endif
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
     c->log->file = clcf->error_log->file;
@@ -443,9 +519,199 @@ ngx_http_init_request(ngx_event_t *rev)
     ctx->current_request = r;
     r->log_handler = ngx_http_log_error_handler;
 
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
+    r->stat_reading = 1;
+    (void) ngx_atomic_fetch_add(ngx_stat_requests, 1);
+#endif
 
     rev->handler(rev);
 }
+
+
+#if (NGX_HTTP_SSL)
+
+static void
+ngx_http_ssl_handshake(ngx_event_t *rev)
+{
+    u_char               buf[1];
+    ssize_t              n;
+    ngx_int_t            rc;
+    ngx_connection_t    *c;
+    ngx_http_request_t  *r;
+
+    c = rev->data;
+    r = c->data;
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
+                   "http check ssl handshake");
+
+    if (rev->timedout) {
+        ngx_log_error(NGX_LOG_INFO, c->log, NGX_ETIMEDOUT, "client timed out");
+        c->timedout = 1;
+        ngx_http_close_request(r, NGX_HTTP_REQUEST_TIME_OUT);
+        return;
+    }
+
+    n = recv(c->fd, (char *) buf, 1, MSG_PEEK);
+
+    if (n == -1 && ngx_socket_errno == NGX_EAGAIN) {
+
+        if (!rev->timer_set) {
+            ngx_add_timer(rev, c->listening->post_accept_timeout);
+        }
+
+        if (ngx_handle_read_event(rev, 0) != NGX_OK) {
+            ngx_http_close_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return;
+    }
+
+    if (n == 1) {
+        if (buf[0] & 0x80 /* SSLv2 */ || buf[0] == 0x16 /* SSLv3/TLSv1 */) {
+            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, rev->log, 0,
+                           "https ssl handshake: 0x%02Xd", buf[0]);
+
+            rc = ngx_ssl_handshake(c);
+
+            if (rc == NGX_AGAIN) {
+
+                if (!rev->timer_set) {
+                    ngx_add_timer(rev, c->listening->post_accept_timeout);
+                }
+
+                c->ssl->handler = ngx_http_ssl_handshake_handler;
+                return;
+            }
+
+            ngx_http_ssl_handshake_handler(c);
+
+            return;
+
+        } else {
+            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, rev->log, 0,
+                           "plain http");
+
+            r->plain_http = 1;
+        }
+    }
+
+    c->log->action = "reading client request line";
+
+    rev->handler = ngx_http_process_request_line;
+    ngx_http_process_request_line(rev);
+}
+
+
+static void
+ngx_http_ssl_handshake_handler(ngx_connection_t *c)
+{
+    ngx_http_request_t  *r;
+
+    if (c->ssl->handshaked) {
+
+        /*
+         * The majority of browsers do not send the "close notify" alert.
+         * Among them are MSIE, old Mozilla, Netscape 4, Konqueror,
+         * and Links.  And what is more, MSIE ignores the server's alert.
+         *
+         * Opera and recent Mozilla send the alert.
+         */
+
+        c->ssl->no_wait_shutdown = 1;
+
+        c->log->action = "reading client request line";
+
+        c->read->handler = ngx_http_process_request_line;
+        /* STUB: epoll edge */ c->write->handler = ngx_http_empty_handler;
+
+        ngx_http_process_request_line(c->read);
+
+        return;
+    }
+
+    r = c->data;
+
+    ngx_http_close_request(r, NGX_HTTP_BAD_REQUEST);
+
+    return;
+}
+
+#ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
+
+int
+ngx_http_ssl_servername(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
+{
+    size_t                    len;
+    u_char                   *host;
+    const char               *servername;
+    ngx_connection_t         *c;
+    ngx_http_request_t       *r;
+    ngx_http_ssl_srv_conf_t  *sscf;
+
+    servername = SSL_get_servername(ssl_conn, TLSEXT_NAMETYPE_host_name);
+
+    if (servername == NULL) {
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    c = ngx_ssl_get_connection(ssl_conn);
+
+    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "SSL server name: \"%s\"", servername);
+
+    len = ngx_strlen(servername);
+
+    if (len == 0) {
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    r = c->data;
+
+    host = (u_char *) servername;
+
+    len = ngx_http_validate_host(r, &host, len, 1);
+
+    if (len <= 0) {
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    if (ngx_http_find_virtual_server(r, host, len) != NGX_OK) {
+        return SSL_TLSEXT_ERR_NOACK;
+    }
+
+    sscf = ngx_http_get_module_srv_conf(r, ngx_http_ssl_module);
+
+    if (sscf->ssl.ctx) {
+        SSL_set_SSL_CTX(ssl_conn, sscf->ssl.ctx);
+
+        /*
+         * SSL_set_SSL_CTX() only changes certs as of 1.0.0d
+         * adjust other things we care about
+         */
+
+        SSL_set_verify(ssl_conn, SSL_CTX_get_verify_mode(sscf->ssl.ctx),
+                       SSL_CTX_get_verify_callback(sscf->ssl.ctx));
+
+        SSL_set_verify_depth(ssl_conn, SSL_CTX_get_verify_depth(sscf->ssl.ctx));
+
+#ifdef SSL_CTRL_CLEAR_OPTIONS
+        /* only in 0.9.8m+ */
+        SSL_clear_options(ssl_conn, SSL_get_options(ssl_conn) &
+                                    ~SSL_CTX_get_options(sscf->ssl.ctx));
+#endif
+
+        SSL_set_options(ssl_conn, SSL_CTX_get_options(sscf->ssl.ctx));
+    }
+
+    return SSL_TLSEXT_ERR_OK;
+}
+
+#endif
+
+#endif
+
 
 static void
 ngx_http_process_request_line(ngx_event_t *rev)
@@ -554,6 +820,55 @@ ngx_http_process_request_line(ngx_event_t *rev)
                 r->args.data = r->args_start;
             }
 
+#if (NGX_WIN32)
+            {
+            u_char  *p, *last;
+
+            p = r->uri.data;
+            last = r->uri.data + r->uri.len;
+
+            while (p < last) {
+
+                if (*p++ == ':') {
+
+                    /*
+                     * this check covers "::$data", "::$index_allocation" and
+                     * ":$i30:$index_allocation"
+                     */
+
+                    if (p < last && *p == '$') {
+                        ngx_log_error(NGX_LOG_INFO, c->log, 0,
+                                      "client sent unsafe win32 URI");
+                        ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+                        return;
+                    }
+                }
+            }
+
+            p = r->uri.data + r->uri.len - 1;
+
+            while (p > r->uri.data) {
+
+                if (*p == ' ') {
+                    p--;
+                    continue;
+                }
+
+                if (*p == '.') {
+                    p--;
+                    continue;
+                }
+
+                break;
+            }
+
+            if (p != r->uri.data + r->uri.len - 1) {
+                r->uri.len = p + 1 - r->uri.data;
+                ngx_http_set_exten(r);
+            }
+
+            }
+#endif
 
             ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                            "http request line: \"%V\"", &r->request_line);
@@ -1321,11 +1636,63 @@ ngx_http_process_request(ngx_http_request_t *r)
         return;
     }
 
+#if (NGX_HTTP_SSL)
+
+    if (c->ssl) {
+        long                      rc;
+        X509                     *cert;
+        ngx_http_ssl_srv_conf_t  *sscf;
+
+        sscf = ngx_http_get_module_srv_conf(r, ngx_http_ssl_module);
+
+        if (sscf->verify) {
+            rc = SSL_get_verify_result(c->ssl->connection);
+
+            if (rc != X509_V_OK
+                && (sscf->verify != 3 || !ngx_ssl_verify_error_optional(rc)))
+            {
+                ngx_log_error(NGX_LOG_INFO, c->log, 0,
+                              "client SSL certificate verify error: (%l:%s)",
+                              rc, X509_verify_cert_error_string(rc));
+
+                ngx_ssl_remove_cached_session(sscf->ssl.ctx,
+                                       (SSL_get0_session(c->ssl->connection)));
+
+                ngx_http_finalize_request(r, NGX_HTTPS_CERT_ERROR);
+                return;
+            }
+
+            if (sscf->verify == 1) {
+                cert = SSL_get_peer_certificate(c->ssl->connection);
+
+                if (cert == NULL) {
+                    ngx_log_error(NGX_LOG_INFO, c->log, 0,
+                                  "client sent no required SSL certificate");
+
+                    ngx_ssl_remove_cached_session(sscf->ssl.ctx,
+                                       (SSL_get0_session(c->ssl->connection)));
+
+                    ngx_http_finalize_request(r, NGX_HTTPS_NO_CERT);
+                    return;
+                }
+
+                X509_free(cert);
+            }
+        }
+    }
+
+#endif
 
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
     }
 
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
+    r->stat_reading = 0;
+    (void) ngx_atomic_fetch_add(ngx_stat_writing, 1);
+    r->stat_writing = 1;
+#endif
 
     c->read->handler = ngx_http_request_handler;
     c->write->handler = ngx_http_request_handler;
@@ -2030,6 +2397,22 @@ ngx_http_test_reading(ngx_http_request_t *r)
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0, "http test reading");
 
+#if (NGX_HAVE_KQUEUE)
+
+    if (ngx_event_flags & NGX_USE_KQUEUE_EVENT) {
+
+        if (!rev->pending_eof) {
+            return;
+        }
+
+        rev->eof = 1;
+        c->error = 1;
+        err = rev->kq_errno;
+
+        goto closed;
+    }
+
+#endif
 
     n = recv(c->fd, buf, 1, MSG_PEEK);
 
@@ -2164,6 +2547,9 @@ ngx_http_set_keepalive(ngx_http_request_t *r)
 
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0, "pipelined request");
 
+#if (NGX_STAT_STUB)
+        (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
+#endif
 
         hc->pipeline = 1;
         c->log->action = "reading client pipelined request line";
@@ -2227,6 +2613,11 @@ ngx_http_set_keepalive(ngx_http_request_t *r)
         hc->nbusy = 0;
     }
 
+#if (NGX_HTTP_SSL)
+    if (c->ssl) {
+        ngx_ssl_free_buffer(c);
+    }
+#endif
 
     rev->handler = ngx_http_keepalive_handler;
 
@@ -2310,6 +2701,25 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
         return;
     }
 
+#if (NGX_HAVE_KQUEUE)
+
+    if (ngx_event_flags & NGX_USE_KQUEUE_EVENT) {
+        if (rev->pending_eof) {
+            c->log->handler = NULL;
+            ngx_log_error(NGX_LOG_INFO, c->log, rev->kq_errno,
+                          "kevent() reported that client %V closed "
+                          "keepalive connection", &c->addr_text);
+#if (NGX_HTTP_SSL)
+            if (c->ssl) {
+                c->ssl->no_send_shutdown = 1;
+            }
+#endif
+            ngx_http_close_connection(c);
+            return;
+        }
+    }
+
+#endif
 
     b = c->buffer;
     size = b->end - b->start;
@@ -2382,6 +2792,9 @@ ngx_http_keepalive_handler(ngx_event_t *rev)
 
     b->last += n;
 
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_reading, 1);
+#endif
 
     c->log->handler = ngx_http_log_error;
     c->log->action = "reading client request line";
@@ -2633,6 +3046,17 @@ ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)
         }
     }
 
+#if (NGX_STAT_STUB)
+
+    if (r->stat_reading) {
+        (void) ngx_atomic_fetch_add(ngx_stat_reading, -1);
+    }
+
+    if (r->stat_writing) {
+        (void) ngx_atomic_fetch_add(ngx_stat_writing, -1);
+    }
+
+#endif
 
     if (rc > 0 && (r->headers_out.status == 0 || r->connection->sent == 0)) {
         r->headers_out.status = rc;
@@ -2697,6 +3121,21 @@ ngx_http_close_connection(ngx_connection_t *c)
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "close http connection: %d", c->fd);
+
+#if (NGX_HTTP_SSL)
+
+    if (c->ssl) {
+        if (ngx_ssl_shutdown(c) == NGX_AGAIN) {
+            c->ssl->handler = ngx_http_close_connection;
+            return;
+        }
+    }
+
+#endif
+
+#if (NGX_STAT_STUB)
+    (void) ngx_atomic_fetch_add(ngx_stat_active, -1);
+#endif
 
     c->destroyed = 1;
 

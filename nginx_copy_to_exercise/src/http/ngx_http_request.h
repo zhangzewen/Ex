@@ -552,6 +552,10 @@ struct ngx_http_request_s {
     unsigned                          filter_need_temporary:1;
     unsigned                          allow_ranges:1;
 
+#if (NGX_STAT_STUB)
+    unsigned                          stat_reading:1;
+    unsigned                          stat_writing:1;
+#endif
 
     /* used to parse HTTP headers */
 
