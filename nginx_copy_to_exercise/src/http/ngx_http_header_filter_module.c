@@ -167,13 +167,13 @@ ngx_http_header_filter(ngx_http_request_t *r)
     struct sockaddr_in        *sin;
     u_char                     addr[NGX_SOCKADDR_STRLEN];
 
-    if (r->header_sent) {
+    if (r->header_sent) { //header_sent标志位，为1表示已经发送过，不需要再次发送
         return NGX_OK;
     }
 
     r->header_sent = 1;
 
-    if (r != r->main) {
+    if (r != r->main) {//子请求是不存在发送HTTP响应头部这个概念
         return NGX_OK;
     }
 
