@@ -25,18 +25,16 @@ struct event_base *current_base = NULL;
 
 
 static void event_queue_insert(struct event_base *, struct event *, int);
+
 static void event_queue_remove(struct event_base *, struct event *, int);
 
 static int event_haveevents(struct event_base *);
 
-static void event_process_actice(struct event_base *);
-
-
-
 static void event_add_timer(struct event_base *, struct event *);
-static void event_del_timer(struct event_base *, struct event *);
-static int gettime(struct event_base *base, struct timeval *tp);
 
+static void event_del_timer(struct event_base *, struct event *);
+
+static int gettime(struct event_base *base, struct timeval *tp);
 
 static int timeout_next(struct event_base *base, struct timeval **tv_p)
 {
@@ -133,7 +131,6 @@ static int gettime(struct event_base *base, struct timeval *tp)
 
 struct event_base *event_base_new(void)
 {
-	int i;
 	struct event_base *base;
 	
 	if ((base = calloc(1, sizeof(struct event_base))) == NULL) {
@@ -163,7 +160,6 @@ static void event_process_active(struct event_base *base)
 {
 	struct event *ev;
 	struct event *tmp;
-	int i;
 	short ncalls;
 	
 
@@ -276,9 +272,6 @@ void timeout_process(struct event_base *base)
 
 static void timeout_correct(struct event_base *base, struct timeval *tv)
 {
-	struct event **pev;
-	unsigned int size;
-	struct timeval off;
 #if 0
 	fprintf(stderr, "[%s:%d]:base->tv_cache->tv_sec = %lld,base->tv_cache->tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.usec = %lld\n",
 					 __func__,

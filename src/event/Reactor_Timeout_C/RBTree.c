@@ -106,7 +106,6 @@ rbtree_node_t *rb_search(uintptr_t key, rbtree_node_t *root)
 
 rbtree_node_t *rb_insert(uintptr_t key, void* data, rbtree_node_t *root)
 {
-	struct event *ev = (struct event *)data;
 	rbtree_node_t *parent = NULL;
 	rbtree_node_t *node = NULL;
 
@@ -197,7 +196,6 @@ rbtree_node_t *rb_erase(uintptr_t key, rbtree_node_t *root)
 	color_t color;
 
 	if (!(node = rb_search_auxiliary(key, root, NULL))) {
-		printf("key %d is not exist !/n");
 		return root;
 	}		
 

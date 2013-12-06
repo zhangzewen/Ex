@@ -1,6 +1,7 @@
 #include "evbuf.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <assert.h>
 
@@ -108,6 +109,7 @@ int evutil_vsnprintf(char *buf, size_t buflen, const char *format, va_list ap)
 {
 	int r = vsnprintf(buf, buflen, format, ap);
 	buf[buflen - 1] = '\0';
+	return r;
 }
 
 int evbuffer_add_printf(struct evbuffer *buf, const char *fmt, ...)
@@ -149,7 +151,7 @@ char *evbuffer_readline(struct evbuffer *buffer)
 	unsigned int i;
 	
 	for(i = 0; i < len; i++) {
-		if(data[i] = '\r' || data[i] == '\n') {
+		if(data[i] == '\r' || data[i] == '\n') {
 			break;
 		}
 	}
