@@ -50,15 +50,15 @@ ngx_destroy_pool(ngx_pool_t *pool)
 
     for (c = pool->cleanup; c; c = c->next) {
         if (c->handler) {
-            ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
-                           "run cleanup: %p", c);
+            ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
+                           "[%s:%d]run cleanup: %p",__func__, __LINE__, c);
             c->handler(c->data);
         }
     }
 
     for (l = pool->large; l; l = l->next) {
 
-        ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0, "free: %p", l->alloc);
+        ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, pool->log, 0, "[%s:%d]free: %p",__func__, __LINE__, l->alloc);
 
         if (l->alloc) {
             ngx_free(l->alloc);
@@ -285,8 +285,8 @@ ngx_pfree(ngx_pool_t *pool, void *p)
 
     for (l = pool->large; l; l = l->next) {
         if (p == l->alloc) {
-            ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
-                           "free: %p", l->alloc);
+            ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, pool->log, 0,
+                           "[%s:%d]free: %p",__func__, __LINE__, l->alloc);
             ngx_free(l->alloc);
             l->alloc = NULL;
 
@@ -337,7 +337,7 @@ ngx_pool_cleanup_add(ngx_pool_t *p, size_t size)
 
     p->cleanup = c;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, p->log, 0, "add cleanup: %p", c);
+    ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, p->log, 0, "[%s:%d]add cleanup: %p",__func__, __LINE__, c);
 
     return c;
 }
@@ -369,12 +369,15 @@ ngx_pool_cleanup_file(void *data)
 {
     ngx_pool_cleanup_file_t  *c = data;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_ALLOC, c->log, 0, "file cleanup: fd:%d",
+    ngx_log_debug3(NGX_LOG_DEBUG_ALLOC, c->log, 0, "[%s:%d]file cleanup: fd:%d",
+									__func__, __LINE__,
                    c->fd);
 
     if (ngx_close_file(c->fd) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_ALERT, c->log, ngx_errno,
-                      ngx_close_file_n " \"%s\" failed", c->name);
+                      ngx_close_file_n "[%s:%d] \"%s\" failed", 
+											__func__, __LINE__,
+											c->name);
     }
 }
 
@@ -386,7 +389,8 @@ ngx_pool_delete_file(void *data)
 
     ngx_err_t  err;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_ALLOC, c->log, 0, "file cleanup: fd:%d %s",
+    ngx_log_debug4(NGX_LOG_DEBUG_ALLOC, c->log, 0, "[%s:%d]file cleanup: fd:%d %s",
+									__func__, __LINE__,
                    c->fd, c->name);
 
     if (ngx_delete_file(c->name) == NGX_FILE_ERROR) {
@@ -394,13 +398,17 @@ ngx_pool_delete_file(void *data)
 
         if (err != NGX_ENOENT) {
             ngx_log_error(NGX_LOG_CRIT, c->log, err,
-                          ngx_delete_file_n " \"%s\" failed", c->name);
+                          ngx_delete_file_n "[%s:%d] \"%s\" failed",
+													__func__, __LINE__,
+													 c->name);
         }
     }
 
     if (ngx_close_file(c->fd) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_ALERT, c->log, ngx_errno,
-                      ngx_close_file_n " \"%s\" failed", c->name);
+                      ngx_close_file_n "[%s:%d] \"%s\" failed",
+											__func__, __LINE__,
+											 c->name);
     }
 }
 

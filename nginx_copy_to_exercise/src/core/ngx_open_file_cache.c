@@ -89,8 +89,8 @@ ngx_open_file_cache_cleanup(void *data)
     ngx_queue_t             *q;
     ngx_cached_open_file_t  *file;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
-                   "open file cache cleanup");
+    ngx_log_debug2(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
+                   "[%s:%d]open file cache cleanup", __func__, __LINE__);
 
     for ( ;; ) {
 
@@ -108,8 +108,8 @@ ngx_open_file_cache_cleanup(void *data)
 
         cache->current--;
 
-        ngx_log_debug1(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
-                       "delete cached open file: %s", file->name);
+        ngx_log_debug3(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
+                       "[%s:%d]delete cached open file: %s", __func__, __LINE__, file->name);
 
         if (!file->err && !file->is_dir) {
             file->close = 1;
@@ -124,13 +124,14 @@ ngx_open_file_cache_cleanup(void *data)
 
     if (cache->current) {
         ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0,
-                      "%d items still leave in open file cache",
+                      "[%s:%d]%d items still leave in open file cache",
+											__func__, __LINE__,
                       cache->current);
     }
 
     if (cache->rbtree.root != cache->rbtree.sentinel) {
         ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0,
-                      "rbtree still is not empty in open file cache");
+                      "[%s:%d]rbtree still is not empty in open file cache", __func__, __LINE__);
 
     }
 }
@@ -264,8 +265,9 @@ ngx_open_cached_file(ngx_open_file_cache_t *cache, ngx_str_t *name,
             goto found;
         }
 
-        ngx_log_debug4(NGX_LOG_DEBUG_CORE, pool->log, 0,
-                       "retest open file: %s, fd:%d, c:%d, e:%d",
+        ngx_log_debug6(NGX_LOG_DEBUG_CORE, pool->log, 0,
+                       "[%s:%d]retest open file: %s, fd:%d, c:%d, e:%d",
+												__func__, __LINE__,
                        file->name, file->fd, file->count, file->err);
 
         if (file->is_dir) {
@@ -330,7 +332,9 @@ ngx_open_cached_file(ngx_open_file_cache_t *cache, ngx_str_t *name,
 
             if (ngx_close_file(file->fd) == NGX_FILE_ERROR) {
                 ngx_log_error(NGX_LOG_ALERT, pool->log, ngx_errno,
-                              ngx_close_file_n " \"%V\" failed", name);
+                              ngx_close_file_n "[%s:%d] \"%V\" failed",
+															__func__, __LINE__,
+															 name);
             }
 
             goto add_event;
@@ -425,8 +429,9 @@ found:
 
     ngx_queue_insert_head(&cache->expire_queue, &file->queue);
 
-    ngx_log_debug5(NGX_LOG_DEBUG_CORE, pool->log, 0,
-                   "cached open file: %s, fd:%d, c:%d, e:%d, u:%d",
+    ngx_log_debug7(NGX_LOG_DEBUG_CORE, pool->log, 0,
+                   "[%s:%d]cached open file: %s, fd:%d, c:%d, e:%d, u:%d",
+										__func__, __LINE__,
                    file->name, file->fd, file->count, file->err, file->uses);
 
     if (of->err == 0) {
@@ -458,7 +463,8 @@ failed:
             if (file->fd != NGX_INVALID_FILE) {
                 if (ngx_close_file(file->fd) == NGX_FILE_ERROR) {
                     ngx_log_error(NGX_LOG_ALERT, pool->log, ngx_errno,
-                                  ngx_close_file_n " \"%s\" failed",
+                                  ngx_close_file_n "[%s:%d] \"%s\" failed",
+																	__func__, __LINE__,
                                   file->name);
                 }
             }
@@ -474,7 +480,9 @@ failed:
     if (of->fd != NGX_INVALID_FILE) {
         if (ngx_close_file(of->fd) == NGX_FILE_ERROR) {
             ngx_log_error(NGX_LOG_ALERT, pool->log, ngx_errno,
-                          ngx_close_file_n " \"%V\" failed", name);
+                          ngx_close_file_n "[%s:%d] \"%V\" failed",
+													__func__, __LINE__,
+													 name);
         }
     }
 
@@ -533,7 +541,9 @@ failed:
 
     if (ngx_close_file(fd) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                      ngx_close_file_n " \"%V\" failed", name);
+                      ngx_close_file_n "[%s:%d] \"%V\" failed",
+											__func__, __LINE__,
+											 name);
     }
 
     ngx_set_errno(err);
@@ -658,7 +668,9 @@ ngx_open_file_wrapper(ngx_str_t *name, ngx_open_file_info_t *of,
 
         if (at_fd != NGX_AT_FDCWD && ngx_close_file(at_fd) == NGX_FILE_ERROR) {
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                          ngx_close_file_n " \"%V\" failed", &at_name);
+                          ngx_close_file_n "[%s:%d] \"%V\" failed",
+													__func__, __LINE__,
+													 &at_name);
         }
 
         p = cp + 1;
@@ -703,7 +715,7 @@ failed:
 
     if (at_fd != NGX_AT_FDCWD && ngx_close_file(at_fd) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                      ngx_close_file_n " \"%V\" failed", &at_name);
+                      ngx_close_file_n "[%s:%d] \"%V\" failed",__func__,__LINE__, &at_name);
     }
 
     return fd;
@@ -762,7 +774,7 @@ ngx_file_info_wrapper(ngx_str_t *name, ngx_open_file_info_t *of,
 
     if (ngx_close_file(fd) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                      ngx_close_file_n " \"%V\" failed", name);
+                      ngx_close_file_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
     }
 
     return rc;
@@ -823,11 +835,11 @@ ngx_open_and_stat_file(ngx_str_t *name, ngx_open_file_info_t *of,
 
     if (ngx_fd_info(fd, &fi) == NGX_FILE_ERROR) {
         ngx_log_error(NGX_LOG_CRIT, log, ngx_errno,
-                      ngx_fd_info_n " \"%V\" failed", name);
+                      ngx_fd_info_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
 
         if (ngx_close_file(fd) == NGX_FILE_ERROR) {
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                          ngx_close_file_n " \"%V\" failed", name);
+                          ngx_close_file_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
         }
 
         of->fd = NGX_INVALID_FILE;
@@ -838,7 +850,7 @@ ngx_open_and_stat_file(ngx_str_t *name, ngx_open_file_info_t *of,
     if (ngx_is_dir(&fi)) {
         if (ngx_close_file(fd) == NGX_FILE_ERROR) {
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                          ngx_close_file_n " \"%V\" failed", name);
+                          ngx_close_file_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
         }
 
         of->fd = NGX_INVALID_FILE;
@@ -849,14 +861,14 @@ ngx_open_and_stat_file(ngx_str_t *name, ngx_open_file_info_t *of,
         if (of->read_ahead && ngx_file_size(&fi) > NGX_MIN_READ_AHEAD) {
             if (ngx_read_ahead(fd, of->read_ahead) == NGX_ERROR) {
                 ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                              ngx_read_ahead_n " \"%V\" failed", name);
+                              ngx_read_ahead_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
             }
         }
 
         if (of->directio <= ngx_file_size(&fi)) {
             if (ngx_directio_on(fd) == NGX_FILE_ERROR) {
                 ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                              ngx_directio_on_n " \"%V\" failed", name);
+                              ngx_directio_on_n "[%s:%d] \"%V\" failed",__func__, __LINE__, name);
 
             } else {
                 of->is_directio = 1;
@@ -966,8 +978,9 @@ static void
 ngx_close_cached_file(ngx_open_file_cache_t *cache,
     ngx_cached_open_file_t *file, ngx_uint_t min_uses, ngx_log_t *log)
 {
-    ngx_log_debug5(NGX_LOG_DEBUG_CORE, log, 0,
-                   "close cached open file: %s, fd:%d, c:%d, u:%d, %d",
+    ngx_log_debug7(NGX_LOG_DEBUG_CORE, log, 0,
+                   "[%s:%d]close cached open file: %s, fd:%d, c:%d, u:%d, %d",
+										__func__, __LINE__,
                    file->name, file->fd, file->count, file->uses, file->close);
 
     if (!file->close) {
@@ -993,7 +1006,7 @@ ngx_close_cached_file(ngx_open_file_cache_t *cache,
 
         if (ngx_close_file(file->fd) == NGX_FILE_ERROR) {
             ngx_log_error(NGX_LOG_ALERT, log, ngx_errno,
-                          ngx_close_file_n " \"%s\" failed", file->name);
+                          ngx_close_file_n "[%s:%d] \"%s\" failed",__func__, __LINE__, file->name);
         }
 
         file->fd = NGX_INVALID_FILE;
@@ -1062,7 +1075,7 @@ ngx_expire_old_cached_files(ngx_open_file_cache_t *cache, ngx_uint_t n,
         cache->current--;
 
         ngx_log_debug1(NGX_LOG_DEBUG_CORE, log, 0,
-                       "expire cached open file: %s", file->name);
+                       "[%s:%d]expire cached open file: %s",__func__, __LINE__, file->name);
 
         if (!file->err && !file->is_dir) {
             file->close = 1;
