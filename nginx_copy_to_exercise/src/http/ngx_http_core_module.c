@@ -914,8 +914,10 @@ ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
      * used by the post read and pre-access phases
      */
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "generic phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]generic phase: %ui", 
+										__func__, __LINE__,
+										r->phase_handler);
 
     rc = ph->handler(r);
 
@@ -946,8 +948,10 @@ ngx_http_core_rewrite_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 {
     ngx_int_t  rc;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "rewrite phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]rewrite phase: %ui",
+										__func__, __LINE__,
+										 r->phase_handler);
 
     rc = ph->handler(r);
 
@@ -994,15 +998,17 @@ ngx_http_core_find_config_phase(ngx_http_request_t *r,
         return NGX_OK;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "using configuration \"%s%V\"",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]using configuration \"%s%V\"",
+										__func__, __LINE__,
                    (clcf->noname ? "*" : (clcf->exact_match ? "=" : "")),
                    &clcf->name);
 
     ngx_http_update_location_config(r);
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http cl:%O max:%O",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http cl:%O max:%O",
+										__func__, __LINE__,
                    r->headers_in.content_length_n, clcf->client_max_body_size);
 
     if (r->headers_in.content_length_n != -1
@@ -1011,7 +1017,8 @@ ngx_http_core_find_config_phase(ngx_http_request_t *r,
         && clcf->client_max_body_size < r->headers_in.content_length_n)
     {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "client intended to send too large body: %O bytes",
+                      "[%s:%d]client intended to send too large body: %O bytes",
+											__func__, __LINE__,
                       r->headers_in.content_length_n);
 
         (void) ngx_http_discard_request_body(r);
@@ -1068,16 +1075,20 @@ ngx_http_core_post_rewrite_phase(ngx_http_request_t *r,
 {
     ngx_http_core_srv_conf_t  *cscf;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "post rewrite phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]post rewrite phase: %ui", 
+										__func__, __LINE__,
+										r->phase_handler);
 
     if (!r->uri_changed) {
         r->phase_handler++;
         return NGX_AGAIN;
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "uri changes: %d", r->uri_changes);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]uri changes: %d", 
+									__func__, __LINE__,
+									r->uri_changes);
 
     /*
      * gcc before 3.3 compiles the broken code for
@@ -1090,8 +1101,10 @@ ngx_http_core_post_rewrite_phase(ngx_http_request_t *r,
 
     if (r->uri_changes == 0) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "rewrite or internal redirection cycle "
-                      "while processing \"%V\"", &r->uri);
+                      "[%s:%d]rewrite or internal redirection cycle "
+                      "while processing \"%V\"",
+											__func__, __LINE__,
+											 &r->uri);
 
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return NGX_OK;
@@ -1117,8 +1130,10 @@ ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
         return NGX_AGAIN;
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "access phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]access phase: %ui", 
+										__func__, __LINE__,
+										r->phase_handler);
 
     rc = ph->handler(r);
 
@@ -1173,15 +1188,18 @@ ngx_http_core_post_access_phase(ngx_http_request_t *r,
 {
     ngx_int_t  access_code;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "post access phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]post access phase: %ui",
+									__func__, __LINE__,
+									 r->phase_handler);
 
     access_code = r->access_code;
 
     if (access_code) {
         if (access_code == NGX_HTTP_FORBIDDEN) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "access forbidden by rule");
+                          "[%s:%d]access forbidden by rule",
+													__func__, __LINE__);
         }
 
         r->access_code = 0;
@@ -1209,8 +1227,10 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
     ngx_http_core_loc_conf_t     *clcf;
     ngx_http_script_len_code_pt   lcode;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "try files phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]try files phase: %ui",
+									__func__, __LINE__,
+									 r->phase_handler);
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
 
@@ -1306,8 +1326,9 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
 
         tf++;
 
-        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "trying to use %s: \"%s\" \"%s\"",
+        ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]trying to use %s: \"%s\" \"%s\"",
+											__func__, __LINE__,
                        test_dir ? "dir" : "file", name, path.data);
 
         if (tf->lengths == NULL && tf->name.len == 0) {
@@ -1356,7 +1377,9 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
                 && of.err != NGX_ENAMETOOLONG)
             {
                 ngx_log_error(NGX_LOG_CRIT, r->connection->log, of.err,
-                              "%s \"%s\" failed", of.failed, path.data);
+                              "[%s:%d]%s \"%s\" failed",
+															__func__, __LINE__,
+															 of.failed, path.data);
             }
 
             continue;
@@ -1393,8 +1416,10 @@ ngx_http_core_try_files_phase(ngx_http_request_t *r,
 
         ngx_http_set_exten(r);
 
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "try file uri: \"%V\"", &r->uri);
+        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]try file uri: \"%V\"",
+											__func__, __LINE__,
+											 &r->uri);
 
         r->phase_handler++;
         return NGX_AGAIN;
@@ -1418,8 +1443,10 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
         return NGX_OK;
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "content phase: %ui", r->phase_handler);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]content phase: %ui",
+									__func__, __LINE__,
+									 r->phase_handler);
 
     rc = ph->handler(r);
 
@@ -1443,14 +1470,16 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
 
         if (ngx_http_map_uri_to_path(r, &path, &root, 0) != NULL) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "directory index of \"%s\" is forbidden", path.data);
+                          "[%s:%d]directory index of \"%s\" is forbidden",
+													__func__, __LINE__,
+													 path.data);
         }
 
         ngx_http_finalize_request(r, NGX_HTTP_FORBIDDEN);
         return NGX_OK;
     }
 
-    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "no handler found");
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "[%s:%d]no handler found", __func__, __LINE__);
 
     ngx_http_finalize_request(r, NGX_HTTP_NOT_FOUND);
     return NGX_OK;
@@ -1593,8 +1622,10 @@ ngx_http_core_find_location(ngx_http_request_t *r)
 
         for (clcfp = pclcf->regex_locations; *clcfp; clcfp++) {
 
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "test location: ~ \"%V\"", &(*clcfp)->name);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]test location: ~ \"%V\"",
+													__func__, __LINE__,
+													 &(*clcfp)->name);
 
             n = ngx_http_regex_exec(r, (*clcfp)->regex, &r->uri);
 
@@ -1647,8 +1678,10 @@ ngx_http_core_find_static_location(ngx_http_request_t *r,
             return rv;
         }
 
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "test location: \"%*s\"", node->len, node->name);
+        ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]test location: \"%*s\"",
+												__func__, __LINE__,
+											 node->len, node->name);
 
         n = (len <= (size_t) node->len) ? len : node->len;
 
@@ -1927,8 +1960,10 @@ ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     c = r->connection;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http output filter \"%V?%V\"", &r->uri, &r->args);
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http output filter \"%V?%V\"",
+									__func__, __LINE__,
+									&r->uri, &r->args);
 
     rc = ngx_http_top_body_filter(r, in);
 
@@ -1955,8 +1990,10 @@ ngx_http_map_uri_to_path(ngx_http_request_t *r, ngx_str_t *path,
 
     if (alias && !r->valid_location) {
         ngx_log_error(NGX_LOG_ALERT, r->connection->log, 0,
-                      "\"alias\" cannot be used in location \"%V\" "
-                      "where URI was rewritten", &clcf->name);
+                      "[%s:%d]\"alias\" cannot be used in location \"%V\" "
+                      "where URI was rewritten",
+											__func__, __LINE__,
+											 &clcf->name);
         return NULL;
     }
 
@@ -2399,7 +2436,9 @@ ngx_http_subrequest(ngx_http_request_t *r,
 
     if (r->main->subrequests == 0) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "subrequests cycle while processing \"%V\"", uri);
+                      "[%s:%d]subrequests cycle while processing \"%V\"",
+											__func__, __LINE__,
+											 uri);
         r->main->subrequests = 1;
         return NGX_ERROR;
     }
@@ -2451,8 +2490,10 @@ ngx_http_subrequest(ngx_http_request_t *r,
         sr->args = *args;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http subrequest \"%V?%V\"", uri, &sr->args);
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http subrequest \"%V?%V\"",
+									 __func__, __LINE__,
+									 uri, &sr->args);
 
     sr->subrequest_in_memory = (flags & NGX_HTTP_SUBREQUEST_IN_MEMORY) != 0;
     sr->waited = (flags & NGX_HTTP_SUBREQUEST_WAITED) != 0;
@@ -2524,8 +2565,10 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
 
     if (r->uri_changes == 0) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "rewrite or internal redirection cycle "
-                      "while internally redirecting to \"%V\"", uri);
+                      "[%s:%d]rewrite or internal redirection cycle "
+                      "while internally redirecting to \"%V\"",
+											__func__, __LINE__,
+											 uri);
 
         r->main->count++;
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -2541,8 +2584,10 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
         ngx_str_null(&r->args);
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "internal redirect: \"%V?%V\"", uri, &r->args);
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]internal redirect: \"%V?%V\"",
+										__func__, __LINE__,
+									 uri, &r->args);
 
     ngx_http_set_exten(r);
 
@@ -2581,8 +2626,10 @@ ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
 
     if (r->uri_changes == 0) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "rewrite or internal redirection cycle "
-                      "while redirect to named location \"%V\"", name);
+                      "[%s:%d]rewrite or internal redirection cycle "
+                      "while redirect to named location \"%V\"",
+											__func__, __LINE__,
+										 name);
 
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return NGX_DONE;
@@ -2594,8 +2641,10 @@ ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
 
         for (clcfp = cscf->named_locations; *clcfp; clcfp++) {
 
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "test location: \"%V\"", &(*clcfp)->name);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]test location: \"%V\"",
+														__func__, __LINE__,
+													 &(*clcfp)->name);
 
             if (name->len != (*clcfp)->name.len
                 || ngx_strncmp(name->data, (*clcfp)->name.data, name->len) != 0)
@@ -2603,8 +2652,9 @@ ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
                 continue;
             }
 
-            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "using location: %V \"%V?%V\"",
+            ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]using location: %V \"%V?%V\"",
+														__func__, __LINE__,
                            name, &r->uri, &r->args);
 
             r->internal = 1;
@@ -2629,7 +2679,9 @@ ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
     }
 
     ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                  "could not find named location \"%V\"", name);
+                  "[%s:%d]could not find named location \"%V\"",
+									__func__, __LINE__,
+									 name);
 
     ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
 
@@ -2664,8 +2716,10 @@ ngx_http_cleanup_add(ngx_http_request_t *r, size_t size)
 
     r->cleanup = cln;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http cleanup add: %p", cln);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http cleanup add: %p", 
+									__func__, __LINE__,
+									cln);
 
     return cln;
 }
@@ -3034,7 +3088,9 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 
         } else {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid location modifier \"%V\"", &value[1]);
+                               "[%s:%d]invalid location modifier \"%V\"",
+																__func__, __LINE__,
+															 &value[1]);
             return NGX_CONF_ERROR;
         }
 
@@ -3096,24 +3152,27 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 
         if (pclcf->exact_match) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "location \"%V\" cannot be inside "
+                               "[%s:%d]location \"%V\" cannot be inside "
                                "the exact location \"%V\"",
+																__func__, __LINE__,
                                &clcf->name, &pclcf->name);
             return NGX_CONF_ERROR;
         }
 
         if (pclcf->named) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "location \"%V\" cannot be inside "
+                               "[%s:%d]location \"%V\" cannot be inside "
                                "the named location \"%V\"",
+															__func__, __LINE__,
                                &clcf->name, &pclcf->name);
             return NGX_CONF_ERROR;
         }
 
         if (clcf->named) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "named location \"%V\" can be "
+                               "[%s:%d]named location \"%V\" can be "
                                "on the server level only",
+																__func__, __LINE__,
                                &clcf->name);
             return NGX_CONF_ERROR;
         }
@@ -3128,7 +3187,8 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 #endif
         {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "location \"%V\" is outside location \"%V\"",
+                               "[%s:%d]location \"%V\" is outside location \"%V\"",
+															__func__, __LINE__,
                                &clcf->name, &pclcf->name);
             return NGX_CONF_ERROR;
         }
@@ -3182,7 +3242,8 @@ ngx_http_core_regex_location(ngx_conf_t *cf, ngx_http_core_loc_conf_t *clcf,
 #else
 
     ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                       "using regex \"%V\" requires PCRE library",
+                       "[%s;%d]using regex \"%V\" requires PCRE library",
+												__func__, __LINE__,
                        regex);
     return NGX_ERROR;
 
@@ -3231,8 +3292,9 @@ ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
     if (ngx_strcmp(value[0].data, "include") == 0) {
         if (cf->args->nelts != 2) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid number of arguments"
-                               " in \"include\" directive");
+                               "[%s:%d]invalid number of arguments"
+                               " in \"include\" directive",
+															__func__, __LINE__);
             return NGX_CONF_ERROR;
         }
 
@@ -3257,9 +3319,10 @@ ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
                 type[n].value = content_type;
 
                 ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                                   "duplicate extension \"%V\", "
+                                   "[%s:%d]duplicate extension \"%V\", "
                                    "content type: \"%V\", "
                                    "previous content type: \"%V\"",
+																		__func__, __LINE__,
                                    &value[i], content_type, old);
                 goto next;
             }
@@ -3413,8 +3476,9 @@ ngx_http_core_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->large_client_header_buffers.size < conf->connection_pool_size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the \"large_client_header_buffers\" size must be "
-                           "equal to or greater than \"connection_pool_size\"");
+                           "[%s:%d]the \"large_client_header_buffers\" size must be "
+                           "equal to or greater than \"connection_pool_size\"",
+														__func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -3870,7 +3934,8 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     if (ngx_parse_url(cf->pool, &u) != NGX_OK) {
         if (u.err) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "%s in \"%V\" of the \"listen\" directive",
+                               "[%s:%d]%s in \"%V\" of the \"listen\" directive",
+																__func__, __LINE__,
                                u.err, &u.url);
         }
 
@@ -3914,7 +3979,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (lsopt.setfib == NGX_ERROR) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "invalid setfib \"%V\"", &value[n]);
+                                   "[%s:%d]invalid setfib \"%V\"",
+																		__func__, __LINE__,
+																	 &value[n]);
                 return NGX_CONF_ERROR;
             }
 
@@ -3928,7 +3995,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (lsopt.backlog == NGX_ERROR || lsopt.backlog == 0) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "invalid backlog \"%V\"", &value[n]);
+                                   "[%s:%d]invalid backlog \"%V\"",
+																		__func__, __LINE__,
+																	 &value[n]);
                 return NGX_CONF_ERROR;
             }
 
@@ -3945,7 +4014,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (lsopt.rcvbuf == NGX_ERROR) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "invalid rcvbuf \"%V\"", &value[n]);
+                                   "[%s:%d]invalid rcvbuf \"%V\"",
+																		__func__, __LINE__,
+																	 &value[n]);
                 return NGX_CONF_ERROR;
             }
 
@@ -3962,7 +4033,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (lsopt.sndbuf == NGX_ERROR) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "invalid sndbuf \"%V\"", &value[n]);
+                                   "[%s:%d]invalid sndbuf \"%V\"",
+																	__func__, __LINE__,
+																	 &value[n]);
                 return NGX_CONF_ERROR;
             }
 
@@ -3976,8 +4049,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
             lsopt.bind = 1;
 #else
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "accept filters \"%V\" are not supported "
+                               "[%s:%d]accept filters \"%V\" are not supported "
                                "on this platform, ignored",
+																__func__, __LINE__,
                                &value[n]);
 #endif
             continue;
@@ -3990,8 +4064,9 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
             lsopt.bind = 1;
 #else
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "the deferred accept is not supported "
-                               "on this platform, ignored");
+                               "[%s:%d]the deferred accept is not supported "
+                               "on this platform, ignored",
+																__func__, __LINE__);
 #endif
             continue;
         }
@@ -4012,7 +4087,8 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
                 } else {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                       "invalid ipv6only flags \"%s\"",
+                                       "[%s:%d]invalid ipv6only flags \"%s\"",
+																				__func__, __LINE__,
                                        &value[n].data[9]);
                     return NGX_CONF_ERROR;
                 }
@@ -4022,15 +4098,17 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             } else {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "ipv6only is not supported "
-                                   "on addr \"%s\", ignored", lsopt.addr);
+                               "[%s:%d]ipv6only is not supported "
+                                   "on addr \"%s\", ignored",
+																__func__, __LINE__,
+																 lsopt.addr);
             }
 
             continue;
 #else
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "ipv6only is not supported "
-                               "on this platform");
+                               "[%s:%d]ipv6only is not supported "
+                               "on this platform", __func__, __LINE__);
             return NGX_CONF_ERROR;
 #endif
         }
@@ -4041,8 +4119,8 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
             continue;
 #else
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "the \"ssl\" parameter requires "
-                               "ngx_http_ssl_module");
+                               "[%s:%d]the \"ssl\" parameter requires "
+                               "ngx_http_ssl_module", __func__, __LINE__);
             return NGX_CONF_ERROR;
 #endif
         }
@@ -4116,8 +4194,8 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 #else
 
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "the \"so_keepalive\" parameter accepts "
-                                   "only \"on\" or \"off\" on this platform");
+                                   "[%s:%d]the \"so_keepalive\" parameter accepts "
+                                   "only \"on\" or \"off\" on this platform", __func__, __LINE__);
                 return NGX_CONF_ERROR;
 
 #endif
@@ -4132,14 +4210,17 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         invalid_so_keepalive:
 
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid so_keepalive value: \"%s\"",
+                               "[%s:%d]invalid so_keepalive value: \"%s\"",
+																__func__, __LINE__,
                                &value[n].data[13]);
             return NGX_CONF_ERROR;
 #endif
         }
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid parameter \"%V\"", &value[n]);
+                           "[%s:%d]invalid parameter \"%V\"",
+														__func__, __LINE__,
+														 &value[n]);
         return NGX_CONF_ERROR;
     }
 
@@ -4171,13 +4252,16 @@ ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
             || (ch == '.' && value[i].len < 2))
         {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "server name \"%V\" is invalid", &value[i]);
+                               "[%s:%d]server name \"%V\" is invalid",
+																__func__, __LINE__,
+																 &value[i]);
             return NGX_CONF_ERROR;
         }
 
         if (ngx_strchr(value[i].data, '/')) {
             ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                               "server name \"%V\" has suspicious symbols",
+                               "[%s:%d]server name \"%V\" has suspicious symbols",
+																__func__, __LINE__,
                                &value[i]);
         }
 
@@ -4211,7 +4295,9 @@ ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if (value[i].len == 1) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "empty regex in server name \"%V\"", &value[i]);
+                               "[%s:%d]empty regex in server name \"%V\"",
+																__func__, __LINE__,
+															 &value[i]);
             return NGX_CONF_ERROR;
         }
 
@@ -4241,8 +4327,10 @@ ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 #else
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "using regex \"%V\" "
-                           "requires PCRE library", &value[i]);
+                           "[%s:%d]using regex \"%V\" "
+                           "requires PCRE library",
+														__func__, __LINE__,
+														 &value[i]);
 
         return NGX_CONF_ERROR;
 #endif
@@ -4268,12 +4356,14 @@ ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if ((clcf->alias != 0) == alias) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "\"%V\" directive is duplicate",
+                               "[%s:%d]\"%V\" directive is duplicate",
+																__func__, __LINE__,
                                &cmd->name);
         } else {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "\"%V\" directive is duplicate, "
+                               "[%s:%d]\"%V\" directive is duplicate, "
                                "\"%s\" directive was specified earlier",
+																__func__, __LINE__,
                                &cmd->name, clcf->alias ? "alias" : "root");
         }
 
@@ -4282,8 +4372,8 @@ ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (clcf->named && alias) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the \"alias\" directive cannot be used "
-                           "inside the named location");
+                           "[%s:%d]the \"alias\" directive cannot be used "
+                           "inside the named location", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -4294,8 +4384,9 @@ ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         || ngx_strstr(value[1].data, "${document_root}"))
     {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the $document_root variable cannot be used "
+                           "[%s:%d]the $document_root variable cannot be used "
                            "in the \"%V\" directive",
+													__func__, __LINE__,
                            &cmd->name);
 
         return NGX_CONF_ERROR;
@@ -4305,8 +4396,9 @@ ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         || ngx_strstr(value[1].data, "${realpath_root}"))
     {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the $realpath_root variable cannot be used "
+                           "[%s:%d]the $realpath_root variable cannot be used "
                            "in the \"%V\" directive",
+														__func__, __LINE__,
                            &cmd->name);
 
         return NGX_CONF_ERROR;
@@ -4405,7 +4497,9 @@ ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid method \"%V\"", &value[i]);
+                           "[%s:%d]invalid method \"%V\"",
+														__func__, __LINE__,
+														 &value[i]);
         return NGX_CONF_ERROR;
 
     next:
@@ -4527,7 +4621,9 @@ ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     if (value[i].data[0] == '=') {
         if (i == 1) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid value \"%V\"", &value[i]);
+                               "[%s:%d]invalid value \"%V\"",
+																__func__, __LINE__,
+															 &value[i]);
             return NGX_CONF_ERROR;
         }
 
@@ -4536,7 +4632,9 @@ ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (overwrite == NGX_ERROR) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "invalid value \"%V\"", &value[i]);
+                                   "[%s:%d]invalid value \"%V\"",
+																		__func__, __LINE__,
+																		 &value[i]);
                 return NGX_CONF_ERROR;
             }
 
@@ -4587,13 +4685,16 @@ ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if (err->status == NGX_ERROR || err->status == 499) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid value \"%V\"", &value[i]);
+                               "[%s:%d]invalid value \"%V\"",
+																__func__, __LINE__,
+															 &value[i]);
             return NGX_CONF_ERROR;
         }
 
         if (err->status < 300 || err->status > 599) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "value \"%V\" must be between 300 and 599",
+                               "[%s:%d]value \"%V\" must be between 300 and 599",
+																__func__, __LINE__,
                                &value[i]);
             return NGX_CONF_ERROR;
         }
@@ -4687,7 +4788,8 @@ ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if (code == NGX_ERROR || code > 999) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid code \"%*s\"",
+                               "[%s:%d]invalid code \"%*s\"",
+																__func__, __LINE__,
                                tf[i - 1].name.len - 1, tf[i - 1].name.data);
             return NGX_CONF_ERROR;
         }
@@ -4753,7 +4855,8 @@ ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     failed:
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid \"open_file_cache\" parameter \"%V\"",
+                           "[%s:%d]invalid \"open_file_cache\" parameter \"%V\"",
+														__func__, __LINE__,
                            &value[i]);
         return NGX_CONF_ERROR;
     }
@@ -4764,7 +4867,7 @@ ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (max == 0) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                        "\"open_file_cache\" must have the \"max\" parameter");
+                        "[%s%d]\"open_file_cache\" must have the \"max\" parameter", __func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -4969,8 +5072,8 @@ ngx_http_gzip_disable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 #endif
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "without PCRE library \"gzip_disable\" supports "
-                           "builtin \"msie6\" and \"degradation\" mask only");
+                           "[%s:%d]without PCRE library \"gzip_disable\" supports "
+                           "builtin \"msie6\" and \"degradation\" mask only", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -5041,14 +5144,15 @@ ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid parameter \"%V\"", &value[i]);
+                           "[%s:%d]invalid parameter \"%V\"", __func__, __LINE__,  &value[i]);
         return NGX_CONF_ERROR;
     }
 
     if (clcf->disable_symlinks == NGX_CONF_UNSET_UINT) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "\"%V\" must have \"off\", \"on\" "
+                           "[%s:%d]\"%V\" must have \"off\", \"on\" "
                            "or \"if_not_owner\" parameter",
+														__func__, __LINE__,
                            &cmd->name);
         return NGX_CONF_ERROR;
     }
@@ -5060,14 +5164,15 @@ ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (clcf->disable_symlinks_from == NGX_CONF_UNSET_PTR) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "duplicate parameters \"%V %V\"",
+                           "[%s:%d]duplicate parameters \"%V %V\"",
+														__func__, __LINE__,
                            &value[1], &value[2]);
         return NGX_CONF_ERROR;
     }
 
     if (clcf->disable_symlinks == NGX_DISABLE_SYMLINKS_OFF) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "\"from=\" cannot be used with \"off\" parameter");
+                           "[%s:%d]\"from=\" cannot be used with \"off\" parameter", __func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -5085,8 +5190,9 @@ ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
 
     if ((u_long) *np >= ngx_freebsd_net_inet_tcp_sendspace) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "\"send_lowat\" must be less than %d "
+                           "[%s:%d]\"send_lowat\" must be less than %d "
                            "(sysctl net.inet.tcp.sendspace)",
+													__func__, __LINE__,
                            ngx_freebsd_net_inet_tcp_sendspace);
 
         return NGX_CONF_ERROR;
@@ -5096,7 +5202,7 @@ ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
     ssize_t *np = data;
 
     ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                       "\"send_lowat\" is not supported, ignored");
+                       "[%s:%d]\"send_lowat\" is not supported, ignored", __func__, __LINE__);
 
     *np = 0;
 
@@ -5113,14 +5219,16 @@ ngx_http_core_pool_size(ngx_conf_t *cf, void *post, void *data)
 
     if (*sp < NGX_MIN_POOL_SIZE) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the pool size must be no less than %uz",
+                           "[%s:%d]the pool size must be no less than %uz",
+														__func__, __LINE__,
                            NGX_MIN_POOL_SIZE);
         return NGX_CONF_ERROR;
     }
 
     if (*sp % NGX_POOL_ALIGNMENT) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "the pool size must be a multiple of %uz",
+                           "[%s:%d]the pool size must be a multiple of %uz",
+														__func__, __LINE__,
                            NGX_POOL_ALIGNMENT);
         return NGX_CONF_ERROR;
     }

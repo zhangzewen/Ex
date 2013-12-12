@@ -155,7 +155,15 @@ void ngx_cdecl ngx_log_debug_core(ngx_log_t *log, ngx_err_t err,
         ngx_log_debug(level, log, err, fmt,                                   \
                        arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 
+#define ngx_log_debug9(level, log, err, fmt,                                  \
+                       arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)        \
+        ngx_log_debug(level, log, err, fmt,                                   \
+                       arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
 
+#define ngx_log_debug10(level, log, err, fmt,                                  \
+                       arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)        \
+        ngx_log_debug(level, log, err, fmt,                                   \
+                       arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
 #else /* NO VARIADIC MACROS */
 
 #define ngx_log_debug0(level, log, err, fmt)                                  \

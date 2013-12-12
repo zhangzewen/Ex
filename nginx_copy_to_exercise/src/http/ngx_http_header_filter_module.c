@@ -595,8 +595,10 @@ ngx_http_header_filter(ngx_http_request_t *r)
         *b->last++ = CR; *b->last++ = LF;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "%*s", (size_t) (b->last - b->pos), b->pos);
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]%*s",
+									__func__, __LINE__,
+									 (size_t) (b->last - b->pos), b->pos);
 
     /* the end of HTTP header */
     *b->last++ = CR; *b->last++ = LF;

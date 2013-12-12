@@ -106,8 +106,10 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
         return NGX_OK;
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                   "pipe read upstream: %d", p->upstream->read->ready);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                   "[%s:%d]pipe read upstream: %d",
+									__func__, __LINE__,
+									 p->upstream->read->ready);
 
     for ( ;; ) {
 
@@ -127,8 +129,10 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
             p->preread_bufs = NULL;
             n = p->preread_size;
 
-            ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                           "pipe preread: %z", n);
+            ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                           "[%s:%d]pipe preread: %z",
+													__func__, __LINE__,
+													 n);
 
             if (n) {
                 p->read = 1;
@@ -159,8 +163,9 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                     ngx_log_error(NGX_LOG_ERR, p->log,
                                   p->upstream->read->kq_errno,
-                                  "kevent() reported that upstream "
-                                  "closed connection");
+                                  "[%s:%d]kevent() reported that upstream "
+                                  "closed connection",
+																	__func__, __LINE__);
                 }
 
                 break;
@@ -210,8 +215,9 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                 p->upstream_blocked = 1;
 
-                ngx_log_debug0(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "pipe downstream ready");
+                ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]pipe downstream ready",
+																__func__, __LINE__);
 
                 break;
 
@@ -226,8 +232,10 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                 rc = ngx_event_pipe_write_chain_to_temp_file(p);
 
-                ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "pipe temp offset: %O", p->temp_file->offset);
+                ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]pipe temp offset: %O",
+																__func__, __LINE__,
+																 p->temp_file->offset);
 
                 if (rc == NGX_BUSY) {
                     break;
@@ -262,16 +270,18 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                 /* there are no bufs to read in */
 
-                ngx_log_debug0(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "no pipe bufs to read in");
+                ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]no pipe bufs to read in",
+																__func__, __LINE__);
 
                 break;
             }
 
             n = p->upstream->recv_chain(p->upstream, chain);
 
-            ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                           "pipe recv chain: %z", n);
+            ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                           "[%s:%d]pipe recv chain: %z",
+														__func__, __LINE__, n);
 
             if (p->free_raw_bufs) {
                 chain->next = p->free_raw_bufs;
@@ -340,10 +350,11 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 #if (NGX_DEBUG)
 
     for (cl = p->busy; cl; cl = cl->next) {
-        ngx_log_debug8(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe buf busy s:%d t:%d f:%d "
+        ngx_log_debug10(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe buf busy s:%d t:%d f:%d "
                        "%p, pos %p, size: %z "
                        "file: %O, size: %z",
+												__func__, __LINE__,
                        (cl->buf->shadow ? 1 : 0),
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
@@ -353,10 +364,11 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
     }
 
     for (cl = p->out; cl; cl = cl->next) {
-        ngx_log_debug8(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe buf out  s:%d t:%d f:%d "
+        ngx_log_debug10(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe buf out  s:%d t:%d f:%d "
                        "%p, pos %p, size: %z "
                        "file: %O, size: %z",
+												__func__, __LINE__,
                        (cl->buf->shadow ? 1 : 0),
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
@@ -366,10 +378,11 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
     }
 
     for (cl = p->in; cl; cl = cl->next) {
-        ngx_log_debug8(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe buf in   s:%d t:%d f:%d "
+        ngx_log_debug10(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe buf in   s:%d t:%d f:%d "
                        "%p, pos %p, size: %z "
                        "file: %O, size: %z",
+												__func__, __LINE__,
                        (cl->buf->shadow ? 1 : 0),
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
@@ -379,10 +392,11 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
     }
 
     for (cl = p->free_raw_bufs; cl; cl = cl->next) {
-        ngx_log_debug8(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe buf free s:%d t:%d f:%d "
+        ngx_log_debug10(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe buf free s:%d t:%d f:%d "
                        "%p, pos %p, size: %z "
                        "file: %O, size: %z",
+												__func__, __LINE__,
                        (cl->buf->shadow ? 1 : 0),
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
@@ -391,8 +405,10 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                        cl->buf->file_last - cl->buf->file_pos);
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                   "pipe length: %O", p->length);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                   "[%s:%d]pipe length: %O",
+										__func__, __LINE__,
+										 p->length);
 
 #endif
 
@@ -459,8 +475,10 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
 
     downstream = p->downstream;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                   "pipe write downstream: %d", downstream->write->ready);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                   "[%s:%d]pipe write downstream: %d",
+										__func__, __LINE__,
+										 downstream->write->ready);
 
     flushed = 0;
 
@@ -478,8 +496,8 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
             }
 
             if (p->out) {
-                ngx_log_debug0(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "pipe write downstream flush out");
+                ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]pipe write downstream flush out", __func__, __LINE__);
 
                 for (cl = p->out; cl; cl = cl->next) {
                     cl->buf->recycled = 0;
@@ -496,8 +514,8 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
             }
 
             if (p->in) {
-                ngx_log_debug0(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "pipe write downstream flush in");
+                ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]pipe write downstream flush in", __func__, __LINE__);
 
                 for (cl = p->in; cl; cl = cl->next) {
                     cl->buf->recycled = 0;
@@ -525,8 +543,8 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
                 }
             }
 
-            ngx_log_debug0(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                           "pipe write downstream done");
+            ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                           "[%s:%d]pipe write downstream done", __func__, __LINE__);
 
             /* TODO: free unused bufs */
 
@@ -558,8 +576,10 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
             }
         }
 
-        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe write busy: %uz", bsize);
+        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe write busy: %uz",
+											__func__, __LINE__,
+											 bsize);
 
         out = NULL;
 
@@ -578,7 +598,7 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
 
                 if (cl->buf->recycled) {
                     ngx_log_error(NGX_LOG_ALERT, p->log, 0,
-                                  "recycled buffer in pipe out chain");
+                                  "[%s:%d]recycled buffer in pipe out chain", __func__, __LINE__);
                 }
 
                 p->out = p->out->next;
@@ -586,8 +606,9 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
             } else if (!p->cacheable && p->in) {
                 cl = p->in;
 
-                ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                               "pipe write buf ls:%d %p %z",
+                ngx_log_debug5(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                               "[%s:%d]pipe write buf ls:%d %p %z",
+																__func__, __LINE__,
                                cl->buf->last_shadow,
                                cl->buf->pos,
                                cl->buf->last - cl->buf->pos);
@@ -621,8 +642,10 @@ ngx_event_pipe_write_to_downstream(ngx_event_pipe_t *p)
 
     flush:
 
-        ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe write: out:%p, f:%d", out, flush);
+        ngx_log_debug4(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe write: out:%p, f:%d",
+												__func__, __LINE__,
+											 out, flush);
 
         if (out == NULL) {
 
@@ -703,14 +726,17 @@ ngx_event_pipe_write_chain_to_temp_file(ngx_event_pipe_t *p)
         ll = NULL;
         prev_last_shadow = 1;
 
-        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "pipe offset: %O", p->temp_file->offset);
+        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]pipe offset: %O",
+												__func__, __LINE__,
+												 p->temp_file->offset);
 
         do {
             bsize = cl->buf->last - cl->buf->pos;
 
-            ngx_log_debug4(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                           "pipe buf ls:%d %p, pos %p, size: %z",
+            ngx_log_debug6(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                           "[%s:%d]pipe buf ls:%d %p, pos %p, size: %z",
+													__func__, __LINE__,
                            cl->buf->last_shadow, cl->buf->start,
                            cl->buf->pos, bsize);
 
@@ -730,7 +756,7 @@ ngx_event_pipe_write_chain_to_temp_file(ngx_event_pipe_t *p)
 
         } while (cl);
 
-        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0, "size: %z", size);
+        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0, "[%s:%d]size: %z",__func__, __LINE__, size);
 
         if (ll == NULL) {
             return NGX_BUSY;
@@ -886,7 +912,7 @@ ngx_event_pipe_copy_input_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
     cl->buf = b;
     cl->next = NULL;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0, "input buf #%d", b->num);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0, "[%s:%d]input buf #%d",__func__, __LINE__, b->num);
 
     if (p->in) {
         *p->last_in = cl;

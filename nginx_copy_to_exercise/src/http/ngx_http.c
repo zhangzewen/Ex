@@ -1013,7 +1013,8 @@ ngx_http_join_exact_locations(ngx_conf_t *cf, ngx_queue_t *locations)
 
             if ((lq->exact && lx->exact) || (lq->inclusive && lx->inclusive)) {
                 ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
-                              "duplicate location \"%V\" in %s:%ui",
+                              "[%s:%d]duplicate location \"%V\" in %s:%ui",
+															__func__, __LINE__,
                               lx->name, lx->file_name, lx->line);
 
                 return NGX_ERROR;
@@ -1316,7 +1317,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
             if (addr[i].opt.set) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                        "duplicate listen options for %s", addr[i].opt.addr);
+                        "[%s:%d]duplicate listen options for %s", 
+												__func__, __LINE__,
+												addr[i].opt.addr);
                 return NGX_ERROR;
             }
 
@@ -1329,7 +1332,9 @@ ngx_http_add_addresses(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
 
             if (default_server) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                        "a duplicate default server for %s", addr[i].opt.addr);
+                        "[%s:%d]a duplicate default server for %s",
+												__func__, __LINE__,
+												 addr[i].opt.addr);
                 return NGX_ERROR;
             }
 
@@ -1414,7 +1419,9 @@ ngx_http_add_server(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
         for (i = 0; i < addr->servers.nelts; i++) {
             if (server[i] == cscf) {
                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                                   "a duplicate listen %s", addr->opt.addr);
+                                   "[%s:%d]a duplicate listen %s", 
+																	__func__, __LINE__,
+																	addr->opt.addr);
                 return NGX_ERROR;
             }
         }
@@ -1531,14 +1538,16 @@ ngx_http_server_names(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
 
             if (rc == NGX_DECLINED) {
                 ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
-                              "invalid server name or wildcard \"%V\" on %s",
+                              "[%s:%d]invalid server name or wildcard \"%V\" on %s",
+															__func__, __LINE__,
                               &name[n].name, addr->opt.addr);
                 return NGX_ERROR;
             }
 
             if (rc == NGX_BUSY) {
                 ngx_log_error(NGX_LOG_WARN, cf->log, 0,
-                              "conflicting server name \"%V\" on %s, ignored",
+                              "[%s:%d]conflicting server name \"%V\" on %s, ignored",
+															__func__, __LINE__,
                               &name[n].name, addr->opt.addr);
             }
         }
@@ -2005,7 +2014,9 @@ ngx_http_types_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
             if (ngx_strcmp(value[i].data, type[n].key.data) == 0) {
                 ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                                   "duplicate MIME type \"%V\"", &value[i]);
+                                   "[%s:%d]duplicate MIME type \"%V\"", 
+																		__func__, __LINE__,
+																		&value[i]);
                 continue;
             }
         }

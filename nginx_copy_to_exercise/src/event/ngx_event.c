@@ -264,8 +264,10 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 
     delta = ngx_current_msec - delta;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
-                   "timer delta: %M", delta);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
+                   "[%s:%d]timer delta: %M",
+										__func__, __LINE__,
+									 delta);
 
     if (ngx_posted_accept_events) {
         ngx_event_process_posted(cycle, &ngx_posted_accept_events);
@@ -279,8 +281,10 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
         ngx_event_expire_timers();
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
-                   "posted events %p", ngx_posted_events);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
+                   "[%s:%d]posted events %p",
+									__func__, __LINE__,
+									 ngx_posted_events);
 
     if (ngx_posted_events) {
         if (ngx_threaded) {
@@ -445,7 +449,8 @@ ngx_event_init_conf(ngx_cycle_t *cycle, void *conf)
 {
     if (ngx_get_conf(cycle->conf_ctx, ngx_events_module) == NULL) {
         ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
-                      "no \"events\" section in configuration");
+                      "[%s:%d]no \"events\" section in configuration",
+											__func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -469,7 +474,9 @@ ngx_event_module_init(ngx_cycle_t *cycle)
 
     if (!ngx_test_config && ngx_process <= NGX_PROCESS_MASTER) {
         ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0,
-                      "using the \"%s\" event method", ecf->name);
+                      "[%s:%d]using the \"%s\" event method",
+											__func__, __LINE__,
+											 ecf->name);
     }
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
@@ -483,7 +490,7 @@ ngx_event_module_init(ngx_cycle_t *cycle)
 
     if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
         ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-                      "getrlimit(RLIMIT_NOFILE) failed, ignored");
+                      "[%s:%d]getrlimit(RLIMIT_NOFILE) failed, ignored", __func__, __LINE__);
 
     } else {
         if (ecf->connections > (ngx_uint_t) rlmt.rlim_cur
@@ -494,8 +501,9 @@ ngx_event_module_init(ngx_cycle_t *cycle)
                          (ngx_int_t) rlmt.rlim_cur : ccf->rlimit_nofile;
 
             ngx_log_error(NGX_LOG_WARN, cycle->log, 0,
-                          "%ui worker_connections exceed "
+                          "[%s:%d]%ui worker_connections exceed "
                           "open file resource limit: %i",
+													__func__, __LINE__,
                           ecf->connections, limit);
         }
     }
@@ -556,8 +564,9 @@ ngx_event_module_init(ngx_cycle_t *cycle)
 
     (void) ngx_atomic_cmp_set(ngx_connection_counter, 0, 1);
 
-    ngx_log_debug2(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
-                   "counter: %p, %d",
+    ngx_log_debug4(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
+                   "[%s:%d]counter: %p, %d",
+										__func__, __LINE__,
                    ngx_connection_counter, *ngx_connection_counter);
 
     ngx_temp_number = (ngx_atomic_t *) (shared + 2 * cl);
@@ -589,7 +598,7 @@ ngx_timer_signal_handler(int signo)
     ngx_event_timer_alarm = 1;
 
 #if 1
-    ngx_log_debug0(NGX_LOG_DEBUG_EVENT, ngx_cycle->log, 0, "timer signal");
+    ngx_log_debug2(NGX_LOG_DEBUG_EVENT, ngx_cycle->log, 0, "[%s:%d]timer signal", __func__, __LINE__);
 #endif
 }
 
@@ -660,7 +669,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
 			if (sigaction(SIGALRM, &sa, NULL) == -1) {
 				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-											"sigaction(SIGALRM) failed");
+											"[%s:%d]sigaction(SIGALRM) failed", __func__, __LINE__);
 				return NGX_ERROR;
 			}
 
@@ -673,7 +682,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
 			if (setitimer(ITIMER_REAL, &itv, NULL) == -1) {
 				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-											"setitimer() failed");
+											"[%s:%d]setitimer() failed", __func__, __LINE__);
 			}
 		}
 
@@ -682,7 +691,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 
 			if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
 				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
-											"getrilimit(RLIMIT_NOFILE) failed");
+											"[%s:%d]getrilimit(RLIMIT_NOFILE) failed", __func__, __LINE__);
 				return NGX_ERROR;
 			}
 
@@ -990,15 +999,15 @@ ngx_event_connections(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (ngx_strcmp(cmd->name.data, "connections") == 0) {
         ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                           "the \"connections\" directive is deprecated, "
-                           "use the \"worker_connections\" directive instead");
+                           "[%s:%d]the \"connections\" directive is deprecated, "
+                           "use the \"worker_connections\" directive instead", __func__, __LINE__);
     }
 
     value = cf->args->elts;
     ecf->connections = ngx_atoi(value[1].data, value[1].len);
     if (ecf->connections == (ngx_uint_t) NGX_ERROR) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid number \"%V\"", &value[1]);
+                           "[%s:%d]invalid number \"%V\"",__func__, __LINE__,  &value[1]);
 
         return NGX_CONF_ERROR;
     }
@@ -1049,12 +1058,13 @@ ngx_event_use(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                     && old_ecf->use != ecf->use)
                 {
                     ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "when the server runs without a master process "
+                               "[%s:%d]when the server runs without a master process "
                                "the \"%V\" event type must be the same as "
                                "in previous configuration - \"%s\" "
                                "and it cannot be changed on the fly, "
                                "to change it you need to stop server "
                                "and start it again",
+																__func__, __LINE__,
                                &value[1], old_ecf->name);
 
                     return NGX_CONF_ERROR;
@@ -1066,7 +1076,7 @@ ngx_event_use(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                       "invalid event type \"%V\"", &value[1]);
+                       "[%s:%d]invalid event type \"%V\"",__func__, __LINE__ ,&value[1]);
 
     return NGX_CONF_ERROR;
 }
@@ -1108,7 +1118,8 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     if (rc != NGX_ERROR) {
         if (rc == NGX_DONE) {
             ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                               "low address bits of %V are meaningless",
+                               "[%s:%d]low address bits of %V are meaningless",
+																__func__, __LINE__,
                                &value[1]);
         }
 
@@ -1128,7 +1139,8 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     if (ngx_inet_resolve_host(cf->pool, &u) != NGX_OK) {
         if (u.err) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "%s in debug_connection \"%V\"",
+                               "[%s:%d]%s in debug_connection \"%V\"",
+																__func__, __LINE__,
                                u.err, &u.host);
         }
 
@@ -1166,8 +1178,8 @@ ngx_event_debug_connection(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 #else
 
     ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                       "\"debug_connection\" is ignored, you need to rebuild "
-                       "nginx using --with-debug option to enable it");
+                       "[%s:%d]\"debug_connection\" is ignored, you need to rebuild "
+                       "nginx using --with-debug option to enable it", __func__, __LINE__);
 
 #endif
 
@@ -1324,7 +1336,7 @@ ngx_event_core_init_conf(ngx_cycle_t *cycle, void *conf)
     }
 
     ngx_log_error(NGX_LOG_EMERG, cycle->log, 0,
-                  "the \"rtsig\" method requires \"accept_mutex\" to be on");
+                  "[%s:%d]the \"rtsig\" method requires \"accept_mutex\" to be on", __func__, __LINE__);
 
     return NGX_CONF_ERROR;
 

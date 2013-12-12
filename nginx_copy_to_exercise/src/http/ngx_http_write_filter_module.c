@@ -70,9 +70,10 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
     for (cl = r->out; cl; cl = cl->next) {
         ll = &cl->next;
 
-        ngx_log_debug7(NGX_LOG_DEBUG_EVENT, c->log, 0,
-                       "write old buf t:%d f:%d %p, pos %p, size: %z "
+        ngx_log_debug9(NGX_LOG_DEBUG_EVENT, c->log, 0,
+                       "[%s:%d]write old buf t:%d f:%d %p, pos %p, size: %z "
                        "file: %O, size: %z",
+											__func__, __LINE__,
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
                        cl->buf->last - cl->buf->pos,
@@ -82,8 +83,9 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 #if 1
         if (ngx_buf_size(cl->buf) == 0 && !ngx_buf_special(cl->buf)) {
             ngx_log_error(NGX_LOG_ALERT, c->log, 0,
-                          "zero size buf in writer "
+                          "[%s:%d]zero size buf in writer "
                           "t:%d r:%d f:%d %p %p-%p %p %O-%O",
+													__func__, __LINE__,
                           cl->buf->temporary,
                           cl->buf->recycled,
                           cl->buf->in_file,
@@ -122,9 +124,10 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
         *ll = cl;
         ll = &cl->next;
 
-        ngx_log_debug7(NGX_LOG_DEBUG_EVENT, c->log, 0,
-                       "write new buf t:%d f:%d %p, pos %p, size: %z "
+        ngx_log_debug9(NGX_LOG_DEBUG_EVENT, c->log, 0,
+                       "[%s:%d]write new buf t:%d f:%d %p, pos %p, size: %z "
                        "file: %O, size: %z",
+												__func__, __LINE__,
                        cl->buf->temporary, cl->buf->in_file,
                        cl->buf->start, cl->buf->pos,
                        cl->buf->last - cl->buf->pos,
@@ -134,8 +137,9 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 #if 1
         if (ngx_buf_size(cl->buf) == 0 && !ngx_buf_special(cl->buf)) {
             ngx_log_error(NGX_LOG_ALERT, c->log, 0,
-                          "zero size buf in writer "
+                          "[%s:%d]zero size buf in writer "
                           "t:%d r:%d f:%d %p %p-%p %p %O-%O",
+													__func__, __LINE__,
                           cl->buf->temporary,
                           cl->buf->recycled,
                           cl->buf->in_file,
@@ -164,8 +168,10 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     *ll = NULL;
 
-    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http write filter: l:%d f:%d s:%O", last, flush, size);
+    ngx_log_debug5(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http write filter: l:%d f:%d s:%O",
+										__func__, __LINE__,
+										 last, flush, size);
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
 
@@ -199,7 +205,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
         }
 
         ngx_log_error(NGX_LOG_ALERT, c->log, 0,
-                      "the http output chain is empty");
+                      "[%s:%d]the http output chain is empty", __func__, __LINE__);
 
         ngx_debug_point();
 
@@ -232,13 +238,17 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
     sent = c->sent;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http write filter limit %O", limit);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http write filter limit %O",
+										__func__, __LINE__,
+									 limit);
 
     chain = c->send_chain(c, r->out, limit);
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http write filter %p", chain);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http write filter %p",
+									__func__, __LINE__,
+									 chain);
 
     if (chain == NGX_CHAIN_ERROR) {
         c->error = 1;

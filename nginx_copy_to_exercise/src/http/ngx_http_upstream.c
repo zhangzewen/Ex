@@ -427,8 +427,10 @@ ngx_http_upstream_init(ngx_http_request_t *r)
 
     c = r->connection;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http init upstream, client timer: %d", c->read->timer_set);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http init upstream, client timer: %d",
+										__func__, __LINE__,
+										 c->read->timer_set);
 //删除定时器
     if (c->read->timer_set) {
         ngx_del_timer(c->read);
@@ -596,7 +598,9 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
 
         if (u->resolved->port == 0) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "no port in upstream \"%V\"", host);
+                          "[%s:%d]no port in upstream \"%V\"",
+														__func__, __LINE__,
+													 host);
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
             return;
@@ -613,7 +617,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
 
         if (ctx == NGX_NO_RESOLVER) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "no resolver defined to resolve %V", host);
+                          "[%s:%d]no resolver defined to resolve %V", __func__, __LINE__,host);
 
             ngx_http_upstream_finalize_request(r, u, NGX_HTTP_BAD_GATEWAY);
             return;
@@ -683,8 +687,9 @@ ngx_http_upstream_cache(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
         if (r->cache->header_start + 256 >= u->conf->buffer_size) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "%V_buffer_size %uz is not enough for cache key, "
+                          "[%s:%d]%V_buffer_size %uz is not enough for cache key, "
                           "it should increased at least to %uz",
+													__func__, __LINE__,
                           &u->conf->module, u->conf->buffer_size,
                           ngx_align(r->cache->header_start + 256, 1024));
 
@@ -721,8 +726,8 @@ ngx_http_upstream_cache(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     rc = ngx_http_file_cache_open(r);
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http upstream cache: %i", rc);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http upstream cache: %i",__func__, __LINE__, rc);
 
     switch (rc) {
 
@@ -871,7 +876,8 @@ ngx_http_upstream_resolve_handler(ngx_resolver_ctx_t *ctx)
 
     if (ctx->state) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "%V could not be resolved (%i: %s)",
+                      "[%s:%d]%V could not be resolved (%i: %s)",
+											__func__, __LINE__,
                       &ctx->name, ctx->state,
                       ngx_resolver_strerror(ctx->state));
 
@@ -890,8 +896,9 @@ ngx_http_upstream_resolve_handler(ngx_resolver_ctx_t *ctx)
     for (i = 0; i < ctx->naddrs; i++) {
         addr = ntohl(ur->addrs[i]);
 
-        ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "name was resolved to %ud.%ud.%ud.%ud",
+        ngx_log_debug6(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]name was resolved to %ud.%ud.%ud.%ud",
+												__func__, __LINE__,
                        (addr >> 24) & 0xff, (addr >> 16) & 0xff,
                        (addr >> 8) & 0xff, addr & 0xff);
     }
@@ -928,8 +935,10 @@ ngx_http_upstream_handler(ngx_event_t *ev)
     ctx = c->log->data;
     ctx->current_request = r;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream request: \"%V?%V\"", &r->uri, &r->args);
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream request: \"%V?%V\"",
+										__func__, __LINE__,
+									 &r->uri, &r->args);
 
     if (ev->write) {
         u->write_event_handler(r, u);
@@ -967,8 +976,9 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
     ngx_connection_t     *c;
     ngx_http_upstream_t  *u;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, ev->log, 0,
-                   "http upstream check client, write event:%d, \"%V\"",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, ev->log, 0,
+                   "[%s:%d]http upstream check client, write event:%d, \"%V\"",
+									__func__, __LINE__,
                    ev->write, &r->uri);
 
     c = r->connection;
@@ -1011,16 +1021,18 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 
         if (!u->cacheable && u->peer.connection) {
             ngx_log_error(NGX_LOG_INFO, ev->log, ev->kq_errno,
-                          "kevent() reported that client prematurely closed "
-                          "connection, so upstream connection is closed too");
+                          "[%s:%d]kevent() reported that client prematurely closed "
+                          "connection, so upstream connection is closed too",
+													__func__, __LINE__);
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_CLIENT_CLOSED_REQUEST);
             return;
         }
 
         ngx_log_error(NGX_LOG_INFO, ev->log, ev->kq_errno,
-                      "kevent() reported that client prematurely closed "
-                      "connection");
+                      "[%s:%d]kevent() reported that client prematurely closed "
+                      "connection",
+											__func__, __LINE__);
 
         if (u->peer.connection == NULL) {
             ngx_http_upstream_finalize_request(r, u,
@@ -1036,8 +1048,10 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 
     err = ngx_socket_errno;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, ev->log, err,
-                   "http upstream recv(): %d", n);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, ev->log, err,
+                   "[%s:%d]http upstream recv(): %d",
+										__func__, __LINE__,
+										 n);
 
     if (ev->write && (n >= 0 || err == NGX_EAGAIN)) {
         return;
@@ -1074,15 +1088,16 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 
     if (!u->cacheable && u->peer.connection) {
         ngx_log_error(NGX_LOG_INFO, ev->log, err,
-                      "client prematurely closed connection, "
-                      "so upstream connection is closed too");
+                      "[%s:%d]client prematurely closed connection, "
+                      "so upstream connection is closed too",
+											__func__, __LINE__);
         ngx_http_upstream_finalize_request(r, u,
                                            NGX_HTTP_CLIENT_CLOSED_REQUEST);
         return;
     }
 
     ngx_log_error(NGX_LOG_INFO, ev->log, err,
-                  "client prematurely closed connection");
+                  "[%s:%d]client prematurely closed connection", __func__, __LINE__);
 
     if (u->peer.connection == NULL) {
         ngx_http_upstream_finalize_request(r, u,
@@ -1123,8 +1138,8 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     rc = ngx_event_connect_peer(&u->peer);
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http upstream connect: %i", rc);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http upstream connect: %i", __func__, __LINE__ ,rc);
 
     if (rc == NGX_ERROR) {
         ngx_http_upstream_finalize_request(r, u,
@@ -1135,7 +1150,7 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     u->state->peer = u->peer.name;
 
     if (rc == NGX_BUSY) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "no live upstreams");
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "[%s:%d]no live upstreams", __func__, __LINE__);
         ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_NOLIVE);
         return;
     }
@@ -1384,8 +1399,8 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     c = u->peer.connection;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream send request");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "http upstream send request", __func__, __LINE__);
 
     if (!u->request_sent && ngx_http_upstream_test_connect(c) != NGX_OK) {
         ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_ERROR);
@@ -1424,7 +1439,7 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
     if (c->tcp_nopush == NGX_TCP_NOPUSH_SET) {
         if (ngx_tcp_push(c->fd) == NGX_ERROR) {
             ngx_log_error(NGX_LOG_CRIT, c->log, ngx_socket_errno,
-                          ngx_tcp_push_n " failed");
+                          ngx_tcp_push_n " [%s:%d]failed", __func__, __LINE__);
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
             return;
@@ -1470,8 +1485,8 @@ ngx_http_upstream_send_request_handler(ngx_http_request_t *r,
 
     c = u->peer.connection;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http upstream send request handler");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http upstream send request handler", __func__, __LINE__);
 
     if (c->write->timedout) {
         ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_TIMEOUT);
@@ -1508,8 +1523,8 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     c = u->peer.connection;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process header");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process header", __func__, __LINE__);
 
     c->log->action = "reading response header from upstream";
 
@@ -1576,7 +1591,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
         if (n == 0) {
             ngx_log_error(NGX_LOG_ERR, c->log, 0,
-                          "upstream prematurely closed connection");
+                          "[%s:%d]upstream prematurely closed connection", __func__, __LINE__);
         }
 
         if (n == NGX_ERROR || n == 0) {
@@ -1598,7 +1613,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
             if (u->buffer.last == u->buffer.end) {
                 ngx_log_error(NGX_LOG_ERR, c->log, 0,
-                              "upstream sent too big header");
+                              "[%s:%d]upstream sent too big header", __func__, __LINE__);
 
                 ngx_http_upstream_next(r, u,
                                        NGX_HTTP_UPSTREAM_FT_INVALID_HEADER);
@@ -1622,7 +1637,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
         return;
     }
 
-    /* rc == NGX_OK */
+    /* rc == ngx_ok */
 
     if (u->headers_in.status_n > NGX_HTTP_SPECIAL_RESPONSE) {
 
@@ -1989,8 +2004,8 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     c = u->peer.connection;
     rev = c->read;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process body on memory");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process body on memory", __func__, __LINE__);
 
     if (rev->timedout) {
         ngx_connection_error(c, NGX_ETIMEDOUT, "upstream timed out");
@@ -2006,7 +2021,7 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
 
         if (size == 0) {
             ngx_log_error(NGX_LOG_ALERT, c->log, 0,
-                          "upstream buffer is too small to read response");
+                          "[%s:%d]upstream buffer is too small to read response",__func__, __LINE__);
             ngx_http_upstream_finalize_request(r, u, NGX_ERROR);
             return;
         }
@@ -2231,8 +2246,8 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
         }
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http cacheable: %d", u->cacheable);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http cacheable: %d", __func__,__LINE__, u->cacheable);
 
     if (u->cacheable == 0 && r->cache) {
         ngx_http_file_cache_free(r->cache, u->pipe->temp_file);
@@ -2363,8 +2378,8 @@ ngx_http_upstream_process_non_buffered_downstream(ngx_http_request_t *r)
     u = r->upstream;
     wev = c->write;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process non buffered downstream");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process non buffered downstream", __func__, __LINE__);
 
     c->log->action = "sending to client";
 
@@ -2387,8 +2402,8 @@ ngx_http_upstream_process_non_buffered_upstream(ngx_http_request_t *r,
 
     c = u->peer.connection;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process non buffered upstream");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process non buffered upstream", __func__, __LINE__);
 
     c->log->action = "reading upstream";
 
@@ -2574,8 +2589,8 @@ ngx_http_upstream_process_downstream(ngx_http_request_t *r)
     p = u->pipe;
     wev = c->write;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process downstream");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process downstream", __func__, __LINE__);
 
     c->log->action = "sending to client";
 
@@ -2611,8 +2626,8 @@ ngx_http_upstream_process_downstream(ngx_http_request_t *r)
 
         if (wev->delayed) {
 
-            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                           "http downstream delayed");
+            ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                           "[%s:%d]http downstream delayed", __func__, __LINE__);
 
             if (ngx_handle_write_event(wev, p->send_lowat) != NGX_OK) {
                 ngx_http_upstream_finalize_request(r, u, 0);
@@ -2639,8 +2654,8 @@ ngx_http_upstream_process_upstream(ngx_http_request_t *r,
 
     c = u->peer.connection;
 
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "http upstream process upstream");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+                   "[%s:%d]http upstream process upstream", __func__, __LINE__);
 
     c->log->action = "reading upstream";
 
@@ -2716,8 +2731,8 @@ ngx_http_upstream_process_request(ngx_http_request_t *r)
 #endif
 
         if (p->upstream_done || p->upstream_eof || p->upstream_error) {
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http upstream exit: %p", p->out);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http upstream exit: %p", __func__, __LINE__,p->out);
 #if 0
             ngx_http_busy_unlock(u->conf->busy_lock, &u->busy_lock);
 #endif
@@ -2727,8 +2742,8 @@ ngx_http_upstream_process_request(ngx_http_request_t *r)
     }
 
     if (p->downstream_error) {
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "http upstream downstream error");
+        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]http upstream downstream error", __func__, __LINE__);
 
         if (!u->cacheable && !u->store && u->peer.connection) {
             ngx_http_upstream_finalize_request(r, u, 0);
@@ -2806,8 +2821,9 @@ ngx_http_upstream_store(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     path.len--;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "upstream stores \"%s\" to \"%s\"",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]upstream stores \"%s\" to \"%s\"",
+										__func__, __LINE__,
                    tf->file.name.data, path.data);
 
     (void) ngx_ext_rename_file(&tf->file.name, &path, &ext);
@@ -2817,8 +2833,8 @@ ngx_http_upstream_store(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_dummy_handler(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http upstream dummy handler");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http upstream dummy handler", __func__, __LINE__);
 }
 
 
@@ -2828,8 +2844,10 @@ ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
 {
     ngx_uint_t  status, state;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http next upstream, %xi", ft_type);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http next upstream, %xi",
+										__func__, __LINE__,
+										ft_type);
 
 #if 0
     ngx_http_busy_unlock(u->conf->busy_lock, &u->busy_lock);
@@ -2847,7 +2865,7 @@ ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
 
     if (ft_type == NGX_HTTP_UPSTREAM_FT_TIMEOUT) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, NGX_ETIMEDOUT,
-                      "upstream timed out");
+                      "[%s:%d]upstream timed out", __func__, __LINE__);
     }
 
     if (u->peer.cached && ft_type == NGX_HTTP_UPSTREAM_FT_ERROR) {
@@ -2918,8 +2936,9 @@ ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
     }
 
     if (u->peer.connection) {
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "close http upstream connection: %d",
+        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]close http upstream connection: %d",
+												__func__, __LINE__,
                        u->peer.connection->fd);
 #if (NGX_HTTP_SSL)
 
@@ -2957,8 +2976,10 @@ ngx_http_upstream_cleanup(void *data)
 
     ngx_http_upstream_t  *u;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "cleanup http upstream request: \"%V\"", &r->uri);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]cleanup http upstream request: \"%V\"", 
+										__func__, __LINE__,
+										&r->uri);
 
     u = r->upstream;
 
@@ -2977,8 +2998,10 @@ ngx_http_upstream_finalize_request(ngx_http_request_t *r,
 {
     ngx_time_t  *tp;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "finalize http upstream request: %i", rc);
+    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]finalize http upstream request: %i",
+										__func__, __LINE__,
+										 rc);
 
     if (u->cleanup) {
         *u->cleanup = NULL;
@@ -3026,8 +3049,9 @@ ngx_http_upstream_finalize_request(ngx_http_request_t *r,
         }
 #endif
 
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "close http upstream connection: %d",
+        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]close http upstream connection: %d",
+												__func__, __LINE__,
                        u->peer.connection->fd);
 
         if (u->peer.connection->pool) {
@@ -3040,8 +3064,9 @@ ngx_http_upstream_finalize_request(ngx_http_request_t *r,
     u->peer.connection = NULL;
 
     if (u->pipe && u->pipe->temp_file) {
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "http upstream temp fd: %d",
+        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]http upstream temp fd: %d",
+												__func__, __LINE__,
                        u->pipe->temp_file->file.fd);
     }
 
@@ -3052,7 +3077,8 @@ ngx_http_upstream_finalize_request(ngx_http_request_t *r,
             == NGX_FILE_ERROR)
         {
             ngx_log_error(NGX_LOG_CRIT, r->connection->log, ngx_errno,
-                          ngx_delete_file_n " \"%s\" failed",
+                          ngx_delete_file_n "[%s:%d] \"%s\" failed",
+													__func__, __LINE__,
                           u->pipe->temp_file->file.name.data);
         }
     }
@@ -3618,8 +3644,10 @@ ngx_http_upstream_rewrite_location(ngx_http_request_t *r, ngx_table_elt_t *h,
         if (rc == NGX_OK) {
             r->headers_out.location = ho;
 
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "rewritten location: \"%V\"", &ho->value);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]rewritten location: \"%V\"",
+														__func__, __LINE__,
+													 &ho->value);
         }
 
         return rc;
@@ -3671,8 +3699,10 @@ ngx_http_upstream_rewrite_refresh(ngx_http_request_t *r, ngx_table_elt_t *h,
         if (rc == NGX_OK) {
             r->headers_out.refresh = ho;
 
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "rewritten refresh: \"%V\"", &ho->value);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]rewritten refresh: \"%V\"",
+														__func__, __LINE__,
+														 &ho->value);
         }
 
         return rc;
@@ -3707,8 +3737,10 @@ ngx_http_upstream_rewrite_set_cookie(ngx_http_request_t *r, ngx_table_elt_t *h,
 
 #if (NGX_DEBUG)
         if (rc == NGX_OK) {
-            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "rewritten cookie: \"%V\"", &ho->value);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]rewritten cookie: \"%V\"",
+														__func__, __LINE__,
+													 &ho->value);
         }
 #endif
 
@@ -4399,7 +4431,8 @@ ngx_http_upstream_add(ngx_conf_t *cf, ngx_url_t *u, ngx_uint_t flags)
 
         if ((flags & NGX_HTTP_UPSTREAM_CREATE) && uscfp[i]->port) {
             ngx_log_error(NGX_LOG_WARN, cf->log, 0,
-                          "upstream \"%V\" may not have port %d in %s:%ui",
+                          "[%s:%d]upstream \"%V\" may not have port %d in %s:%ui",
+														__func__, __LINE__,
                           &u->host, uscfp[i]->port,
                           uscfp[i]->file_name, uscfp[i]->line);
             return NULL;

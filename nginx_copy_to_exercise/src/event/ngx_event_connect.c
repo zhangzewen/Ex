@@ -29,11 +29,11 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
 
     s = ngx_socket(pc->sockaddr->sa_family, SOCK_STREAM, 0);
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, pc->log, 0, "socket %d", s);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, pc->log, 0, "[%s:%d]socket %d",__func__, __LINE__,s);
 
     if (s == -1) {
         ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
-                      ngx_socket_n " failed");
+                      ngx_socket_n "[%s:%d] failed", __func__, __LINE__);
         return NGX_ERROR;
     }
 
@@ -43,7 +43,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
     if (c == NULL) {
         if (ngx_close_socket(s) == -1) {
             ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
-                          ngx_close_socket_n "failed");
+                          ngx_close_socket_n "[%s:%d]failed", __func__, __LINE__);
         }
 
         return NGX_ERROR;
@@ -54,14 +54,14 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
                        (const void *) &pc->rcvbuf, sizeof(int)) == -1)
         {
             ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
-                          "setsockopt(SO_RCVBUF) failed");
+                          "[%s:%d]setsockopt(SO_RCVBUF) failed", __func__, __LINE__);
             goto failed;
         }
     }
 
     if (ngx_nonblocking(s) == -1) {
         ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
-                      ngx_nonblocking_n " failed");
+                      ngx_nonblocking_n "[%s:%d] failed", __func__, __LINE__);
 
         goto failed;
     }
@@ -69,7 +69,9 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
     if (pc->local) {
         if (bind(s, pc->local->sockaddr, pc->local->socklen) == -1) {
             ngx_log_error(NGX_LOG_CRIT, pc->log, ngx_socket_errno,
-                          "bind(%V) failed", &pc->local->name);
+                          "[%s:%d]bind(%V) failed",
+														__func__, __LINE__,
+													 &pc->local->name);
 
             goto failed;
         }
@@ -121,8 +123,10 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
         }
     }
 
-    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, pc->log, 0,
-                   "connect to %V, fd:%d #%d", pc->name, s, c->number);
+    ngx_log_debug5(NGX_LOG_DEBUG_EVENT, pc->log, 0,
+                   "[%s:%d]connect to %V, fd:%d #%d",
+										__func__, __LINE__,
+									 pc->name, s, c->number);
 
     rc = connect(s, pc->sockaddr, pc->socklen);
 
@@ -157,7 +161,8 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
                 level = NGX_LOG_CRIT;
             }
 
-            ngx_log_error(level, c->log, err, "connect() to %V failed",
+            ngx_log_error(level, c->log, err, "[%s:%d]connect() to %V failed",
+													__func__, __LINE__,
                           pc->name);
 
             ngx_close_connection(c);
@@ -175,7 +180,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
             return NGX_AGAIN;
         }
 
-        ngx_log_debug0(NGX_LOG_DEBUG_EVENT, pc->log, 0, "connected");
+        ngx_log_debug2(NGX_LOG_DEBUG_EVENT, pc->log, 0, "[%s:%d]connected", __func__, __LINE__);
 
         wev->ready = 1;
 
@@ -184,14 +189,16 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
 
     if (ngx_event_flags & NGX_USE_AIO_EVENT) {
 
-        ngx_log_debug1(NGX_LOG_DEBUG_EVENT, pc->log, ngx_socket_errno,
-                       "connect(): %d", rc);
+        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, pc->log, ngx_socket_errno,
+                       "[%s:%d]connect(): %d",
+											__func__, __LINE__,
+											 rc);
 
         /* aio, iocp */
 
         if (ngx_blocking(s) == -1) {
             ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
-                          ngx_blocking_n " failed");
+                          ngx_blocking_n "[%s:%d] failed", __func__, __LINE__);
             goto failed;
         }
 
@@ -236,7 +243,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
         return NGX_AGAIN;
     }
 
-    ngx_log_debug0(NGX_LOG_DEBUG_EVENT, pc->log, 0, "connected");
+    ngx_log_debug2(NGX_LOG_DEBUG_EVENT, pc->log, 0, "[%s:%d]connected", __func__, __LINE__);
 
     wev->ready = 1;
 

@@ -53,8 +53,10 @@ ngx_event_accept(ngx_event_t *ev)
     ls = lc->listening;
     ev->ready = 0;
 
-    ngx_log_debug2(NGX_LOG_DEBUG_EVENT, ev->log, 0,
-                   "accept on %V, ready: %d", &ls->addr_text, ev->available);
+    ngx_log_debug4(NGX_LOG_DEBUG_EVENT, ev->log, 0,
+                   "[%s:%d]accept on %V, ready: %d", 
+										__func__, __LINE__,
+										&ls->addr_text, ev->available);
 
     do {
         socklen = NGX_SOCKADDRLEN;
@@ -74,8 +76,9 @@ ngx_event_accept(ngx_event_t *ev)
             err = ngx_socket_errno;
 
             if (err == NGX_EAGAIN) {
-                ngx_log_debug0(NGX_LOG_DEBUG_EVENT, ev->log, err,
-                               "accept() not ready");
+                ngx_log_debug2(NGX_LOG_DEBUG_EVENT, ev->log, err,
+                               "[%s:%d]accept() not ready",
+																__func__, __LINE__);
                 return;
             }
 
@@ -90,7 +93,7 @@ ngx_event_accept(ngx_event_t *ev)
 
 #if (NGX_HAVE_ACCEPT4)
             ngx_log_error(level, ev->log, err,
-                          use_accept4 ? "accept4() failed" : "accept() failed");
+                          use_accept4 ? "[%s:%d]accept4() failed" : "[%s:%d]accept() failed", __func__, __LINE__);
 
             if (use_accept4 && err == NGX_ENOSYS) {
                 use_accept4 = 0;
@@ -98,7 +101,7 @@ ngx_event_accept(ngx_event_t *ev)
                 continue;
             }
 #else
-            ngx_log_error(level, ev->log, err, "accept() failed");
+            ngx_log_error(level, ev->log, err, "[%s:%d]accept() failed", __func__, __LINE__);
 #endif
 
             if (err == NGX_ECONNABORTED) {
@@ -146,7 +149,7 @@ ngx_event_accept(ngx_event_t *ev)
         if (c == NULL) {
             if (ngx_close_socket(s) == -1) {
                 ngx_log_error(NGX_LOG_ALERT, ev->log, ngx_socket_errno,
-                              ngx_close_socket_n " failed");
+                              ngx_close_socket_n "[%s:%d] failed", __func__, __LINE__);
             }
 
             return;
@@ -182,7 +185,7 @@ ngx_event_accept(ngx_event_t *ev)
             if (ngx_event_flags & NGX_USE_AIO_EVENT) {
                 if (ngx_blocking(s) == -1) {
                     ngx_log_error(NGX_LOG_ALERT, ev->log, ngx_socket_errno,
-                                  ngx_blocking_n " failed");
+                                  ngx_blocking_n "[%s:%d] failed", __func__, __LINE__);
                     ngx_close_accepted_connection(c);
                     return;
                 }
@@ -192,7 +195,7 @@ ngx_event_accept(ngx_event_t *ev)
             if (!(ngx_event_flags & (NGX_USE_AIO_EVENT|NGX_USE_RTSIG_EVENT))) {
                 if (ngx_nonblocking(s) == -1) {
                     ngx_log_error(NGX_LOG_ALERT, ev->log, ngx_socket_errno,
-                                  ngx_nonblocking_n " failed");
+                                  ngx_nonblocking_n "[%s:%d] failed", __func__, __LINE__);
                     ngx_close_accepted_connection(c);
                     return;
                 }
@@ -341,8 +344,10 @@ ngx_event_accept(ngx_event_t *ev)
         }
 #endif
 
-        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, log, 0,
-                       "*%d accept: %V fd:%d", c->number, &c->addr_text, s);
+        ngx_log_debug5(NGX_LOG_DEBUG_EVENT, log, 0,
+                       "[%s:%d]*%d accept: %V fd:%d",
+												__func__, __LINE__,
+											 c->number, &c->addr_text, s);
 
         if (ngx_add_conn && (ngx_event_flags & NGX_USE_EPOLL_EVENT) == 0) {
             if (ngx_add_conn(c) == NGX_ERROR) {
@@ -375,8 +380,8 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
 		//非阻塞的，此时一旦锁被其他worker子进程占用，就立即返回
     if (ngx_shmtx_trylock(&ngx_accept_mutex)) {
 
-        ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
-                       "accept mutex locked");
+        ngx_log_debug2(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
+                       "[%s:%d]accept mutex locked", __func__, __LINE__);
 				//如果获取到锁了，但是ngx_acept_mutex_held为1，立刻返回，ngx_accept_mutex_held是标志位，当它为1的时候，表示当前进程已经获取到锁了
         if (ngx_accept_mutex_held
             && ngx_accept_events == 0
@@ -397,8 +402,10 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
         return NGX_OK;
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
-                   "accept mutex lock failed: %ui", ngx_accept_mutex_held);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
+                   "[%s:%d]accept mutex lock failed: %ui",
+									__func__, __LINE__,
+									 ngx_accept_mutex_held);
 		//如果ngx_accept_mutex_held标志位还是1，即当前进程还在获取到锁的状态，这个状态不正确
     if (ngx_accept_mutex_held) {
         if (ngx_disable_accept_events(cycle) == NGX_ERROR) { //将所有监听连接的读事件从事件驱动中移去
@@ -507,6 +514,6 @@ ngx_close_accepted_connection(ngx_connection_t *c)
 u_char *
 ngx_accept_log_error(ngx_log_t *log, u_char *buf, size_t len)
 {
-    return ngx_snprintf(buf, len, " while accepting new connection on %V",
-                        log->data);
+    return ngx_snprintf(buf, len, "[%s:%d] while accepting new connection on %V",
+                        __func__, __LINE__, log->data);
 }

@@ -1108,8 +1108,10 @@ ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
          * the line feed
          */
 
-        ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "s:%d in:'%Xd:%c', out:'%c'", state, ch, ch, *u);
+        ngx_log_debug6(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]s:%d in:'%Xd:%c', out:'%c'",
+												__func__, __LINE__,
+												 state, ch, ch, *u);
 
         switch (state) {
 
@@ -1677,7 +1679,9 @@ unsafe:
 
     if (*flags & NGX_HTTP_LOG_UNSAFE) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "unsafe URI \"%V\" was detected", uri);
+                      "[%s:%d]unsafe URI \"%V\" was detected",
+											__func__, __LINE__,
+											 uri);
     }
 
     return NGX_ERROR;
@@ -1696,8 +1700,10 @@ ngx_http_parse_multi_header_lines(ngx_array_t *headers, ngx_str_t *name,
 
     for (i = 0; i < headers->nelts; i++) {
 
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, headers->pool->log, 0,
-                       "parse header: \"%V: %V\"", &h[i]->key, &h[i]->value);
+        ngx_log_debug4(NGX_LOG_DEBUG_HTTP, headers->pool->log, 0,
+                       "[%s:%d]parse header: \"%V: %V\"",
+												__func__, __LINE__,
+												 &h[i]->key, &h[i]->value);
 
         if (name->len > h[i]->value.len) {
             continue;
