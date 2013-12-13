@@ -1586,7 +1586,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
     for ( ;; ) {
-
+//接收数据
         n = c->recv(c, u->buffer.last, u->buffer.end - u->buffer.last);
 
         if (n == NGX_AGAIN) {
@@ -1602,7 +1602,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
             return;
         }
-
+//如果为0 ，说明upstream已经关闭了连接
         if (n == 0) {
             ngx_log_error(NGX_LOG_ERR, c->log, 0,
                           "[%s:%d]upstream prematurely closed connection", __func__, __LINE__);
@@ -1612,7 +1612,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
             ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_ERROR);
             return;
         }
-
+//更新buffer
         u->buffer.last += n;
 
 #if 0
@@ -1620,9 +1620,9 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
         u->peer.cached = 0;
 #endif
-
+//然后调用挂载的回调函数
         rc = u->process_header(r);
-
+//如果返回again，则说明后端的数据发送不完全，此时需要再次读取
         if (rc == NGX_AGAIN) {
 
             if (u->buffer.last == u->buffer.end) {

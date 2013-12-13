@@ -1442,10 +1442,11 @@ ngx_http_fastcgi_process_header(ngx_http_request_t *r)
             }
 
             if (rc == NGX_OK) {
-
+//到达这里说明一个header已经被解析出来了
                 /* a header line has been parsed successfully */
 
                 h = ngx_list_push(&u->headers_in.headers);
+//此时从headers list里面取出一个table
                 if (h == NULL) {
                     return NGX_ERROR;
                 }
@@ -1493,7 +1494,7 @@ ngx_http_fastcgi_process_header(ngx_http_request_t *r)
                     }
 
                 } else {
-
+//开始构造头，将解析好的指针赋值给h
                     h->key.len = r->header_name_end - r->header_name_start;
                     h->value.len = r->header_end - r->header_start;
 
@@ -1522,10 +1523,10 @@ ngx_http_fastcgi_process_header(ngx_http_request_t *r)
                 } else {
                     ngx_strlow(h->lowcase_key, h->key.data, h->key.len);
                 }
-
+//先从umcf->headers_in_hash中查找
                 hh = ngx_hash_find(&umcf->headers_in_hash, h->hash,
                                    h->lowcase_key, h->key.len);
-
+//如果存在则调用hh->handler
                 if (hh && hh->handler(r, h, hh->offset) != NGX_OK) {
                     return NGX_ERROR;
                 }

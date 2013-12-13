@@ -201,8 +201,9 @@ typedef struct {
 
 
 typedef struct {
+//保存了所有的将要传递给client的头
     ngx_list_t                       headers;
-
+//这里用来设置发送给client的状态码
     ngx_uint_t                       status_n;
     ngx_str_t                        status_line;
 
