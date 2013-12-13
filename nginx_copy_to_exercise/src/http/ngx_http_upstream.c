@@ -506,7 +506,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
     if (r->request_body) {
         u->request_bufs = r->request_body->bufs;
     }
-
+//调用create_request来创建请求
     if (u->create_request(r) != NGX_OK) {
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
         return;
@@ -524,7 +524,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
     u->output.filter_ctx = &u->writer;
 
     u->writer.pool = r->pool;
-
+//初始化upstream states
     if (r->upstream_states == NULL) {
 
         r->upstream_states = ngx_array_create(r->pool, 1,
@@ -545,7 +545,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
 
         ngx_memzero(u->state, sizeof(ngx_http_upstream_state_t));
     }
-
+//开始挂载清理回调函数
     cln = ngx_http_cleanup_add(r, 0);
     if (cln == NULL) {
         ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -555,13 +555,19 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
     cln->handler = ngx_http_upstream_cleanup;
     cln->data = r;
     u->cleanup = &cln->handler;
+//
+//然后就是最核心的处理部分，根据upstream的类型来进行不同的操作，这里的upstream就是通过xxx_pass传递进来的值，
+//1.xxx_pass中不包含变量
+//2.xxx_pass传递的值包含一个变量（$开始），这种情况下也就是说upstream的url是动态变化的，因此需要每次都解析一遍
+//而第二种情况又分为2中，一种是在进入upstream之前，也就是upstream模块的handler之中已经被resolve的地址（ngx_http_xxx_eval）
+//一种是没有被resolve，此时需要upstream模块进行resolve
 
     if (u->resolved == NULL) {
-
+//这里的话，在xxx_pass命令被解析的时候，upstream已经被解析完毕了
         uscf = u->conf->upstream;
 
     } else {
-
+//如果地址已经被resolve过了，此时创建round robin peer
         if (u->resolved->sockaddr) {
 
             if (ngx_http_upstream_create_round_robin_peer(r, u->resolved)
@@ -571,7 +577,7 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
                 return;
             }
-
+//然后开始连接后端的upstream
             ngx_http_upstream_connect(r, u);
 
             return;
@@ -625,12 +631,13 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
 
         ctx->name = *host;
         ctx->type = NGX_RESOLVE_A;
+//设置handler，最终在下面的ngx_resolve_name中会调用者个handler
         ctx->handler = ngx_http_upstream_resolve_handler;
         ctx->data = r;
         ctx->timeout = clcf->resolver_timeout;
 
         u->resolved->ctx = ctx;
-
+//resolve hostname 然后会调用上面的handler
         if (ngx_resolve_name(ctx) != NGX_OK) {
             u->resolved->ctx = NULL;
             ngx_http_upstream_finalize_request(r, u,
@@ -983,12 +990,13 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 
     c = r->connection;
     u = r->upstream;
-
+//如果连接已经出现错误
     if (c->error) {
+//如果是水平触发
         if ((ngx_event_flags & NGX_USE_LEVEL_EVENT) && ev->active) {
 
             event = ev->write ? NGX_WRITE_EVENT : NGX_READ_EVENT;
-
+//删除事件
             if (ngx_del_event(ev, event, 0) != NGX_OK) {
                 ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -997,6 +1005,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
         }
 
         if (!u->cacheable) {
+//清理upstream request
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_CLIENT_CLOSED_REQUEST);
         }
@@ -1056,7 +1065,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
     if (ev->write && (n >= 0 || err == NGX_EAGAIN)) {
         return;
     }
-
+//如果是水平触发则删除事件
     if ((ngx_event_flags & NGX_USE_LEVEL_EVENT) && ev->active) {
 
         event = ev->write ? NGX_WRITE_EVENT : NGX_READ_EVENT;
@@ -1067,7 +1076,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
             return;
         }
     }
-
+//如果还有数据，则直接返回
     if (n > 0) {
         return;
     }
@@ -1082,10 +1091,11 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
     } else { /* n == 0 */
         err = 0;
     }
-
+//到达这里说明有错误产生了
     ev->eof = 1;
+//设置错误，可以看到这个值在函数一开始有检测
     c->error = 1;
-
+//如果没有cache，则finalize upstream request
     if (!u->cacheable && u->peer.connection) {
         ngx_log_error(NGX_LOG_INFO, ev->log, err,
                       "[%s:%d]client prematurely closed connection, "
@@ -1098,7 +1108,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 
     ngx_log_error(NGX_LOG_INFO, ev->log, err,
                   "[%s:%d]client prematurely closed connection", __func__, __LINE__);
-
+//如果有cache，并且后端的upstream还在处理，则此时继续处理upstream，忽略对端的错误
     if (u->peer.connection == NULL) {
         ngx_http_upstream_finalize_request(r, u,
                                            NGX_HTTP_CLIENT_CLOSED_REQUEST);
@@ -1122,7 +1132,7 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
         u->state->response_sec = tp->sec - u->state->response_sec;
         u->state->response_msec = tp->msec - u->state->response_msec;
     }
-
+//取得upstream的状态
     u->state = ngx_array_push(r->upstream_states);
     if (u->state == NULL) {
         ngx_http_upstream_finalize_request(r, u,
@@ -1133,9 +1143,10 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     ngx_memzero(u->state, sizeof(ngx_http_upstream_state_t));
 
     tp = ngx_timeofday();
+//初始化时间
     u->state->response_sec = tp->sec;
     u->state->response_msec = tp->msec;
-
+//连接后端
     rc = ngx_event_connect_peer(&u->peer);
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -1200,13 +1211,14 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     u->writer.limit = 0;
 
     if (u->request_sent) {
+//重新初始化upstream
         if (ngx_http_upstream_reinit(r, u) != NGX_OK) {
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
             return;
         }
     }
-
+//如果request_body存在的话，保存request_body
     if (r->request_body
         && r->request_body->buf
         && r->request_body->temp_file
@@ -1223,11 +1235,11 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
             return;
         }
-
+//保存到output
         u->output.free->buf = r->request_body->buf;
         u->output.free->next = NULL;
         u->output.allocated = 1;
-
+//重置request_body
         r->request_body->buf->pos = r->request_body->buf->start;
         r->request_body->buf->last = r->request_body->buf->start;
         r->request_body->buf->tag = u->output.tag;
@@ -1236,6 +1248,7 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     u->request_sent = 0;
 
     if (rc == NGX_AGAIN) {
+//添加定时器
         ngx_add_timer(c->write, u->conf->connect_timeout);
         return;
     }
@@ -1401,14 +1414,14 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http upstream send request", __func__, __LINE__);
-
+//如果test connect失败，则说明连接失败，于是跳到下一个upstream，然后返回
     if (!u->request_sent && ngx_http_upstream_test_connect(c) != NGX_OK) {
         ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_ERROR);
         return;
     }
 
     c->log->action = "sending request to upstream";
-
+//发送数据，这里的u->output.output_filter已经被修改过了
     rc = ngx_output_chain(&u->output, u->request_sent ? NULL : u->request_bufs);
 
     u->request_sent = 1;
@@ -1421,7 +1434,7 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
     if (c->write->timer_set) {
         ngx_del_timer(c->write);
     }
-
+//和request的处理类似，如果again，则说明数据没有发送完毕，此时挂载写事件
     if (rc == NGX_AGAIN) {
         ngx_add_timer(c->write, u->conf->send_timeout);
 
@@ -1435,7 +1448,7 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
     /* rc == NGX_OK */
-
+//设置tcp_cork，远离和前面的keepalive部分的处理类似
     if (c->tcp_nopush == NGX_TCP_NOPUSH_SET) {
         if (ngx_tcp_push(c->fd) == NGX_ERROR) {
             ngx_log_error(NGX_LOG_CRIT, c->log, ngx_socket_errno,
@@ -1451,6 +1464,7 @@ ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
     ngx_add_timer(c->read, u->conf->read_timeout);
 
 #if 1
+//如果读也可以了，则开始解析头
     if (c->read->ready) {
 
         /* post aio operation */

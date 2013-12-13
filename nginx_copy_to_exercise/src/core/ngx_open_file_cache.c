@@ -1074,7 +1074,7 @@ ngx_expire_old_cached_files(ngx_open_file_cache_t *cache, ngx_uint_t n,
 
         cache->current--;
 
-        ngx_log_debug1(NGX_LOG_DEBUG_CORE, log, 0,
+        ngx_log_debug3(NGX_LOG_DEBUG_CORE, log, 0,
                        "[%s:%d]expire cached open file: %s",__func__, __LINE__, file->name);
 
         if (!file->err && !file->is_dir) {

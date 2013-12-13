@@ -97,8 +97,10 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
         ls[i].socklen = NGX_SOCKADDRLEN;
         if (getsockname(ls[i].fd, ls[i].sockaddr, &ls[i].socklen) == -1) {
             ngx_log_error(NGX_LOG_CRIT, cycle->log, ngx_socket_errno,
-                          "getsockname() of the inherited "
-                          "socket #%d failed", ls[i].fd);
+                          "[%s:%d]getsockname() of the inherited "
+                          "socket #%d failed",
+													__func__, __LINE__,
+													 ls[i].fd);
             ls[i].ignore = 1;
             continue;
         }
@@ -114,8 +116,10 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
 
         default:
             ngx_log_error(NGX_LOG_CRIT, cycle->log, ngx_socket_errno,
-                          "the inherited socket #%d has "
-                          "an unsupported protocol family", ls[i].fd);
+                          "[%s:%d]the inherited socket #%d has "
+                          "an unsupported protocol family",
+													 __func__, __LINE__,
+													 ls[i].fd);
             ls[i].ignore = 1;
             continue;
         }
@@ -141,7 +145,8 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
             == -1)
         {
             ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                          "getsockopt(SO_RCVBUF) %V failed, ignored",
+                          "[%s:%d]getsockopt(SO_RCVBUF) %V failed, ignored",
+													__func__, __LINE__,
                           &ls[i].addr_text);
 
             ls[i].rcvbuf = -1;
@@ -154,7 +159,8 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
             == -1)
         {
             ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                          "getsockopt(SO_SNDBUF) %V failed, ignored",
+                          "[%s:%d]getsockopt(SO_SNDBUF) %V failed, ignored",
+													__func__, __LINE__,
                           &ls[i].addr_text);
 
             ls[i].sndbuf = -1;
@@ -219,7 +225,9 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 
             if (s == -1) {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                              ngx_socket_n " %V failed", &ls[i].addr_text);
+                              ngx_socket_n "[%s:%d] %V failed",
+															__func__, __LINE__,
+															 &ls[i].addr_text);
                 return NGX_ERROR;
             }
 						//set socket address reuseadble允许重用本地地址
@@ -228,12 +236,14 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                              "setsockopt(SO_REUSEADDR) %V failed",
+                              "[%s:%d]setsockopt(SO_REUSEADDR) %V failed",
+															__func__, __LINE__,
                               &ls[i].addr_text);
 
                 if (ngx_close_socket(s) == -1) {
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                  ngx_close_socket_n " %V failed",
+                                  ngx_close_socket_n "[%s:%d] %V failed",
+																	__func__, __LINE__,
                                   &ls[i].addr_text);
                 }
 
@@ -245,12 +255,14 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
             if (!(ngx_event_flags & NGX_USE_AIO_EVENT)) {
                 if (ngx_nonblocking(s) == -1) {
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                  ngx_nonblocking_n " %V failed",
+                                  ngx_nonblocking_n "[%s:%d] %V failed",
+																	__func__, __LINE__,
                                   &ls[i].addr_text);
 
                     if (ngx_close_socket(s) == -1) {
                         ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                      ngx_close_socket_n " %V failed",
+                                      ngx_close_socket_n "[%s:%d] %V failed",
+																			__func__, __LINE__,
                                       &ls[i].addr_text);
                     }
 
@@ -258,8 +270,10 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 }
             }
 
-            ngx_log_debug2(NGX_LOG_DEBUG_CORE, log, 0,
-                           "bind() %V #%d ", &ls[i].addr_text, s);
+            ngx_log_debug4(NGX_LOG_DEBUG_CORE, log, 0,
+                           "[%s:%d]bind() %V #%d ",
+													__func__, __LINE__,
+													 &ls[i].addr_text, s);
 						//bind(fd, struct sockaddr *, socklen_t)
             if (bind(s, ls[i].sockaddr, ls[i].socklen) == -1) {
                 err = ngx_socket_errno;
@@ -269,11 +283,14 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
                 }
 
                 ngx_log_error(NGX_LOG_EMERG, log, err,
-                              "bind() to %V failed", &ls[i].addr_text);
+                              "[%s:%d]bind() to %V failed",
+															__func__, __LINE__,
+															 &ls[i].addr_text);
 
                 if (ngx_close_socket(s) == -1) {
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                  ngx_close_socket_n " %V failed",
+                                  ngx_close_socket_n "[%s:%d] %V failed",
+																	__func__, __LINE__,
                                   &ls[i].addr_text);
                 }
 
@@ -289,12 +306,14 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 						//listen(fd, backlog)
             if (listen(s, ls[i].backlog) == -1) {
                 ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                              "listen() to %V, backlog %d failed",
+                              "[%s:%d]listen() to %V, backlog %d failed",
+															__func__, __LINE__,
                               &ls[i].addr_text, ls[i].backlog);
 
                 if (ngx_close_socket(s) == -1) {
                     ngx_log_error(NGX_LOG_EMERG, log, ngx_socket_errno,
-                                  ngx_close_socket_n " %V failed",
+                                  ngx_close_socket_n "[%s:%d] %V failed",
+																	__func__, __LINE__,
                                   &ls[i].addr_text);
                 }
 
@@ -313,13 +332,13 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
         /* TODO: delay configurable */
 
         ngx_log_error(NGX_LOG_NOTICE, log, 0,
-                      "try again to bind() after 500ms");
+                      "[%s:%d]try again to bind() after 500ms", __func__, __LINE__);
 
         ngx_msleep(500);
     }
 
     if (failed) {
-        ngx_log_error(NGX_LOG_EMERG, log, 0, "still could not bind()");
+        ngx_log_error(NGX_LOG_EMERG, log, 0, "[%s:%d]still could not bind()", __func__, __LINE__);
         return NGX_ERROR;
     }
 
@@ -349,7 +368,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(SO_RCVBUF, %d) %V failed, ignored",
+                              "[%s:%d]setsockopt(SO_RCVBUF, %d) %V failed, ignored",
+															__func__, __LINE__,
                               ls[i].rcvbuf, &ls[i].addr_text);
             }
         }
@@ -360,7 +380,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(SO_SNDBUF, %d) %V failed, ignored",
+                              "[%s:%d]setsockopt(SO_SNDBUF, %d) %V failed, ignored",
+															__func__, __LINE__,
                               ls[i].sndbuf, &ls[i].addr_text);
             }
         }
@@ -373,7 +394,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(SO_KEEPALIVE, %d) %V failed, ignored",
+                              "[%s:%d]setsockopt(SO_KEEPALIVE, %d) %V failed, ignored",
+															__func__, __LINE__,
                               keepalive, &ls[i].addr_text);
             }
         }
@@ -386,7 +408,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(TCP_KEEPIDLE, %d) %V failed, ignored",
+                              "[%s:%d]setsockopt(TCP_KEEPIDLE, %d) %V failed, ignored",
+															__func__, __LINE__,
                               ls[i].keepidle, &ls[i].addr_text);
             }
         }
@@ -397,7 +420,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                             "setsockopt(TCP_KEEPINTVL, %d) %V failed, ignored",
+                             "[%s:%d]setsockopt(TCP_KEEPINTVL, %d) %V failed, ignored",
+															__func__, __LINE__,
                              ls[i].keepintvl, &ls[i].addr_text);
             }
         }
@@ -408,7 +432,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
                 == -1)
             {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "setsockopt(TCP_KEEPCNT, %d) %V failed, ignored",
+                              "[%s:%d]setsockopt(TCP_KEEPCNT, %d) %V failed, ignored",
+															__func__, __LINE__,
                               ls[i].keepcnt, &ls[i].addr_text);
             }
         }
@@ -423,7 +448,8 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 
             if (listen(ls[i].fd, ls[i].backlog) == -1) {
                 ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_socket_errno,
-                              "listen() to %V, backlog %d failed, ignored",
+                              "[%s:%d]listen() to %V, backlog %d failed, ignored",
+															__func__, __LINE__,
                               &ls[i].addr_text, ls[i].backlog);
             }
         }
@@ -486,12 +512,16 @@ ngx_close_listening_sockets(ngx_cycle_t *cycle)
             c->fd = (ngx_socket_t) -1;
         }
 
-        ngx_log_debug2(NGX_LOG_DEBUG_CORE, cycle->log, 0,
-                       "close listening %V #%d ", &ls[i].addr_text, ls[i].fd);
+        ngx_log_debug4(NGX_LOG_DEBUG_CORE, cycle->log, 0,
+                       "[%s:%d]close listening %V #%d ",
+											__func__, __LINE__,
+											 &ls[i].addr_text, ls[i].fd);
 
         if (ngx_close_socket(ls[i].fd) == -1) {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_socket_errno,
-                          ngx_close_socket_n " %V failed", &ls[i].addr_text);
+                          ngx_close_socket_n "[%s:%d] %V failed",
+													__func__, __LINE__,
+													 &ls[i].addr_text);
         }
 
 
@@ -513,8 +543,9 @@ ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
 
     if (ngx_cycle->files && (ngx_uint_t) s >= ngx_cycle->files_n) {
         ngx_log_error(NGX_LOG_ALERT, log, 0,
-                      "the new socket has number %d, "
+                      "[%s:%d]the new socket has number %d, "
                       "but only %ui files are available",
+											__func__, __LINE__,
                       s, ngx_cycle->files_n);
         return NULL;
     }
@@ -530,7 +561,8 @@ ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
 
     if (c == NULL) {
         ngx_log_error(NGX_LOG_ALERT, log, 0,
-                      "%ui worker_connections are not enough",
+                      "[%s:%d]%ui worker_connections are not enough",
+											__func__, __LINE__,
                       ngx_cycle->connection_n);
 
         /* ngx_mutex_unlock */
@@ -608,7 +640,7 @@ ngx_close_connection(ngx_connection_t *c)
     ngx_socket_t  fd;
 
     if (c->fd == -1) {
-        ngx_log_error(NGX_LOG_ALERT, c->log, 0, "connection already closed");
+        ngx_log_error(NGX_LOG_ALERT, c->log, 0, "[%s:%d]connection already closed", __func__, __LINE__);
         return;
     }
 		//删除读事件的timer
@@ -682,7 +714,9 @@ ngx_close_connection(ngx_connection_t *c)
         /* we use ngx_cycle->log because c->log was in c->pool */
 
         ngx_log_error(level, ngx_cycle->log, err,
-                      ngx_close_socket_n " %d failed", fd);
+                      ngx_close_socket_n "[%s:%d] %d failed",
+											__func__, __LINE__,
+										  fd);
     }
 }
 
@@ -690,8 +724,10 @@ ngx_close_connection(ngx_connection_t *c)
 void
 ngx_reusable_connection(ngx_connection_t *c, ngx_uint_t reusable)
 {
-    ngx_log_debug1(NGX_LOG_DEBUG_CORE, c->log, 0,
-                   "reusable connection: %ui", reusable);
+    ngx_log_debug3(NGX_LOG_DEBUG_CORE, c->log, 0,
+                   "[%s:%d]reusable connection: %ui",
+									__func__, __LINE__,
+									 reusable);
 
     if (c->reusable) {
         ngx_queue_remove(&c->queue);
@@ -723,8 +759,8 @@ ngx_drain_connections(void)
         q = ngx_queue_last(&ngx_cycle->reusable_connections_queue);
         c = ngx_queue_data(q, ngx_connection_t, queue);
 
-        ngx_log_debug0(NGX_LOG_DEBUG_CORE, c->log, 0,
-                       "reusing connection");
+        ngx_log_debug2(NGX_LOG_DEBUG_CORE, c->log, 0,
+                       "[%s:%d]reusing connection", __func__, __LINE__);
 
         c->close = 1;
         c->read->handler(c->read);

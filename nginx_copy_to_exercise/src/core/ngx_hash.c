@@ -15,8 +15,8 @@ ngx_hash_find(ngx_hash_t *hash, ngx_uint_t key, u_char *name, size_t len)
     ngx_uint_t       i;
     ngx_hash_elt_t  *elt;
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "hf:\"%*s\"", len, name);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]hf:\"%*s\"",__func__, __LINE__, len, name);
 #endif
 
     elt = hash->buckets[key % hash->size];
@@ -55,8 +55,8 @@ ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
     void        *value;
     ngx_uint_t   i, n, key;
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "wch:\"%*s\"", len, name);
+#if 1 
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]wch:\"%*s\"", __func__, __LINE__, len, name);
 #endif
 
     n = len;
@@ -75,14 +75,14 @@ ngx_hash_find_wc_head(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
         key = ngx_hash(key, name[i]);
     }
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "key:\"%ui\"", key);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]key:\"%ui\"",__func__, __LINE__, key);
 #endif
 
     value = ngx_hash_find(&hwc->hash, key, &name[n], len - n);
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "value:\"%p\"", value);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]value:\"%p\"",__func__, __LINE__, value);
 #endif
 
     if (value) {
@@ -149,8 +149,8 @@ ngx_hash_find_wc_tail(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
     void        *value;
     ngx_uint_t   i, key;
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "wct:\"%*s\"", len, name);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]wct:\"%*s\"",__func__, __LINE__, len, name);
 #endif
 
     key = 0;
@@ -167,14 +167,14 @@ ngx_hash_find_wc_tail(ngx_hash_wildcard_t *hwc, u_char *name, size_t len)
         return NULL;
     }
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "key:\"%ui\"", key);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]y:\"%ui\"", __func__, __LINE__, key);
 #endif
 
     value = ngx_hash_find(&hwc->hash, key, name, i);
 
-#if 0
-    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "value:\"%p\"", value);
+#if 1
+    ngx_log_error(NGX_LOG_ALERT, ngx_cycle->log, 0, "[%s:%d]value:\"%p\"", __func__, __LINE__, value);
 #endif
 
     if (value) {
@@ -275,8 +275,9 @@ ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
         if (hinit->bucket_size < NGX_HASH_ELT_SIZE(&names[n]) + sizeof(void *))
         {
             ngx_log_error(NGX_LOG_EMERG, hinit->pool->log, 0,
-                          "could not build the %s, you should "
+                          "[%s:%d]could not build the %s, you should "
                           "increase %s_bucket_size: %i",
+													__func__, __LINE__,
                           hinit->name, hinit->name, hinit->bucket_size);
             return NGX_ERROR;
         }
@@ -335,8 +336,9 @@ ngx_hash_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names, ngx_uint_t nelts)
     }
 
     ngx_log_error(NGX_LOG_EMERG, hinit->pool->log, 0,
-                  "could not build the %s, you should increase "
+                  "[%s:%d]could not build the %s, you should increase "
                   "either %s_max_size: %i or %s_bucket_size: %i",
+									__func__, __LINE__,
                   hinit->name, hinit->name, hinit->max_size,
                   hinit->name, hinit->bucket_size);
 
@@ -504,9 +506,9 @@ ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
 
     for (n = 0; n < nelts; n = i) {
 
-#if 0
+#if 1
         ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
-                      "wc0: \"%V\"", &names[n].key);
+                      "[%s:%d]wc0: \"%V\"", __func__, __LINE__, &names[n].key);
 #endif
 
         dot = 0;
@@ -528,9 +530,9 @@ ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
         name->key_hash = hinit->key(name->key.data, name->key.len);
         name->value = names[n].value;
 
-#if 0
+#if 1
         ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
-                      "wc1: \"%V\" %ui", &name->key, dot);
+                      "[%s:%d]wc1: \"%V\" %ui", __func__, __LINE__, &name->key, dot);
 #endif
 
         dot_len = len + 1;
@@ -552,9 +554,9 @@ ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
             next_name->key_hash = 0;
             next_name->value = names[n].value;
 
-#if 0
+#if 1
             ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
-                          "wc2: \"%V\"", &next_name->key);
+                          "[%s:%d]wc2: \"%V\"", __func__, __LINE__, &next_name->key);
 #endif
         }
 
@@ -580,9 +582,9 @@ ngx_hash_wildcard_init(ngx_hash_init_t *hinit, ngx_hash_key_t *names,
             next_name->key_hash = 0;
             next_name->value = names[i].value;
 
-#if 0
+#if 1
             ngx_log_error(NGX_LOG_ALERT, hinit->pool->log, 0,
-                          "wc3: \"%V\"", &next_name->key);
+                          "[%s:%d]wc3: \"%V\"", __func__, __LINE__, &next_name->key);
 #endif
         }
 

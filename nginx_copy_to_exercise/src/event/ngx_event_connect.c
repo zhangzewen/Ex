@@ -21,12 +21,12 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
     ngx_socket_t       s;
     ngx_event_t       *rev, *wev;
     ngx_connection_t  *c;
-
+//取得我们要发送的upstream对端
     rc = pc->get(pc, pc->data);
     if (rc != NGX_OK) {
         return rc;
     }
-
+//新建socket
     s = ngx_socket(pc->sockaddr->sa_family, SOCK_STREAM, 0);
 
     ngx_log_debug3(NGX_LOG_DEBUG_EVENT, pc->log, 0, "[%s:%d]socket %d",__func__, __LINE__,s);
@@ -37,7 +37,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
         return NGX_ERROR;
     }
 
-
+//取得连接
     c = ngx_get_connection(s, pc->log);
 
     if (c == NULL) {
@@ -48,7 +48,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
 
         return NGX_ERROR;
     }
-
+//设置recvbuf的大小
     if (pc->rcvbuf) {
         if (setsockopt(s, SOL_SOCKET, SO_RCVBUF,
                        (const void *) &pc->rcvbuf, sizeof(int)) == -1)
@@ -58,7 +58,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
             goto failed;
         }
     }
-
+//设置非阻塞
     if (ngx_nonblocking(s) == -1) {
         ngx_log_error(NGX_LOG_ALERT, pc->log, ngx_socket_errno,
                       ngx_nonblocking_n "[%s:%d] failed", __func__, __LINE__);
@@ -76,7 +76,7 @@ ngx_event_connect_peer(ngx_peer_connection_t *pc)
             goto failed;
         }
     }
-
+//开始挂载对应的读写函数
     c->recv = ngx_recv;
     c->send = ngx_send;
     c->recv_chain = ngx_recv_chain;
