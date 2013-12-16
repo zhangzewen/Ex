@@ -746,7 +746,7 @@ ngx_http_proxy_eval(ngx_http_request_t *r, ngx_http_proxy_ctx_t *ctx,
 
     } else {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "invalid URL prefix in \"%V\"", &proxy);
+                      "[%s:%d]invalid URL prefix in \"%V\"", __func__, __LINE__, &proxy);
         return NGX_ERROR;
     }
 
@@ -766,7 +766,7 @@ ngx_http_proxy_eval(ngx_http_request_t *r, ngx_http_proxy_ctx_t *ctx,
     if (ngx_parse_url(r->pool, &url) != NGX_OK) {
         if (url.err) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "%s in upstream \"%V\"", url.err, &url.url);
+                          "[%s:%d]%s in upstream \"%V\"", __func__, __LINE__, url.err, &url.url);
         }
 
         return NGX_ERROR;
@@ -985,7 +985,7 @@ ngx_http_proxy_create_request(ngx_http_request_t *r)
 
     if (uri_len == 0) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "zero length URI to proxy");
+                      "[%s:%d]zero length URI to proxy", __func__, __LINE__);
         return NGX_ERROR;
     }
 
@@ -1176,8 +1176,9 @@ ngx_http_proxy_create_request(ngx_http_request_t *r)
 
             *b->last++ = CR; *b->last++ = LF;
 
-            ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http proxy header: \"%V: %V\"",
+            ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http proxy header: \"%V: %V\"",
+													__func__, __LINE__,
                            &header[i].key, &header[i].value);
         }
     }
@@ -1198,8 +1199,9 @@ ngx_http_proxy_create_request(ngx_http_request_t *r)
         b->last = e.pos;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http proxy header:\n\"%*s\"",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http proxy header:\n\"%*s\"",
+										__func__, __LINE__,
                    (size_t) (b->last - b->pos), b->pos);
 
     if (plcf->body_set == NULL && plcf->upstream.pass_request_body) {
@@ -1297,7 +1299,7 @@ ngx_http_proxy_process_status_line(ngx_http_request_t *r)
 #endif
 
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "upstream sent no valid HTTP/1.0 header");
+                      "[%s:%d]upstream sent no valid HTTP/1.0 header", __func__, __LINE__);
 
 #if 0
         if (u->accel) {
@@ -1328,8 +1330,9 @@ ngx_http_proxy_process_status_line(ngx_http_request_t *r)
 
     ngx_memcpy(u->headers_in.status_line.data, ctx->status.start, len);
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http proxy status %ui \"%V\"",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http proxy status %ui \"%V\"",
+									__func__, __LINE__,
                    u->headers_in.status_n, &u->headers_in.status_line);
 
     if (ctx->status.http_version < NGX_HTTP_VERSION_11) {
@@ -1400,8 +1403,9 @@ ngx_http_proxy_process_header(ngx_http_request_t *r)
                 return NGX_ERROR;
             }
 
-            ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http proxy header: \"%V: %V\"",
+            ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http proxy header: \"%V: %V\"",
+														__func__, __LINE__,
                            &h->key, &h->value);
 
             continue;
@@ -1411,8 +1415,8 @@ ngx_http_proxy_process_header(ngx_http_request_t *r)
 
             /* a whole header has been parsed successfully */
 
-            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http proxy header done");
+            ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http proxy header done", __func__, __LINE__);
 
             /*
              * if no "Server" and "Date" in header line,
@@ -1480,7 +1484,7 @@ ngx_http_proxy_process_header(ngx_http_request_t *r)
         /* there was error while a header line parsing */
 
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "upstream sent invalid header");
+                      "[%s:%d]upstream sent invalid header", __func__, __LINE__);
 
         return NGX_HTTP_UPSTREAM_INVALID_HEADER;
     }
@@ -1501,8 +1505,9 @@ ngx_http_proxy_input_filter_init(void *data)
         return NGX_ERROR;
     }
 
-    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http proxy filter init s:%d h:%d c:%d l:%O",
+    ngx_log_debug6(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http proxy filter init s:%d h:%d c:%d l:%O",
+										__func__, __LINE__,
                    u->headers_in.status_n, ctx->head, u->headers_in.chunked,
                    u->headers_in.content_length_n);
 
@@ -1585,7 +1590,7 @@ ngx_http_proxy_copy_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
     cl->buf = b;
     cl->next = NULL;
 
-    ngx_log_debug1(NGX_LOG_DEBUG_EVENT, p->log, 0, "input buf #%d", b->num);
+    ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0, "[%s:%d]input buf #%d", __func__, __LINE__, b->num);
 
     if (p->in) {
         *p->last_in = cl;
@@ -1610,7 +1615,7 @@ ngx_http_proxy_copy_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
         p->upstream_done = 1;
 
         ngx_log_error(NGX_LOG_WARN, r->connection->log, 0,
-                      "upstream sent too much data");
+                      "[%s:%d]upstream sent too much data", __func__, __LINE__);
     }
 
     return NGX_OK;
@@ -1657,8 +1662,8 @@ ngx_http_proxy_parse_chunked(ngx_http_request_t *r, ngx_buf_t *buf)
 
         ch = *pos;
 
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                       "http proxy chunked byte: %02Xd s:%d", ch, state);
+        ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                       "[%s:%d]http proxy chunked byte: %02Xd s:%d", __func__, __LINE__, ch, state);
 
         switch (state) {
 
@@ -1949,8 +1954,8 @@ ngx_http_proxy_chunked_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
 
             /* STUB */ b->num = buf->num;
 
-            ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                           "input buf #%d %p", b->num, b->pos);
+            ngx_log_debug4(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                           "[%s:%d]input buf #%d %p", __func__, __LINE__, b->num, b->pos);
 
             if (buf->last - buf->pos >= ctx->size) {
 
@@ -1990,21 +1995,22 @@ ngx_http_proxy_chunked_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
         /* invalid response */
 
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "upstream sent invalid chunked response");
+                      "[%s:%d]upstream sent invalid chunked response", __func__, __LINE__);
 
         return NGX_ERROR;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "http proxy chunked state %d, length %d",
+    ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]http proxy chunked state %d, length %d",
+									__func__, __LINE__,
                    ctx->state, p->length);
 
     if (b) {
         b->shadow = buf;
         b->last_shadow = 1;
 
-        ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
-                       "input buf %p %z", b->pos, b->last - b->pos);
+        ngx_log_debug4(NGX_LOG_DEBUG_EVENT, p->log, 0,
+                       "[%s:%d]input buf %p %z", __func__, __LINE__, b->pos, b->last - b->pos);
 
         return NGX_OK;
     }
@@ -2127,8 +2133,9 @@ ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
                 b->last = buf->last;
             }
 
-            ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http proxy out buf %p %z",
+            ngx_log_debug4(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http proxy out buf %p %z",
+														__func__, __LINE__,
                            b->pos, b->last - b->pos);
 
             continue;
@@ -2151,7 +2158,7 @@ ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
         /* invalid response */
 
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "upstream sent invalid chunked response");
+                      "[%s:%d]upstream sent invalid chunked response", __func__, __LINE__);
 
         return NGX_ERROR;
     }
@@ -2169,8 +2176,9 @@ ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
         buf->last = buf->pos;
 
         for (cl = u->out_bufs; cl; cl = cl->next) {
-            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                           "http proxy in memory %p-%p %uz",
+            ngx_log_debug5(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                           "[%s:%d]http proxy in memory %p-%p %uz",
+														__func__, __LINE__,
                            cl->buf->pos, cl->buf->last, ngx_buf_size(cl->buf));
 
             if (buf->last == cl->buf->pos) {
@@ -2193,8 +2201,8 @@ ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
 static void
 ngx_http_proxy_abort_request(ngx_http_request_t *r)
 {
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "abort http proxy request");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]abort http proxy request", __func__, __LINE__);
 
     return;
 }
@@ -2203,8 +2211,8 @@ ngx_http_proxy_abort_request(ngx_http_request_t *r)
 static void
 ngx_http_proxy_finalize_request(ngx_http_request_t *r, ngx_int_t rc)
 {
-    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "finalize http proxy request");
+    ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "[%s:%d]finalize http proxy request", __func__, __LINE__);
 
     return;
 }
@@ -2728,7 +2736,7 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.bufs.num < 2) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "there must be at least 2 \"proxy_buffers\"");
+                           "[%s:%d]there must be at least 2 \"proxy_buffers\"", __func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -2752,9 +2760,9 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.busy_buffers_size < size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-             "\"proxy_busy_buffers_size\" must be equal to or greater than "
+             "[%s:%d]\"proxy_busy_buffers_size\" must be equal to or greater than "
              "the maximum of the value of \"proxy_buffer_size\" and "
-             "one of the \"proxy_buffers\"");
+             "one of the \"proxy_buffers\"", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -2763,8 +2771,8 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         > (conf->upstream.bufs.num - 1) * conf->upstream.bufs.size)
     {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-             "\"proxy_busy_buffers_size\" must be less than "
-             "the size of all \"proxy_buffers\" minus one buffer");
+             "[%s:%d]\"proxy_busy_buffers_size\" must be less than "
+             "the size of all \"proxy_buffers\" minus one buffer", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -2783,9 +2791,9 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.temp_file_write_size < size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-             "\"proxy_temp_file_write_size\" must be equal to or greater "
+             "[%s:%d]\"proxy_temp_file_write_size\" must be equal to or greater "
              "than the maximum of the value of \"proxy_buffer_size\" and "
-             "one of the \"proxy_buffers\"");
+             "one of the \"proxy_buffers\"", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -2805,10 +2813,10 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         && conf->upstream.max_temp_file_size < size)
     {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-             "\"proxy_max_temp_file_size\" must be equal to zero to disable "
+             "[%s:%d]\"proxy_max_temp_file_size\" must be equal to zero to disable "
              "temporary files usage or must be equal to or greater than "
              "the maximum of the value of \"proxy_buffer_size\" and "
-             "one of the \"proxy_buffers\"");
+             "one of the \"proxy_buffers\"", __func__, __LINE__);
 
         return NGX_CONF_ERROR;
     }
@@ -2850,7 +2858,8 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         shm_zone = conf->upstream.cache;
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "\"proxy_cache\" zone \"%V\" is unknown",
+                           "[%s:%d]\"proxy_cache\" zone \"%V\" is unknown",
+														__func__, __LINE__,
                            &shm_zone->shm.name);
 
         return NGX_CONF_ERROR;
@@ -2887,8 +2896,8 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.no_cache && conf->upstream.cache_bypass == NULL) {
         ngx_log_error(NGX_LOG_WARN, cf->log, 0,
-             "\"proxy_no_cache\" functionality has been changed in 0.8.46, "
-             "now it should be used together with \"proxy_cache_bypass\"");
+             "[%s:%d]\"proxy_no_cache\" functionality has been changed in 0.8.46, "
+             "now it should be used together with \"proxy_cache_bypass\"", __func__, __LINE__);
     }
 
     ngx_conf_merge_ptr_value(conf->upstream.cache_valid,
@@ -3405,12 +3414,12 @@ ngx_http_proxy_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         port = 443;
 #else
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "https protocol requires SSL support");
+                           "[%s:%d]https protocol requires SSL support", __func__, __LINE__);
         return NGX_CONF_ERROR;
 #endif
 
     } else {
-        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "invalid URL prefix");
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "[%s:%d]invalid URL prefix", __func__, __LINE__);
         return NGX_CONF_ERROR;
     }
 
@@ -3443,11 +3452,11 @@ ngx_http_proxy_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     {
         if (plcf->vars.uri.len) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "\"proxy_pass\" cannot have URI part in "
+                               "[%s:%d]\"proxy_pass\" cannot have URI part in "
                                "location given by regular expression, "
                                "or inside named location, "
                                "or inside \"if\" statement, "
-                               "or inside \"limit_except\" block");
+                               "or inside \"limit_except\" block", __func__, __LINE__);
             return NGX_CONF_ERROR;
         }
 
@@ -3487,7 +3496,7 @@ ngx_http_proxy_redirect(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if (ngx_strcmp(value[1].data, "false") == 0) {
             ngx_conf_log_error(NGX_LOG_ERR, cf, 0,
-                           "invalid parameter \"false\", use \"off\" instead");
+                           "[%s:%d]invalid parameter \"false\", use \"off\" instead", __func__, __LINE__);
             plcf->redirect = 0;
             plcf->redirects = NULL;
             return NGX_CONF_OK;
@@ -3495,7 +3504,7 @@ ngx_http_proxy_redirect(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
         if (ngx_strcmp(value[1].data, "default") != 0) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "invalid parameter \"%V\"", &value[1]);
+                               "[%s:%d]invalid parameter \"%V\"", __func__, __LINE__, &value[1]);
             return NGX_CONF_ERROR;
         }
     }
@@ -3516,15 +3525,15 @@ ngx_http_proxy_redirect(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     if (ngx_strcmp(value[1].data, "default") == 0) {
         if (plcf->proxy_lengths) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "\"proxy_redirect default\" cannot be used "
-                               "with \"proxy_pass\" directive with variables");
+                               "[%s:%d]\"proxy_redirect default\" cannot be used "
+                               "with \"proxy_pass\" directive with variables", __func__, __LINE__);
             return NGX_CONF_ERROR;
         }
 
         if (plcf->url.data == NULL) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                               "\"proxy_redirect default\" should be placed "
-                               "after the \"proxy_pass\" directive");
+                               "[%s:%d]\"proxy_redirect default\" should be placed "
+                               "after the \"proxy_pass\" directive", __func__, __LINE__);
             return NGX_CONF_ERROR;
         }
 
@@ -3629,7 +3638,7 @@ ngx_http_proxy_cookie_domain(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid parameter \"%V\"", &value[1]);
+                           "[%s:%d]invalid parameter \"%V\"", __func__, __LINE__, &value[1]);
         return NGX_CONF_ERROR;
     }
 
@@ -3716,7 +3725,7 @@ ngx_http_proxy_cookie_path(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
 
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "invalid parameter \"%V\"", &value[1]);
+                           "[%s:%d]invalid parameter \"%V\"", __func__, __LINE__, &value[1]);
         return NGX_CONF_ERROR;
     }
 
@@ -3810,7 +3819,7 @@ ngx_http_proxy_rewrite_regex(ngx_conf_t *cf, ngx_http_proxy_rewrite_t *pr,
 #else
 
     ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                       "using regex \"%V\" requires PCRE library", regex);
+                       "[%s:%d]using regex \"%V\" requires PCRE library", __func__, __LINE__, regex);
     return NGX_ERROR;
 
 #endif
@@ -3946,8 +3955,9 @@ ngx_http_proxy_lowat_check(ngx_conf_t *cf, void *post, void *data)
 
     if ((u_long) *np >= ngx_freebsd_net_inet_tcp_sendspace) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                           "\"proxy_send_lowat\" must be less than %d "
+                           "[%s:%d]\"proxy_send_lowat\" must be less than %d "
                            "(sysctl net.inet.tcp.sendspace)",
+													__func__, __LINE__,
                            ngx_freebsd_net_inet_tcp_sendspace);
 
         return NGX_CONF_ERROR;
@@ -3957,7 +3967,7 @@ ngx_http_proxy_lowat_check(ngx_conf_t *cf, void *post, void *data)
     ssize_t *np = data;
 
     ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
-                       "\"proxy_send_lowat\" is not supported, ignored");
+                       "[%s:%d]\"proxy_send_lowat\" is not supported, ignored", __func__, __LINE__);
 
     *np = 0;
 

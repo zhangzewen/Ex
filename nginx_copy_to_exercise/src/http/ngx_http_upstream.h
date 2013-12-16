@@ -120,14 +120,16 @@ struct ngx_http_upstream_srv_conf_s {
 
 
 typedef struct {
+//当在ngx_http_upstream_t结构体中没有实现resolved成员时，upstream这个结构体才会生效，他会定义上游服务器的配置
     ngx_http_upstream_srv_conf_t    *upstream;
-
+//建立TCP连接的超时时间，实际上就是写事件添加到定时器中设置的超时时间
     ngx_msec_t                       connect_timeout;
     ngx_msec_t                       send_timeout;
     ngx_msec_t                       read_timeout;
     ngx_msec_t                       timeout;
-
+//TCP的SO_SNOLOWAT选项，表示发送缓冲区的下限
     size_t                           send_lowat;
+//定义了接收头部的缓冲区分配的内存大小（ngx_http_upstream_t中的buffer缓存区），当不转发响应给下游或者在buffering标志位为0的情况下转发响应，他同样表示接受包体的缓冲区大小
     size_t                           buffer_size;
 
     size_t                           busy_buffers_size;

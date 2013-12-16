@@ -423,6 +423,9 @@ ngx_http_upstream_create(ngx_http_request_t *r)
 void
 ngx_http_upstream_init(ngx_http_request_t *r)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
+									"[%s:%d]",
+									__func__, __LINE__);
     ngx_connection_t     *c;
 
     c = r->connection;
@@ -455,6 +458,10 @@ ngx_http_upstream_init(ngx_http_request_t *r)
 static void
 ngx_http_upstream_init_request(ngx_http_request_t *r)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
+									"[%s:%d]",
+									__func__, __LINE__);
+	
     ngx_str_t                      *host;
     ngx_uint_t                      i;
     ngx_resolver_ctx_t             *ctx, temp;
@@ -1119,6 +1126,9 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 static void
 ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
+									"[%s:%d]",
+									__func__, __LINE__);
     ngx_int_t          rc;
     ngx_time_t        *tp;
     ngx_connection_t  *c;
@@ -1407,6 +1417,9 @@ ngx_http_upstream_reinit(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
+									"[%s:%d]",
+									__func__, __LINE__);
     ngx_int_t          rc;
     ngx_connection_t  *c;
 
@@ -1496,13 +1509,14 @@ ngx_http_upstream_send_request_handler(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
     ngx_connection_t  *c;
-
+//获取上游服务器间表示连接的ngx_connection_t结构体
     c = u->peer.connection;
 
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "[%s:%d]http upstream send request handler", __func__, __LINE__);
-
+//写事件的timeout标志位为1时表示向上游服务器发送的请求已经超时
     if (c->write->timedout) {
+//将超时错误传递给ngx_http_upsteam_next方法，该方法将会根据允许的错误重连策略决定：重新发起连接执行upstream，或者结束upstream请求
         ngx_http_upstream_next(r, u, NGX_HTTP_UPSTREAM_FT_TIMEOUT);
         return;
     }
@@ -1515,15 +1529,17 @@ ngx_http_upstream_send_request_handler(ngx_http_request_t *r,
     }
 
 #endif
-
+//header_sent标志位为1时表明上游服务器的响应需要直接转发给客户端，从而此时nginx已经把响应包头转发给了客户端
     if (u->header_sent) {
+
+//header_send为1时一定是已经解析完全部的上游响应包头，并且开始向下游发送HTTP包头，此时，是不应该继续向上游发送请求的，所以把write_event_handler设置为任何工作都没有做的ngx_http_upstream_dummy_handler
         u->write_event_handler = ngx_http_upstream_dummy_handler;
 
         (void) ngx_handle_write_event(c->write, 0);
-
+//因为不存在继续发送请求到上游的可能，所以直接返回
         return;
     }
-
+//ngx_http_upstream_send_request方法向上游服务器发送请求
     ngx_http_upstream_send_request(r, u);
 }
 
@@ -2009,6 +2025,9 @@ static void
 ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
+									"[%s:%d]",
+									__func__, __LINE__);
     size_t             size;
     ssize_t            n;
     ngx_buf_t         *b;
@@ -2130,24 +2149,24 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
 
     if (!u->buffering) {
-
+//如果input_filter为空，则设置默认的filter
         if (u->input_filter == NULL) {
             u->input_filter_init = ngx_http_upstream_non_buffered_filter_init;
             u->input_filter = ngx_http_upstream_non_buffered_filter;
             u->input_filter_ctx = r;
         }
-
+//设置读写函数
         u->read_event_handler = ngx_http_upstream_process_non_buffered_upstream;
         r->write_event_handler =
                              ngx_http_upstream_process_non_buffered_downstream;
 
         r->limit_rate = 0;
-
+//调用input filter初始化函数
         if (u->input_filter_init(u->input_filter_ctx) == NGX_ERROR) {
             ngx_http_upstream_finalize_request(r, u, 0);
             return;
         }
-
+//打开nodelay，准备将数据完全发送出去
         if (clcf->tcp_nodelay && c->tcp_nodelay == NGX_TCP_NODELAY_UNSET) {
             ngx_log_debug0(NGX_LOG_DEBUG_HTTP, c->log, 0, "tcp_nodelay");
 
@@ -2164,30 +2183,32 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
             c->tcp_nodelay = NGX_TCP_NODELAY_SET;
         }
-
+//得到将要发送的数据的大小
         n = u->buffer.last - u->buffer.pos;
 
         if (n) {
+//注意这里，可以看到buffer被reset了
             u->buffer.last = u->buffer.pos;
-
+//设置将要发送的数据大小
             u->state->response_length += n;
-
+//调用input filter
             if (u->input_filter(u->input_filter_ctx, n) == NGX_ERROR) {
                 ngx_http_upstream_finalize_request(r, u, 0);
                 return;
             }
-
+//最终开始发送数据到downstream
             ngx_http_upstream_process_non_buffered_downstream(r);
 
         } else {
+//说明buffer是空的
             u->buffer.pos = u->buffer.start;
             u->buffer.last = u->buffer.start;
-
+//此时刷新数据到client
             if (ngx_http_send_special(r, NGX_HTTP_FLUSH) == NGX_ERROR) {
                 ngx_http_upstream_finalize_request(r, u, 0);
                 return;
             }
-
+//如果可读，则继续读取upstream的数据
             if (u->peer.connection->read->ready || u->length == 0) {
                 ngx_http_upstream_process_non_buffered_upstream(r, u);
             }
@@ -2856,6 +2877,9 @@ static void
 ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
     ngx_uint_t ft_type)
 {
+		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
+									"[%s:%d]",
+									__func__, __LINE__);
     ngx_uint_t  status, state;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
