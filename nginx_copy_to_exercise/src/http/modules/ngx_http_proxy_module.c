@@ -628,6 +628,7 @@ static ngx_path_init_t  ngx_http_proxy_temp_path = {
 static ngx_int_t
 ngx_http_proxy_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                   rc;
     ngx_http_upstream_t        *u;
     ngx_http_proxy_ctx_t       *ctx;
@@ -713,6 +714,7 @@ static ngx_int_t
 ngx_http_proxy_eval(ngx_http_request_t *r, ngx_http_proxy_ctx_t *ctx,
     ngx_http_proxy_loc_conf_t *plcf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char               *p;
     size_t                add;
     u_short               port;
@@ -817,6 +819,7 @@ ngx_http_proxy_eval(ngx_http_request_t *r, ngx_http_proxy_ctx_t *ctx,
 static ngx_int_t
 ngx_http_proxy_create_key(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                      len, loc_len;
     u_char                     *p;
     uintptr_t                   escape;
@@ -916,6 +919,7 @@ ngx_http_proxy_create_key(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_proxy_create_request(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                        len, uri_len, loc_len, body_len;
     uintptr_t                     escape;
     ngx_buf_t                    *b;
@@ -1242,6 +1246,7 @@ ngx_http_proxy_create_request(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_proxy_reinit_request(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_ctx_t  *ctx;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_proxy_module);
@@ -1268,6 +1273,7 @@ ngx_http_proxy_reinit_request(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_proxy_process_status_line(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                 len;
     ngx_int_t              rc;
     ngx_http_upstream_t   *u;
@@ -1348,6 +1354,7 @@ ngx_http_proxy_process_status_line(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_proxy_process_header(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                       rc;
     ngx_table_elt_t                *h;
     ngx_http_upstream_t            *u;
@@ -1494,6 +1501,7 @@ ngx_http_proxy_process_header(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_proxy_input_filter_init(void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t    *r = data;
     ngx_http_upstream_t   *u;
     ngx_http_proxy_ctx_t  *ctx;
@@ -1554,6 +1562,7 @@ ngx_http_proxy_input_filter_init(void *data)
 static ngx_int_t
 ngx_http_proxy_copy_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_buf_t           *b;
     ngx_chain_t         *cl;
     ngx_http_request_t  *r;
@@ -1625,6 +1634,7 @@ ngx_http_proxy_copy_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
 static ngx_inline ngx_int_t
 ngx_http_proxy_parse_chunked(ngx_http_request_t *r, ngx_buf_t *buf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                *pos, ch, c;
     ngx_int_t              rc;
     ngx_http_proxy_ctx_t  *ctx;
@@ -1884,6 +1894,7 @@ invalid:
 static ngx_int_t
 ngx_http_proxy_chunked_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t              rc;
     ngx_buf_t             *b, **prev;
     ngx_chain_t           *cl;
@@ -2028,6 +2039,7 @@ ngx_http_proxy_chunked_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
 static ngx_int_t
 ngx_http_proxy_non_buffered_copy_filter(void *data, ssize_t bytes)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t   *r = data;
 
     ngx_buf_t            *b;
@@ -2074,6 +2086,7 @@ ngx_http_proxy_non_buffered_copy_filter(void *data, ssize_t bytes)
 static ngx_int_t
 ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t   *r = data;
 
     ngx_int_t              rc;
@@ -2201,6 +2214,7 @@ ngx_http_proxy_non_buffered_chunked_filter(void *data, ssize_t bytes)
 static void
 ngx_http_proxy_abort_request(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "[%s:%d]abort http proxy request", __func__, __LINE__);
 
@@ -2211,6 +2225,7 @@ ngx_http_proxy_abort_request(ngx_http_request_t *r)
 static void
 ngx_http_proxy_finalize_request(ngx_http_request_t *r, ngx_int_t rc)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "[%s:%d]finalize http proxy request", __func__, __LINE__);
 
@@ -2222,6 +2237,7 @@ static ngx_int_t
 ngx_http_proxy_host_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_ctx_t  *ctx;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_proxy_module);
@@ -2245,6 +2261,7 @@ static ngx_int_t
 ngx_http_proxy_port_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_ctx_t  *ctx;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_proxy_module);
@@ -2268,6 +2285,7 @@ static ngx_int_t
 ngx_http_proxy_add_x_forwarded_for_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p;
 
     v->valid = 1;
@@ -2305,6 +2323,7 @@ static ngx_int_t
 ngx_http_proxy_internal_body_length_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_ctx_t  *ctx;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_proxy_module);
@@ -2334,6 +2353,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_redirect(ngx_http_request_t *r, ngx_table_elt_t *h,
     size_t prefix)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                      len;
     ngx_int_t                   rc;
     ngx_uint_t                  i;
@@ -2365,6 +2385,7 @@ ngx_http_proxy_rewrite_redirect(ngx_http_request_t *r, ngx_table_elt_t *h,
 static ngx_int_t
 ngx_http_proxy_rewrite_cookie(ngx_http_request_t *r, ngx_table_elt_t *h)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                      prefix;
     u_char                     *p;
     ngx_int_t                   rc, rv;
@@ -2421,6 +2442,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_cookie_value(ngx_http_request_t *r, ngx_table_elt_t *h,
     u_char *value, ngx_array_t *rewrites)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                     len, prefix;
     u_char                    *p;
     ngx_int_t                  rc;
@@ -2451,6 +2473,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_complex_handler(ngx_http_request_t *r,
     ngx_table_elt_t *h, size_t prefix, size_t len, ngx_http_proxy_rewrite_t *pr)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t  pattern, replacement;
 
     if (ngx_http_complex_value(r, &pr->pattern.complex, &pattern) != NGX_OK) {
@@ -2478,6 +2501,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_regex_handler(ngx_http_request_t *r, ngx_table_elt_t *h,
     size_t prefix, size_t len, ngx_http_proxy_rewrite_t *pr)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t  pattern, replacement;
 
     pattern.len = len;
@@ -2506,6 +2530,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_domain_handler(ngx_http_request_t *r,
     ngx_table_elt_t *h, size_t prefix, size_t len, ngx_http_proxy_rewrite_t *pr)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char     *p;
     ngx_str_t   pattern, replacement;
 
@@ -2537,6 +2562,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite(ngx_http_request_t *r, ngx_table_elt_t *h, size_t prefix,
     size_t len, ngx_str_t *replacement)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p, *data;
     size_t   new_len;
 
@@ -2574,6 +2600,7 @@ ngx_http_proxy_rewrite(ngx_http_request_t *r, ngx_table_elt_t *h, size_t prefix,
 static ngx_int_t
 ngx_http_proxy_add_variables(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_variable_t  *var, *v;
 
     for (v = ngx_http_proxy_vars; v->name.len; v++) {
@@ -2593,6 +2620,7 @@ ngx_http_proxy_add_variables(ngx_conf_t *cf)
 static void *
 ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_proxy_loc_conf_t));
@@ -2686,6 +2714,7 @@ ngx_http_proxy_create_loc_conf(ngx_conf_t *cf)
 static char *
 ngx_http_proxy_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *prev = parent;
     ngx_http_proxy_loc_conf_t *conf = child;
 
@@ -3073,6 +3102,7 @@ static ngx_int_t
 ngx_http_proxy_merge_headers(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *conf,
     ngx_http_proxy_loc_conf_t *prev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                       *p;
     size_t                        size;
     uintptr_t                    *code;
@@ -3346,6 +3376,7 @@ ngx_http_proxy_merge_headers(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *conf,
 static char *
 ngx_http_proxy_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     size_t                      add;
@@ -3472,6 +3503,7 @@ ngx_http_proxy_pass(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_redirect(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     u_char                            *p;
@@ -3618,6 +3650,7 @@ ngx_http_proxy_redirect(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_cookie_domain(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     ngx_str_t                         *value;
@@ -3705,6 +3738,7 @@ ngx_http_proxy_cookie_domain(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_cookie_path(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     ngx_str_t                         *value;
@@ -3793,6 +3827,7 @@ static ngx_int_t
 ngx_http_proxy_rewrite_regex(ngx_conf_t *cf, ngx_http_proxy_rewrite_t *pr,
     ngx_str_t *regex, ngx_uint_t caseless)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_PCRE)
     u_char               errstr[NGX_MAX_CONF_ERRSTR];
     ngx_regex_compile_t  rc;
@@ -3829,6 +3864,7 @@ ngx_http_proxy_rewrite_regex(ngx_conf_t *cf, ngx_http_proxy_rewrite_t *pr,
 static char *
 ngx_http_proxy_store(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     ngx_str_t                  *value;
@@ -3888,6 +3924,7 @@ ngx_http_proxy_store(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     ngx_str_t  *value;
@@ -3920,6 +3957,7 @@ ngx_http_proxy_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_cache_key(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_proxy_loc_conf_t *plcf = conf;
 
     ngx_str_t                         *value;
@@ -3950,6 +3988,7 @@ ngx_http_proxy_cache_key(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_proxy_lowat_check(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_FREEBSD)
     ssize_t *np = data;
 
@@ -3982,6 +4021,7 @@ ngx_http_proxy_lowat_check(ngx_conf_t *cf, void *post, void *data)
 static ngx_int_t
 ngx_http_proxy_set_ssl(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *plcf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_pool_cleanup_t  *cln;
 
     plcf->upstream.ssl = ngx_pcalloc(cf->pool, sizeof(ngx_ssl_t));
@@ -4017,6 +4057,7 @@ ngx_http_proxy_set_ssl(ngx_conf_t *cf, ngx_http_proxy_loc_conf_t *plcf)
 static void
 ngx_http_proxy_set_vars(ngx_url_t *u, ngx_http_proxy_vars_t *v)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (u->family != AF_UNIX) {
 
         if (u->no_port || u->port == u->default_port) {

@@ -385,6 +385,7 @@ ngx_conf_bitmask_t  ngx_http_upstream_ignore_headers_masks[] = {
 ngx_int_t
 ngx_http_upstream_create(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_t  *u;
 
     u = r->upstream;
@@ -423,9 +424,7 @@ ngx_http_upstream_create(ngx_http_request_t *r)
 void
 ngx_http_upstream_init(ngx_http_request_t *r)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t     *c;
 
     c = r->connection;
@@ -458,9 +457,7 @@ ngx_http_upstream_init(ngx_http_request_t *r)
 static void
 ngx_http_upstream_init_request(ngx_http_request_t *r)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 	
     ngx_str_t                      *host;
     ngx_uint_t                      i;
@@ -672,6 +669,7 @@ found:
 static ngx_int_t
 ngx_http_upstream_cache(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_http_cache_t  *c;
 
@@ -825,6 +823,7 @@ ngx_http_upstream_cache(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static ngx_int_t
 ngx_http_upstream_cache_send(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_http_cache_t  *c;
 
@@ -879,6 +878,7 @@ ngx_http_upstream_cache_send(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_resolve_handler(ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t            *r;
     ngx_http_upstream_t           *u;
     ngx_http_upstream_resolved_t  *ur;
@@ -935,6 +935,7 @@ ngx_http_upstream_resolve_handler(ngx_resolver_ctx_t *ctx)
 static void
 ngx_http_upstream_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t     *c;
     ngx_http_request_t   *r;
     ngx_http_log_ctx_t   *ctx;
@@ -968,6 +969,7 @@ ngx_http_upstream_handler(ngx_event_t *ev)
 static void
 ngx_http_upstream_rd_check_broken_connection(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_check_broken_connection(r, r->connection->read);
 }
 
@@ -975,6 +977,7 @@ ngx_http_upstream_rd_check_broken_connection(ngx_http_request_t *r)
 static void
 ngx_http_upstream_wr_check_broken_connection(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_check_broken_connection(r, r->connection->write);
 }
 
@@ -983,6 +986,7 @@ static void
 ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
     ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                  n;
     char                 buf[1];
     ngx_err_t            err;
@@ -1126,9 +1130,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
 static void
 ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_time_t        *tp;
     ngx_connection_t  *c;
@@ -1282,6 +1284,7 @@ static void
 ngx_http_upstream_ssl_init_connection(ngx_http_request_t *r,
     ngx_http_upstream_t *u, ngx_connection_t *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t   rc;
 
     if (ngx_ssl_create_connection(u->conf->ssl, c,
@@ -1320,6 +1323,7 @@ ngx_http_upstream_ssl_init_connection(ngx_http_request_t *r,
 static void
 ngx_http_upstream_ssl_handshake(ngx_connection_t *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t   *r;
     ngx_http_upstream_t  *u;
 
@@ -1350,6 +1354,7 @@ ngx_http_upstream_ssl_handshake(ngx_connection_t *c)
 static ngx_int_t
 ngx_http_upstream_reinit(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl;
 
     if (u->reinit_request(r) != NGX_OK) {
@@ -1417,9 +1422,7 @@ ngx_http_upstream_reinit(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_send_request(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_connection_t  *c;
 
@@ -1508,6 +1511,7 @@ static void
 ngx_http_upstream_send_request_handler(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t  *c;
 //获取上游服务器间表示连接的ngx_connection_t结构体
     c = u->peer.connection;
@@ -1547,6 +1551,7 @@ ngx_http_upstream_send_request_handler(ngx_http_request_t *r,
 static void
 ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t            n;
     ngx_int_t          rc;
     ngx_connection_t  *c;
@@ -1734,6 +1739,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static ngx_int_t
 ngx_http_upstream_test_next(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t                 status;
     ngx_http_upstream_next_t  *un;
 
@@ -2025,9 +2031,7 @@ static void
 ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t             size;
     ssize_t            n;
     ngx_buf_t         *b;
@@ -2049,6 +2053,7 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     b = &u->buffer;
 
     for ( ;; ) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 
         size = b->end - b->last;
 
@@ -2083,19 +2088,23 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     }
 
     if (u->length == 0) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
         ngx_http_upstream_finalize_request(r, u, 0);
         return;
     }
 
     if (ngx_handle_read_event(rev, 0) != NGX_OK) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
         ngx_http_upstream_finalize_request(r, u, NGX_ERROR);
         return;
     }
 
     if (rev->active) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
         ngx_add_timer(rev, u->conf->read_timeout);
 
     } else if (rev->timer_set) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
         ngx_del_timer(rev);
     }
 }
@@ -2104,6 +2113,7 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
 static void
 ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                        tcp_nodelay;
     ssize_t                    n;
     ngx_int_t                  rc;
@@ -2405,6 +2415,7 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_process_non_buffered_downstream(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_event_t          *wev;
     ngx_connection_t     *c;
     ngx_http_upstream_t  *u;
@@ -2433,6 +2444,7 @@ static void
 ngx_http_upstream_process_non_buffered_upstream(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t  *c;
 
     c = u->peer.connection;
@@ -2614,6 +2626,7 @@ ngx_http_upstream_non_buffered_filter(void *data, ssize_t bytes)
 static void
 ngx_http_upstream_process_downstream(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_event_t          *wev;
     ngx_connection_t     *c;
     ngx_event_pipe_t     *p;
@@ -2685,6 +2698,7 @@ static void
 ngx_http_upstream_process_upstream(ngx_http_request_t *r,
     ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t  *c;
 
     c = u->peer.connection;
@@ -2712,6 +2726,7 @@ ngx_http_upstream_process_upstream(ngx_http_request_t *r,
 static void
 ngx_http_upstream_process_request(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_temp_file_t      *tf;
     ngx_event_pipe_t     *p;
     ngx_http_upstream_t  *u;
@@ -2790,6 +2805,7 @@ ngx_http_upstream_process_request(ngx_http_request_t *r)
 static void
 ngx_http_upstream_store(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                  root;
     time_t                  lm;
     ngx_str_t               path;
@@ -2868,6 +2884,7 @@ ngx_http_upstream_store(ngx_http_request_t *r, ngx_http_upstream_t *u)
 static void
 ngx_http_upstream_dummy_handler(ngx_http_request_t *r, ngx_http_upstream_t *u)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "[%s:%d]http upstream dummy handler", __func__, __LINE__);
 }
@@ -2877,9 +2894,7 @@ static void
 ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
     ngx_uint_t ft_type)
 {
-		ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0
-									"[%s:%d]",
-									__func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  status, state;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -3010,6 +3025,7 @@ ngx_http_upstream_next(ngx_http_request_t *r, ngx_http_upstream_t *u,
 static void
 ngx_http_upstream_cleanup(void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_request_t *r = data;
 
     ngx_http_upstream_t  *u;
@@ -3034,6 +3050,7 @@ static void
 ngx_http_upstream_finalize_request(ngx_http_request_t *r,
     ngx_http_upstream_t *u, ngx_int_t rc)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_time_t  *tp;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -3174,6 +3191,7 @@ static ngx_int_t
 ngx_http_upstream_process_header_line(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  **ph;
 
     ph = (ngx_table_elt_t **) ((char *) &r->upstream->headers_in + offset);
@@ -3190,6 +3208,7 @@ static ngx_int_t
 ngx_http_upstream_ignore_header_line(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return NGX_OK;
 }
 
@@ -3198,6 +3217,7 @@ static ngx_int_t
 ngx_http_upstream_process_content_length(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_t  *u;
 
     u = r->upstream;
@@ -3213,6 +3233,7 @@ static ngx_int_t
 ngx_http_upstream_process_set_cookie(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_HTTP_CACHE)
     ngx_http_upstream_t  *u;
 
@@ -3231,6 +3252,7 @@ static ngx_int_t
 ngx_http_upstream_process_cache_control(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_array_t          *pa;
     ngx_table_elt_t     **ph;
     ngx_http_upstream_t  *u;
@@ -3319,6 +3341,7 @@ static ngx_int_t
 ngx_http_upstream_process_expires(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_t  *u;
 
     u = r->upstream;
@@ -3359,6 +3382,7 @@ static ngx_int_t
 ngx_http_upstream_process_accel_expires(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_t  *u;
 
     u = r->upstream;
@@ -3417,6 +3441,7 @@ static ngx_int_t
 ngx_http_upstream_process_limit_rate(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t             n;
     ngx_http_upstream_t  *u;
 
@@ -3441,6 +3466,7 @@ static ngx_int_t
 ngx_http_upstream_process_buffering(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                c0, c1, c2;
     ngx_http_upstream_t  *u;
 
@@ -3479,6 +3505,7 @@ static ngx_int_t
 ngx_http_upstream_process_charset(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (r->upstream->conf->ignore_headers & NGX_HTTP_UPSTREAM_IGN_XA_CHARSET) {
         return NGX_OK;
     }
@@ -3493,6 +3520,7 @@ static ngx_int_t
 ngx_http_upstream_process_connection(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     r->upstream->headers_in.connection = h;
 
     if (ngx_strlcasestrn(h->value.data, h->value.data + h->value.len,
@@ -3510,6 +3538,7 @@ static ngx_int_t
 ngx_http_upstream_process_transfer_encoding(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     r->upstream->headers_in.transfer_encoding = h;
 
     if (ngx_strlcasestrn(h->value.data, h->value.data + h->value.len,
@@ -3527,6 +3556,7 @@ static ngx_int_t
 ngx_http_upstream_copy_header_line(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *ho, **ph;
 
     ho = ngx_list_push(&r->headers_out.headers);
@@ -3549,6 +3579,7 @@ static ngx_int_t
 ngx_http_upstream_copy_multi_header_lines(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_array_t      *pa;
     ngx_table_elt_t  *ho, **ph;
 
@@ -3582,6 +3613,7 @@ static ngx_int_t
 ngx_http_upstream_copy_content_type(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p, *last;
 
     r->headers_out.content_type_len = h->value.len;
@@ -3634,6 +3666,7 @@ static ngx_int_t
 ngx_http_upstream_copy_last_modified(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *ho;
 
     ho = ngx_list_push(&r->headers_out.headers);
@@ -3662,6 +3695,7 @@ static ngx_int_t
 ngx_http_upstream_rewrite_location(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t         rc;
     ngx_table_elt_t  *ho;
 
@@ -3708,6 +3742,7 @@ static ngx_int_t
 ngx_http_upstream_rewrite_refresh(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char           *p;
     ngx_int_t         rc;
     ngx_table_elt_t  *ho;
@@ -3756,6 +3791,7 @@ static ngx_int_t
 ngx_http_upstream_rewrite_set_cookie(ngx_http_request_t *r, ngx_table_elt_t *h,
     ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t         rc;
     ngx_table_elt_t  *ho;
 
@@ -3793,6 +3829,7 @@ static ngx_int_t
 ngx_http_upstream_copy_allow_ranges(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *ho;
 
 #if (NGX_HTTP_CACHE)
@@ -3824,6 +3861,7 @@ static ngx_int_t
 ngx_http_upstream_copy_content_encoding(ngx_http_request_t *r,
     ngx_table_elt_t *h, ngx_uint_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *ho;
 
     ho = ngx_list_push(&r->headers_out.headers);
@@ -3844,6 +3882,7 @@ ngx_http_upstream_copy_content_encoding(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_upstream_add_variables(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_variable_t  *var, *v;
 
     for (v = ngx_http_upstream_vars; v->name.len; v++) {
@@ -3864,6 +3903,7 @@ static ngx_int_t
 ngx_http_upstream_addr_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     *p;
     size_t                      len;
     ngx_uint_t                  i;
@@ -3935,6 +3975,7 @@ static ngx_int_t
 ngx_http_upstream_status_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     *p;
     size_t                      len;
     ngx_uint_t                  i;
@@ -4000,6 +4041,7 @@ static ngx_int_t
 ngx_http_upstream_response_time_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     *p;
     size_t                      len;
     ngx_uint_t                  i;
@@ -4069,6 +4111,7 @@ static ngx_int_t
 ngx_http_upstream_response_length_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     *p;
     size_t                      len;
     ngx_uint_t                  i;
@@ -4129,6 +4172,7 @@ ngx_int_t
 ngx_http_upstream_header_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (r->upstream == NULL) {
         v->not_found = 1;
         return NGX_OK;
@@ -4146,6 +4190,7 @@ ngx_int_t
 ngx_http_upstream_cache_status(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  n;
 
     if (r->upstream == NULL || r->upstream->cache_status == 0) {
@@ -4170,6 +4215,7 @@ ngx_http_upstream_cache_status(ngx_http_request_t *r,
 static char *
 ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 		//获取upstream服务器租的名字，即upstream命令的参数
 		
     char                          *rv;
@@ -4283,6 +4329,7 @@ ngx_http_upstream(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 static char *
 ngx_http_upstream_server(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_srv_conf_t  *uscf = conf;
 
     time_t                       fail_timeout;
@@ -4422,6 +4469,7 @@ invalid:
 ngx_http_upstream_srv_conf_t *
 ngx_http_upstream_add(ngx_conf_t *cf, ngx_url_t *u, ngx_uint_t flags)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t                      i;
     ngx_http_upstream_server_t     *us;
     ngx_http_upstream_srv_conf_t   *uscf, **uscfp;
@@ -4538,6 +4586,7 @@ char *
 ngx_http_upstream_bind_set_slot(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     ngx_int_t     rc;
@@ -4575,6 +4624,7 @@ char *
 ngx_http_upstream_param_set_slot(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     ngx_str_t                   *value;
@@ -4620,6 +4670,7 @@ ngx_http_upstream_hide_headers_hash(ngx_conf_t *cf,
     ngx_http_upstream_conf_t *conf, ngx_http_upstream_conf_t *prev,
     ngx_str_t *default_hide_headers, ngx_hash_init_t *hash)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t       *h;
     ngx_uint_t       i, j;
     ngx_array_t      hide_headers;
@@ -4730,6 +4781,7 @@ ngx_http_upstream_hide_headers_hash(ngx_conf_t *cf,
 static void *
 ngx_http_upstream_create_main_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_main_conf_t  *umcf;
 
     umcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_upstream_main_conf_t));
@@ -4751,6 +4803,7 @@ ngx_http_upstream_create_main_conf(ngx_conf_t *cf)
 static char *
 ngx_http_upstream_init_main_conf(ngx_conf_t *cf, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_main_conf_t  *umcf = conf;
 
     ngx_uint_t                      i;
