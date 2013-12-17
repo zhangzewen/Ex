@@ -22,6 +22,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include <syslog.h>
 
 
 typedef struct {
@@ -841,6 +842,7 @@ ngx_str_t  ngx_http_core_get_method = { 3, (u_char *) "GET " };
 void
 ngx_http_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_main_conf_t  *cmcf;
 
     r->connection->log->action = NULL;
@@ -885,6 +887,7 @@ ngx_http_handler(ngx_http_request_t *r)
 void
 ngx_http_core_run_phases(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                   rc;
     ngx_http_phase_handler_t   *ph;
     ngx_http_core_main_conf_t  *cmcf;
@@ -907,6 +910,7 @@ ngx_http_core_run_phases(ngx_http_request_t *r)
 ngx_int_t
 ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  rc;
 
     /*
@@ -946,6 +950,7 @@ ngx_http_core_generic_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 ngx_int_t
 ngx_http_core_rewrite_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  rc;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -976,6 +981,7 @@ ngx_int_t
 ngx_http_core_find_config_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                    *p;
     size_t                     len;
     ngx_int_t                  rc;
@@ -1073,6 +1079,7 @@ ngx_int_t
 ngx_http_core_post_rewrite_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t  *cscf;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -1122,6 +1129,7 @@ ngx_http_core_post_rewrite_phase(ngx_http_request_t *r,
 ngx_int_t
 ngx_http_core_access_phase(ngx_http_request_t *r, ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *clcf;
 
@@ -1186,6 +1194,7 @@ ngx_int_t
 ngx_http_core_post_access_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  access_code;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
@@ -1216,6 +1225,7 @@ ngx_int_t
 ngx_http_core_try_files_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                        len, root, alias, reserve, allocated;
     u_char                       *p, *name;
     ngx_str_t                     path, args;
@@ -1433,6 +1443,7 @@ ngx_int_t
 ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_http_phase_handler_t *ph)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t     root;
     ngx_int_t  rc;
     ngx_str_t  path;
@@ -1489,6 +1500,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
 void
 ngx_http_update_location_config(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t  *clcf;
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
@@ -1583,6 +1595,7 @@ ngx_http_update_location_config(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_core_find_location(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                  rc;
     ngx_http_core_loc_conf_t  *pclcf;
 #if (NGX_PCRE)
@@ -1663,6 +1676,7 @@ static ngx_int_t
 ngx_http_core_find_static_location(ngx_http_request_t *r,
     ngx_http_location_tree_node_t *node)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char     *uri;
     size_t      len, n;
     ngx_int_t   rc, rv;
@@ -1743,6 +1757,7 @@ ngx_http_core_find_static_location(ngx_http_request_t *r,
 void *
 ngx_http_test_content_type(ngx_http_request_t *r, ngx_hash_t *types_hash)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char      c, *lowcase;
     size_t      len;
     ngx_uint_t  i, hash;
@@ -1785,6 +1800,7 @@ ngx_http_test_content_type(ngx_http_request_t *r, ngx_hash_t *types_hash)
 ngx_int_t
 ngx_http_set_content_type(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     c, *exten;
     ngx_str_t                 *type;
     ngx_uint_t                 i, hash;
@@ -1841,6 +1857,7 @@ ngx_http_set_content_type(ngx_http_request_t *r)
 void
 ngx_http_set_exten(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  i;
 
     ngx_str_null(&r->exten);
@@ -1866,6 +1883,7 @@ ngx_int_t
 ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
     ngx_str_t *ct, ngx_http_complex_value_t *cv)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t     rc;
     ngx_str_t     val;
     ngx_buf_t    *b;
@@ -1943,6 +1961,7 @@ ngx_http_send_response(ngx_http_request_t *r, ngx_uint_t status,
 ngx_int_t
 ngx_http_send_header(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (r->err_status) {
         r->headers_out.status = r->err_status;
         r->headers_out.status_line.len = 0;
@@ -1955,6 +1974,7 @@ ngx_http_send_header(ngx_http_request_t *r)
 ngx_int_t
 ngx_http_output_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_connection_t  *c;
 
@@ -1980,6 +2000,7 @@ u_char *
 ngx_http_map_uri_to_path(ngx_http_request_t *r, ngx_str_t *path,
     size_t *root_length, size_t reserved)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                    *last;
     size_t                     alias;
     ngx_http_core_loc_conf_t  *clcf;
@@ -2058,6 +2079,7 @@ ngx_http_map_uri_to_path(ngx_http_request_t *r, ngx_str_t *path,
 ngx_int_t
 ngx_http_auth_basic_user(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t   auth, encoded;
     ngx_uint_t  len;
 
@@ -2132,6 +2154,7 @@ ngx_http_auth_basic_user(ngx_http_request_t *r)
 ngx_int_t
 ngx_http_gzip_ok(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                     date, expires;
     ngx_uint_t                 p;
     ngx_array_t               *cc;
@@ -2300,6 +2323,7 @@ ok:
 static ngx_int_t
 ngx_http_gzip_accept_encoding(ngx_str_t *ae)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p, *start, *last;
 
     start = ae->data;
@@ -2368,6 +2392,7 @@ equal:
 ngx_uint_t
 ngx_http_gzip_quantity(u_char *p, u_char *last)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char      c;
     ngx_uint_t  n, q;
 
@@ -2426,6 +2451,7 @@ ngx_http_subrequest(ngx_http_request_t *r,
     ngx_str_t *uri, ngx_str_t *args, ngx_http_request_t **psr,
     ngx_http_post_subrequest_t *ps, ngx_uint_t flags)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_time_t                    *tp;
     ngx_connection_t              *c;
     ngx_http_request_t            *sr;
@@ -2559,6 +2585,7 @@ ngx_int_t
 ngx_http_internal_redirect(ngx_http_request_t *r,
     ngx_str_t *uri, ngx_str_t *args)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t  *cscf;
 
     r->uri_changes--;
@@ -2617,6 +2644,7 @@ ngx_http_internal_redirect(ngx_http_request_t *r,
 ngx_int_t
 ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t    *cscf;
     ngx_http_core_loc_conf_t   **clcfp;
     ngx_http_core_main_conf_t   *cmcf;
@@ -2692,6 +2720,7 @@ ngx_http_named_location(ngx_http_request_t *r, ngx_str_t *name)
 ngx_http_cleanup_t *
 ngx_http_cleanup_add(ngx_http_request_t *r, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_cleanup_t  *cln;
 
     r = r->main;
@@ -2729,6 +2758,7 @@ ngx_int_t
 ngx_http_set_disable_symlinks(ngx_http_request_t *r,
     ngx_http_core_loc_conf_t *clcf, ngx_str_t *path, ngx_open_file_info_t *of)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_HAVE_OPENAT)
     u_char     *p;
     ngx_str_t   from;
@@ -2779,6 +2809,7 @@ ngx_int_t
 ngx_http_get_forwarded_addr(ngx_http_request_t *r, ngx_addr_t *addr,
     u_char *xff, size_t xfflen, ngx_array_t *proxies, int recursive)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char           *p;
     in_addr_t         inaddr;
     ngx_addr_t        paddr;
@@ -2889,6 +2920,7 @@ ngx_http_get_forwarded_addr(ngx_http_request_t *r, ngx_addr_t *addr,
 static char *
 ngx_http_core_server(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char                        *rv;
     void                        *mconf;
     ngx_uint_t                   i;
@@ -3013,6 +3045,7 @@ ngx_http_core_server(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 static char *
 ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char                      *rv;
     u_char                    *mod;
     size_t                     len;
@@ -3214,6 +3247,7 @@ static ngx_int_t
 ngx_http_core_regex_location(ngx_conf_t *cf, ngx_http_core_loc_conf_t *clcf,
     ngx_str_t *regex, ngx_uint_t caseless)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_PCRE)
     ngx_regex_compile_t  rc;
     u_char               errstr[NGX_MAX_CONF_ERRSTR];
@@ -3254,6 +3288,7 @@ ngx_http_core_regex_location(ngx_conf_t *cf, ngx_http_core_loc_conf_t *clcf,
 static char *
 ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     char        *rv;
@@ -3281,6 +3316,7 @@ ngx_http_core_types(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t       *value, *content_type, *old;
@@ -3349,6 +3385,7 @@ ngx_http_core_type(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
 static ngx_int_t
 ngx_http_core_preconfiguration(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_http_variables_add_core_vars(cf);
 }
 
@@ -3356,6 +3393,7 @@ ngx_http_core_preconfiguration(ngx_conf_t *cf)
 static void *
 ngx_http_core_create_main_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_main_conf_t  *cmcf;
 
     cmcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_core_main_conf_t));
@@ -3383,6 +3421,7 @@ ngx_http_core_create_main_conf(ngx_conf_t *cf)
 static char *
 ngx_http_core_init_main_conf(ngx_conf_t *cf, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_main_conf_t *cmcf = conf;
 
     if (cmcf->server_names_hash_max_size == NGX_CONF_UNSET_UINT) {
@@ -3419,6 +3458,7 @@ ngx_http_core_init_main_conf(ngx_conf_t *cf, void *conf)
 static void *
 ngx_http_core_create_srv_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t  *cscf;
 
     cscf = ngx_pcalloc(cf->pool, sizeof(ngx_http_core_srv_conf_t));
@@ -3454,6 +3494,7 @@ ngx_http_core_create_srv_conf(ngx_conf_t *cf)
 static char *
 ngx_http_core_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t *prev = parent;
     ngx_http_core_srv_conf_t *conf = child;
 
@@ -3528,6 +3569,7 @@ ngx_http_core_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
 static void *
 ngx_http_core_create_loc_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t  *clcf;
 
     clcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_core_loc_conf_t));
@@ -3641,6 +3683,7 @@ static ngx_hash_key_t  ngx_http_core_default_types[] = {
 static char *
 ngx_http_core_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *prev = parent;
     ngx_http_core_loc_conf_t *conf = child;
 
@@ -3914,6 +3957,7 @@ ngx_http_core_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static char *
 ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t *cscf = conf;
 
     ngx_str_t              *value, size;
@@ -4235,6 +4279,7 @@ ngx_http_core_listen(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_srv_conf_t *cscf = conf;
 
     u_char                   ch;
@@ -4343,6 +4388,7 @@ ngx_http_core_server_name(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_root(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t                  *value;
@@ -4467,6 +4513,7 @@ static ngx_http_method_name_t  ngx_methods_names[] = {
 static char *
 ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *pclcf = conf;
 
     char                      *rv;
@@ -4569,6 +4616,7 @@ ngx_http_core_limit_except(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_directio(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t  *value;
@@ -4596,6 +4644,7 @@ ngx_http_core_directio(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     u_char                            *p;
@@ -4723,6 +4772,7 @@ ngx_http_core_error_page(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t                  *value;
@@ -4804,6 +4854,7 @@ ngx_http_core_try_files(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     time_t       inactive;
@@ -4883,6 +4934,7 @@ ngx_http_core_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t  *value, name;
@@ -4917,6 +4969,7 @@ ngx_http_core_error_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t  *value;
@@ -4950,6 +5003,7 @@ ngx_http_core_keepalive(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     if (clcf->internal != NGX_CONF_UNSET) {
@@ -4965,6 +5019,7 @@ ngx_http_core_internal(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_resolver(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t  *clcf = conf;
 
     ngx_str_t  *value;
@@ -4989,6 +5044,7 @@ ngx_http_core_resolver(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_gzip_disable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t  *clcf = conf;
 
 #if (NGX_PCRE)
@@ -5091,6 +5147,7 @@ ngx_http_gzip_disable(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t *clcf = conf;
 
     ngx_str_t                         *value;
@@ -5185,6 +5242,7 @@ ngx_http_disable_symlinks(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if (NGX_FREEBSD)
     ssize_t *np = data;
 
@@ -5215,6 +5273,7 @@ ngx_http_core_lowat_check(ngx_conf_t *cf, void *post, void *data)
 static char *
 ngx_http_core_pool_size(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t *sp = data;
 
     if (*sp < NGX_MIN_POOL_SIZE) {
