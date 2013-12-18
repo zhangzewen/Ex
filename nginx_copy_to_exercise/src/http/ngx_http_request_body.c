@@ -29,6 +29,7 @@ ngx_int_t
 ngx_http_read_client_request_body(ngx_http_request_t *r,
     ngx_http_client_body_handler_pt post_handler)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                     preread;
     ssize_t                    size;
     ngx_int_t                  rc;

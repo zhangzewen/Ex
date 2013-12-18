@@ -501,7 +501,11 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
 #endif
 
     u->store = (u->conf->store || u->conf->store_lengths);
-
+//对于upstream，同时又两个连接，一个client和nginx，一个nginx和upstream，这时会有两个回调，会改变
+//read_event_handler和write_event_handler，但是有三个条件
+//1.没有使用cache
+//2.不忽略client的提前终止
+//3.不是post_action
     if (!u->store && !r->post_action && !u->conf->ignore_client_abort) {
         r->read_event_handler = ngx_http_upstream_rd_check_broken_connection;
         r->write_event_handler = ngx_http_upstream_wr_check_broken_connection;
@@ -981,6 +985,9 @@ ngx_http_upstream_wr_check_broken_connection(ngx_http_request_t *r)
     ngx_http_upstream_check_broken_connection(r, r->connection->write);
 }
 
+//这个函数主要是用来检测client的连接是否完好，因此使用MSG_PEEK这个参数，也就是预读
+//分两部分
+//1.本身连接在进入这个回调函数之前连接都已经有错误了，这个时候如果是水平触发，则删除事件，然后finalize这个upstream（没有cache情况下），否则直接finalize这个upstream
 
 static void
 ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
@@ -1063,7 +1070,7 @@ ngx_http_upstream_check_broken_connection(ngx_http_request_t *r,
     }
 
 #endif
-
+//2.这部分的工作就是预读取1个字节，然后来判断是否连接已经被client断掉
     n = recv(c->fd, buf, 1, MSG_PEEK);
 
     err = ngx_socket_errno;
@@ -1221,7 +1228,7 @@ ngx_http_upstream_connect(ngx_http_request_t *r, ngx_http_upstream_t *u)
     u->writer.last = &u->writer.out;
     u->writer.connection = c;
     u->writer.limit = 0;
-
+//如果upstream已经发送了一部分数据了，此时需要重新初始化upstream
     if (u->request_sent) {
 //重新初始化upstream
         if (ngx_http_upstream_reinit(r, u) != NGX_OK) {

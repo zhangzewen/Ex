@@ -1448,7 +1448,7 @@ ngx_http_core_content_phase(ngx_http_request_t *r,
     ngx_int_t  rc;
     ngx_str_t  path;
 
-    if (r->content_handler) {
+    if (r->content_handler) { //在使用反向代理的时候用到，比如看ngx_proxy 的proxy_pass命令的操作
         r->write_event_handler = ngx_http_request_empty_handler;
         ngx_http_finalize_request(r, r->content_handler(r));
         return NGX_OK;
