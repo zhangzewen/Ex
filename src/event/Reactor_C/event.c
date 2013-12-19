@@ -24,7 +24,7 @@ static void event_queue_remove(struct event_base *, struct event *, int);
 
 static int event_haveevents(struct event_base *);
 
-static void event_process_actice(struct event_base *);
+static void event_process_active(struct event_base *);
 
 
 
@@ -41,7 +41,6 @@ struct event_base *event_init(void)
 
 struct event_base *event_base_new(void)
 {
-	int i;
 	struct event_base *base;
 	
 	if ((base = calloc(1, sizeof(struct event_base))) == NULL) {
@@ -111,7 +110,6 @@ static void event_process_active(struct event_base *base)
 {
 	struct event *ev;
 	struct event *tmp;
-	int i;
 	short ncalls;
 	
 

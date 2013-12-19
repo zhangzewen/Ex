@@ -10,6 +10,7 @@
 
 #include "http_epoll.h"
 #include "evbuf.h"
+#include "event.h"
 
 static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
 	
@@ -40,11 +41,11 @@ void ServerRead(int fd, short events, void *arg)
 	//nread = read(fd, buff, sizeof(buff) - 1);
 	nread = evbuffer_read(ev->buffer, fd, 16);
 	printf("\n----------------------------------------\n");
-	printf("ev->buffer->off: %d", ev->buffer->off);
+	printf("ev->buffer->off: %d", (int)ev->buffer->off);
 	printf("\n----------------------------------------\n");
 
 	if (nread  == -1) {
-		event_del(&ev);
+		event_del(ev);
 	}
 	
 	write(fd ,return_ok, sizeof(return_ok));
@@ -60,8 +61,6 @@ void ServerAccept(int fd, short events, void *arg)
 	struct event *cli_ev;
 	socklen_t addrlen = sizeof(addr);
 	cli_ev = calloc(1, sizeof(struct event));
-	int yes = 1;
-	int retval;
 
 	cfd = accept(fd ,(struct sockaddr *)&addr, &addrlen);
 	
@@ -83,7 +82,6 @@ void ServerAccept(int fd, short events, void *arg)
 int main(int argc, char *argv[])
 {
 	int listen_fd;
-	int epfd;
 	
 	event_init();
 	struct event ev;
