@@ -12,6 +12,7 @@
 ngx_buf_t *
 ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_buf_t *b;
 
     b = ngx_calloc_buf(pool);
@@ -47,6 +48,7 @@ ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
 ngx_chain_t *
 ngx_alloc_chain_link(ngx_pool_t *pool)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl;
 
     cl = pool->chain;
@@ -68,6 +70,7 @@ ngx_alloc_chain_link(ngx_pool_t *pool)
 ngx_chain_t *
 ngx_create_chain_of_bufs(ngx_pool_t *pool, ngx_bufs_t *bufs)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char       *p;
     ngx_int_t     i;
     ngx_buf_t    *b;
@@ -126,6 +129,7 @@ ngx_create_chain_of_bufs(ngx_pool_t *pool, ngx_bufs_t *bufs)
 ngx_int_t
 ngx_chain_add_copy(ngx_pool_t *pool, ngx_chain_t **chain, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl, **ll;
 
     ll = chain;
@@ -155,6 +159,7 @@ ngx_chain_add_copy(ngx_pool_t *pool, ngx_chain_t **chain, ngx_chain_t *in)
 ngx_chain_t *
 ngx_chain_get_free_buf(ngx_pool_t *p, ngx_chain_t **free)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl;
 
     if (*free) {
@@ -184,6 +189,7 @@ void
 ngx_chain_update_chains(ngx_pool_t *p, ngx_chain_t **free, ngx_chain_t **busy,
     ngx_chain_t **out, ngx_buf_tag_t tag)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl;
 
     if (*busy == NULL) {

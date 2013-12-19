@@ -25,6 +25,7 @@ static void ngx_drain_connections(void);
 ngx_listening_t *
 ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t            len;
     ngx_listening_t  *ls;
     struct sockaddr  *sa;
@@ -81,6 +82,7 @@ ngx_create_listening(ngx_conf_t *cf, void *sockaddr, socklen_t socklen)
 ngx_int_t
 ngx_set_inherited_sockets(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                     len;
     ngx_uint_t                 i;
     ngx_listening_t           *ls;
@@ -180,6 +182,7 @@ ngx_set_inherited_sockets(ngx_cycle_t *cycle)
 ngx_int_t
 ngx_open_listening_sockets(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int               reuseaddr;
     ngx_uint_t        i, tries, failed;
     ngx_err_t         err;
@@ -352,6 +355,7 @@ ngx_open_listening_sockets(ngx_cycle_t *cycle)
 void
 ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                        keepalive;
     ngx_uint_t                 i;
     ngx_listening_t           *ls;
@@ -471,6 +475,7 @@ ngx_configure_listening_sockets(ngx_cycle_t *cycle)
 void
 ngx_close_listening_sockets(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t         i;
     ngx_listening_t   *ls;
     ngx_connection_t  *c;
@@ -535,6 +540,7 @@ ngx_close_listening_sockets(ngx_cycle_t *cycle)
 ngx_connection_t *
 ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t         instance;
     ngx_event_t       *rev, *wev;
     ngx_connection_t  *c;
@@ -615,6 +621,7 @@ ngx_get_connection(ngx_socket_t s, ngx_log_t *log)
 void
 ngx_free_connection(ngx_connection_t *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* ngx_mutex_lock */
 
     c->data = ngx_cycle->free_connections;
@@ -635,6 +642,7 @@ ngx_free_connection(ngx_connection_t *c)
 void
 ngx_close_connection(ngx_connection_t *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_err_t     err;
     ngx_uint_t    log_error, level;
     ngx_socket_t  fd;
@@ -724,6 +732,7 @@ ngx_close_connection(ngx_connection_t *c)
 void
 ngx_reusable_connection(ngx_connection_t *c, ngx_uint_t reusable)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_log_debug3(NGX_LOG_DEBUG_CORE, c->log, 0,
                    "[%s:%d]reusable connection: %ui",
 									__func__, __LINE__,
@@ -747,6 +756,7 @@ ngx_reusable_connection(ngx_connection_t *c, ngx_uint_t reusable)
 static void
 ngx_drain_connections(void)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          i;
     ngx_queue_t       *q;
     ngx_connection_t  *c;
@@ -776,6 +786,7 @@ ngx_int_t
 ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
     ngx_uint_t port)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     socklen_t             len;
     ngx_uint_t            addr;
     u_char                sa[NGX_SOCKADDRLEN];
@@ -814,6 +825,7 @@ ngx_connection_local_sockaddr(ngx_connection_t *c, ngx_str_t *s,
 ngx_int_t
 ngx_connection_error(ngx_connection_t *c, ngx_err_t err, char *text)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  level;
 
     /* Winsock may return NGX_ECONNABORTED instead of NGX_ECONNRESET */

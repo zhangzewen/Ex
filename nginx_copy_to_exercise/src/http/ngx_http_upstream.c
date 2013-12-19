@@ -1581,20 +1581,21 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
     if (u->buffer.start == NULL) {
+//分配一块buffer，大小为fastcgi_buffer_size或者proxy_buffer_size
         u->buffer.start = ngx_palloc(r->pool, u->conf->buffer_size);
         if (u->buffer.start == NULL) {
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
             return;
         }
-
+//初始化对应的域
         u->buffer.pos = u->buffer.start;
         u->buffer.last = u->buffer.start;
         u->buffer.end = u->buffer.start + u->conf->buffer_size;
         u->buffer.temporary = 1;
 
         u->buffer.tag = u->output.tag;
-
+//初始化headers
         if (ngx_list_init(&u->headers_in.headers, r->pool, 8,
                           sizeof(ngx_table_elt_t))
             != NGX_OK)
@@ -1680,7 +1681,7 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
     /* rc == ngx_ok */
-
+//错误处理
     if (u->headers_in.status_n > NGX_HTTP_SPECIAL_RESPONSE) {
 
         if (r->subrequest_in_memory) {
@@ -1695,12 +1696,13 @@ ngx_http_upstream_process_header(ngx_http_request_t *r, ngx_http_upstream_t *u)
             return;
         }
     }
-
+//执行后续工作，主要是设置将要发送给client的header(r->header_out)
     if (ngx_http_upstream_process_headers(r, u) != NGX_OK) {
         return;
     }
 
     if (!r->subrequest_in_memory) {
+//发送response到client端
         ngx_http_upstream_send_response(r, u);
         return;
     }
@@ -1911,6 +1913,11 @@ ngx_http_upstream_test_connect(ngx_connection_t *c)
     return NGX_OK;
 }
 
+//
+//ngx_http_upstream_process_headers这个函数会对一个x_accept_redirect的头进行特殊处理
+//这个头主要是nginx提供了一种机制，让后端的server能够控制访问权限。比如后端限制某个页面
+//不能被用户访问，那么当用户访问这个页面的时候，后端server只需要设置X-Accel-Redirect这个头
+//到一个路径，然后nginx将会输出这个路径的内容给用户.
 
 static ngx_int_t
 ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
@@ -1928,7 +1935,7 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
         && !(u->conf->ignore_headers & NGX_HTTP_UPSTREAM_IGN_XA_REDIRECT))
     {
         ngx_http_upstream_finalize_request(r, u, NGX_DECLINED);
-
+//遍历headers
         part = &u->headers_in.headers.part;
         h = part->elts;
 
@@ -1943,7 +1950,7 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
                 h = part->elts;
                 i = 0;
             }
-
+//如果在ngx_http_upstream_headers_in中存在，并且这个头当redirect之后，还是不变得，此时则调用copy_handler
             hh = ngx_hash_find(&umcf->headers_in_hash, h[i].hash,
                                h[i].lowcase_key, h[i].key.len);
 
@@ -1955,11 +1962,11 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
                 }
             }
         }
-
+//取出uri
         uri = &u->headers_in.x_accel_redirect->value;
         ngx_str_null(&args);
         flags = NGX_HTTP_LOG_UNSAFE;
-
+//parse
         if (ngx_http_parse_unsafe_uri(r, uri, &args, &flags) != NGX_OK) {
             ngx_http_finalize_request(r, NGX_HTTP_NOT_FOUND);
             return NGX_DONE;
@@ -1968,15 +1975,18 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
         if (r->method != NGX_HTTP_HEAD) {
             r->method = NGX_HTTP_GET;
         }
-
+//内部重定向
         ngx_http_internal_redirect(r, uri, &args);
         ngx_http_finalize_request(r, NGX_DONE);
         return NGX_DONE;
     }
+//接下来就是没有X-Accel-Redirect头的情况.这个时候，前部分和上面处理类似，
+//首先从ngx_http_upstream_headers_in查找，如果存在则调用copy_handler,然后再
+//调用ngx_http_upstream_copy_header_line将剩余的头copy到r->header_out.
 
     part = &u->headers_in.headers.part;
     h = part->elts;
-
+//开始便利
     for (i = 0; /* void */; i++) {
 
         if (i >= part->nelts) {
@@ -1988,17 +1998,18 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
             h = part->elts;
             i = 0;
         }
-
+//查找hash，如果是需要hide的头，则continue
         if (ngx_hash_find(&u->conf->hide_headers_hash, h[i].hash,
                           h[i].lowcase_key, h[i].key.len))
         {
             continue;
         }
-
+//否则hash查找
         hh = ngx_hash_find(&umcf->headers_in_hash, h[i].hash,
                            h[i].lowcase_key, h[i].key.len);
 
         if (hh) {
+//调用copy_header
             if (hh->copy_handler(r, &h[i], hh->conf) != NGX_OK) {
                 ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -2007,7 +2018,7 @@ ngx_http_upstream_process_headers(ngx_http_request_t *r, ngx_http_upstream_t *u)
 
             continue;
         }
-
+//最后copy剩下的heade//最后copy剩下的headerr
         if (ngx_http_upstream_copy_header_line(r, &h[i], 0) != NGX_OK) {
             ngx_http_upstream_finalize_request(r, u,
                                                NGX_HTTP_INTERNAL_SERVER_ERROR);
@@ -2116,6 +2127,22 @@ ngx_http_upstream_process_body_in_memory(ngx_http_request_t *r,
     }
 }
 
+//这部分的函数入口是ngx_http_upstream_send_response，这里有一个很重要的标记，
+//那就是u->buffering，这个标记的含义就是nginx是否会尽可能多的读取upstream的数据。
+//如果关闭，则就是一个同步的发送，也就是接收多少，发送给客户端多少。默认这个是打开的。
+//也就是nginx会buf住upstream发送的数据。
+//
+//                     数据发送
+//												|
+//									是否需要buffering
+//                        |
+//							否				|         是
+//----------------------------------------------
+//    |                                        |
+//ngx_http_upstream_                          ngx_http_upstream)process_upstream
+//process_non_bufferd_downstream
+//
+
 
 static void
 ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
@@ -2164,6 +2191,11 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
     }
 
     clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
+//然后就是发送body部分，这里我们先来看buffering被关闭的情况，这里有两个要注意的回调函数，
+//分别是input_filter/input_filter_init,这个filter回调指的是对upstream发送给nginx的数据将要
+//发送前的filter(严格来说是一个body filter).这里如果input_filter没有被设置，则nginx会有默认
+//的回调.后面我们会分析这个默认的filter，以及这个filter具体是需要操作那个数据。要注意，这两个
+//回调都只是针对buffering被关闭的情况，而对应buffering打开的时候的情况，有另外的hook
 
     if (!u->buffering) {
 //如果input_filter为空，则设置默认的filter
