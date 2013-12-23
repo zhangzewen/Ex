@@ -29,7 +29,7 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
     for ( ;; ) {
         if (do_write) {
             p->log->action = "sending to client";
-
+//写数据到downstream
             rc = ngx_event_pipe_write_to_downstream(p);
 
             if (rc == NGX_ABORT) {
@@ -45,18 +45,18 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
         p->upstream_blocked = 0;
 
         p->log->action = "reading upstream";
-
+//读取数据
         if (ngx_event_pipe_read_upstream(p) == NGX_ABORT) {
             return NGX_ABORT;
         }
-
+//判断是否需要退出循环，p->read表示是否已经读取了upstream的数据，upstream_blocked表示是否downstream可写
         if (!p->read && !p->upstream_blocked) {
             break;
         }
-
+//可以看到如果读取了数据就准备写数据到downstream
         do_write = 1;
     }
-
+//判断是否需要挂载读事件
     if (p->upstream->fd != -1) {
         rev = p->upstream->read;
 
@@ -73,7 +73,7 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
             ngx_del_timer(rev);
         }
     }
-
+//挂载写事件
     if (p->downstream->fd != -1 && p->downstream->data == p->output_ctx) {
         wev = p->downstream->write;
         if (ngx_handle_write_event(wev, p->send_lowat) != NGX_OK) {
@@ -92,6 +92,21 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
 
     return NGX_OK;
 }
+//
+//																					read upstream
+//															/                 |                     \
+//                         p->preread_bufs      p->free_raw_bufs        p->bufs
+//																\                   \										/				
+//                                 \                   \                 /
+//                                  \                   upstream->recv_chain  																
+//                                   \                     /
+//                                    \                   /
+//                                     \                 /
+//                                     p->input_filter_chain
+//                                             |
+//                                        write downstream
+
+
 
 
 static ngx_int_t
@@ -112,21 +127,24 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 									 p->upstream->read->ready);
 
     for ( ;; ) {
-
+//判断upstream的状态
         if (p->upstream_eof || p->upstream_error || p->upstream_done) {
             break;
         }
-
+//如果preread_bufs为空（上面的初始化中这个buf也就是upstream读取头的时候，解析完头，然后剩
+//余的buf），并且upstream并不可读，此时则说明对数据也没有任何操作和读取的必要
         if (p->preread_bufs == NULL && !p->upstream->read->ready) {
             break;
         }
-
+//如果preread_bufs存在
         if (p->preread_bufs) {
 
             /* use the pre-read bufs if they exist */
-
+//使用preread_bufs
             chain = p->preread_bufs;
+//可以看到设置preread_bufs为空，这样子，下次循环，则会进入另外的处理，也就是需要从upstream读取数据
             p->preread_bufs = NULL;
+//n也就是u->buf的大小
             n = p->preread_size;
 
             ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
@@ -135,10 +153,12 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 													 n);
 
             if (n) {
+//设置read，也就是当前upstream中存在读取还没有发送的数据 
                 p->read = 1;
             }
 
         } else {
+//当p->preread_bufs为空的情况，此时就需要从upstream来读取数据，而读取之前则需要分配buf，以供upstream使用
 
 #if (NGX_HAVE_KQUEUE)
 
@@ -171,7 +191,7 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                 break;
             }
 #endif
-
+//首先看free_raw_bufs是否存在，如果存在，则直接使用它
             if (p->free_raw_bufs) {
 
                 /* use the free bufs if they exist */
@@ -185,7 +205,7 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                 }
 
             } else if (p->allocated < p->bufs.num) {
-
+//如果free_raw_bufs不存在，并且分配的buf数量没有超过bufs的个数，此时则创建新的buf
                 /* allocate a new buf if it's still allowed */
 
                 b = ngx_create_temp_buf(p->pool, p->bufs.size);
@@ -212,7 +232,8 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                  * if the bufs are not needed to be saved in a cache and
                  * a downstream is ready then write the bufs to a downstream
                  */
-
+//如果已经分配的bufs的个数大于预设定的个数，并且没有打开cache，而且downstream可写，则设置
+//upstream_blocked，准备写数据到upstream（这个是为了发送数据之后，数据buf能够被使用读
                 p->upstream_blocked = 1;
 
                 ngx_log_debug2(NGX_LOG_DEBUG_EVENT, p->log, 0,
@@ -229,6 +250,7 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                  * if it is allowed, then save some bufs from r->in
                  * to a temporary file, and add them to a r->out chain
                  */
+// 到达这里有两个情况，一个是cacheable打开，一个是当buf不够用了，此时就会将一部分数据buf到temp file中，这个函数
 
                 rc = ngx_event_pipe_write_chain_to_temp_file(p);
 
@@ -257,7 +279,7 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
                 if (rc != NGX_OK) {
                     return rc;
                 }
-
+//说明写成功，此时free_raw_bufs已经被重新赋值，也就是我们可以使用，所以类似上面free_raw_bufs存在的处理
                 chain = p->free_raw_bufs;
                 if (p->single_buf) {
                     p->free_raw_bufs = p->free_raw_bufs->next;
@@ -276,18 +298,18 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                 break;
             }
-
+//开始从后端读取数据，可以看到书记员被读取进chain，n表示读到的字节数
             n = p->upstream->recv_chain(p->upstream, chain);
 
             ngx_log_debug3(NGX_LOG_DEBUG_EVENT, p->log, 0,
                            "[%s:%d]pipe recv chain: %z",
 														__func__, __LINE__, n);
-
+//如果将chain添加到free_raw_bufs的开头
             if (p->free_raw_bufs) {
                 chain->next = p->free_raw_bufs;
             }
             p->free_raw_bufs = chain;
-
+//设置error
             if (n == NGX_ERROR) {
                 p->upstream_error = 1;
                 return NGX_ERROR;
@@ -300,45 +322,50 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
 
                 break;
             }
-
+//设置read，表示已经读取了数据
             p->read = 1;
-
+//如果返回0，则说明对端关闭了连接
             if (n == 0) {
                 p->upstream_eof = 1;
                 break;
             }
         }
-
+//更新已经读取了的字节数
         p->read_length += n;
         cl = chain;
         p->free_raw_bufs = NULL;
-
+//开始遍历chain，
         while (cl && n > 0) {
-
+//首先remove shadow buf
             ngx_event_pipe_remove_shadow_links(cl->buf);
-
+//得到当前的chain buf的空间大小（因为读取数据，是从cl->buf->last开始的）
             size = cl->buf->end - cl->buf->last;
-
+//如果已经读取的字节数大于等于chain buf，ze对当前的buf更新
             if (n >= size) {
+//更新last
                 cl->buf->last = cl->buf->end;
 
                 /* STUB */ cl->buf->num = p->num++;
-
+//调用input_filter
                 if (p->input_filter(p, cl->buf) == NGX_ERROR) {
                     return NGX_ABORT;
                 }
-
+//更新n, cl最终free chain
                 n -= size;
                 ln = cl;
                 cl = cl->next;
                 ngx_free_chain(p->pool, ln);
 
             } else {
+//否则说明当前的chain是最后一个chain，因此更新last然后设置你，以便退出循环
+//这里要注意，可以看到nginx并没有调用input_filter，这事因为，nginx会尽量的使cl->buf最大情况下调用
+//p->input_filter,不过这里会有个问题，当cl->buf没有最大，这次就会少调用一次p->input_filter, 不过nginx在最后会处理这个问题
                 cl->buf->last += n;
                 n = 0;
             }
         }
-
+//如果cl还存在，则说明我们开始设置的chain，只有一部分被使用了，因此此时将这写chain保存到
+//free_raw_bufs中。可以看到如果chain只有一部分被使用，然后当再次循环，则使用的chain会直接使用free_raw_bufs，也就是我们前一次没有使用完全的chain
         if (cl) {
             for (ln = cl; ln->next; ln = ln->next) { /* void */ }
 
@@ -433,7 +460,9 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
         p->upstream_done = 1;
         p->read = 1;
     }
-
+//上面的p->input_filter我们后面再分析，先来看函数剩余的部分剩余的这一部分
+//主要是处理free_raw_bufs，调用p->input_filter，将free_raw_bufs中的数据保存发送chain中，
+//这个就是为了解决前面少调用一次p->input_filter的情况。
     if ((p->upstream_eof || p->upstream_error) && p->free_raw_bufs) {
 
         /* STUB */ p->free_raw_bufs->buf->num = p->num++;
@@ -452,7 +481,7 @@ ngx_event_pipe_read_upstream(ngx_event_pipe_t *p)
             }
         }
     }
-
+//如果cache打开，并且p->in存在*也就是有读取的数据），则写数据到temp file
     if (p->cacheable && p->in) {
         if (ngx_event_pipe_write_chain_to_temp_file(p) == NGX_ABORT) {
             return NGX_ABORT;
@@ -870,7 +899,13 @@ free:
 
     return NGX_OK;
 }
+/*
 
+nginx默认实现的一个ngx_event_pipe_copy_input_filter，其中proxy等模块都是调用这个filter。它主要是拷贝buf(不是buf的内容，
+只是buf的属性)到p->in或者p->last_in,这两个域都是用来和write数据的时候交互用的。这两个域的区别是这样子的
+p->in只能保存一个chain，而p->in这条链上的剩余的chain都保存在p->last_in中，这么做的原因还不太清楚，而且搜索
+了下代码，last_in也没有被使用到.
+*/
 
 /* the copy input filter */
 
@@ -883,7 +918,7 @@ ngx_event_pipe_copy_input_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
     if (buf->pos == buf->last) {
         return NGX_OK;
     }
-
+//如果free存在，则从free中取得缓存的buf
     if (p->free) {
         cl = p->free;
         b = cl->buf;
@@ -891,19 +926,20 @@ ngx_event_pipe_copy_input_filter(ngx_event_pipe_t *p, ngx_buf_t *buf)
         ngx_free_chain(p->pool, cl);
 
     } else {
+//否则分配buf
         b = ngx_alloc_buf(p->pool);
         if (b == NULL) {
             return NGX_ERROR;
         }
     }
-
+//拷贝buf的属性
     ngx_memcpy(b, buf, sizeof(ngx_buf_t));
     b->shadow = buf;
     b->tag = p->tag;
     b->last_shadow = 1;
     b->recycled = 1;
     buf->shadow = b;
-
+//分配chain
     cl = ngx_alloc_chain_link(p->pool);
     if (cl == NULL) {
         return NGX_ERROR;

@@ -2340,19 +2340,22 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
 #endif
 
     p = u->pipe;
-
+//设置filter，可以看到就是http的输出filter
     p->output_filter = (ngx_event_pipe_output_filter_pt) ngx_http_output_filter;
     p->output_ctx = r;
     p->tag = u->output.tag;
+//设置bufs，他就是upstream中设置的bufs 
     p->bufs = u->conf->bufs;
+//busy buffers的大小
     p->busy_size = u->conf->busy_buffers_size;
+//upstream
     p->upstream = u->peer.connection;
     p->downstream = c;
     p->pool = r->pool;
     p->log = c->log;
-
+//设置是否需要cache
     p->cacheable = u->cacheable || u->store;
-
+//初始化temp_file
     p->temp_file = ngx_pcalloc(r->pool, sizeof(ngx_temp_file_t));
     if (p->temp_file == NULL) {
         ngx_http_upstream_finalize_request(r, u, 0);
@@ -2372,10 +2375,10 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
         p->temp_file->warn = "an upstream response is buffered "
                              "to a temporary file";
     }
-
+//temp file的相关设置
     p->max_temp_file_size = u->conf->max_temp_file_size;
     p->temp_file_write_size = u->conf->temp_file_write_size;
-
+//初始化preread bufs
     p->preread_bufs = ngx_alloc_chain_link(r->pool);
     if (p->preread_bufs == NULL) {
         ngx_http_upstream_finalize_request(r, u, 0);
@@ -2387,7 +2390,7 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
     u->buffer.recycled = 1;
 
     p->preread_size = u->buffer.last - u->buffer.pos;
-
+//设置cache相关
     if (u->cacheable) {
 
         p->buf_to_file = ngx_calloc_buf(r->pool);
@@ -2430,7 +2433,7 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
     } else {
         p->cyclic_temp_file = 0;
     }
-
+//事件相关的初始化
     p->read_timeout = u->conf->read_timeout;
     p->send_timeout = clcf->send_timeout;
     p->send_lowat = clcf->send_lowat;
@@ -2443,12 +2446,17 @@ ngx_http_upstream_send_response(ngx_http_request_t *r, ngx_http_upstream_t *u)
         ngx_http_upstream_finalize_request(r, u, 0);
         return;
     }
-
+//挂载读写回调函数，这里是一个upstream的读回调，一个是人r(client)的写回调
     u->read_event_handler = ngx_http_upstream_process_upstream;
     r->write_event_handler = ngx_http_upstream_process_downstream;
 
     ngx_http_upstream_process_upstream(r, u);
 }
+//主要是调用ngx_http_output_filter输出给body filter，然后根据返回值来更新busy_bufs（还没有发送完毕，则保存
+//未发送完毕的bufer到busy），可以看到和http部分的处理类似
+//
+//
+//
 
 
 static void
@@ -2524,7 +2532,7 @@ ngx_http_upstream_process_non_buffered_request(ngx_http_request_t *r,
     do_write = do_write || u->length == 0;
 
     for ( ;; ) {
-
+//如果u->out_bufs不为NULL则说明有需要发送的数据，如果u->busy_bufs，则说明上次有未发送完的数据
         if (do_write) {
 
             if (u->out_bufs || u->busy_bufs) {
@@ -2534,28 +2542,29 @@ ngx_http_upstream_process_non_buffered_request(ngx_http_request_t *r,
                     ngx_http_upstream_finalize_request(r, u, 0);
                     return;
                 }
-
+//更新busy chain
                 ngx_chain_update_chains(r->pool, &u->free_bufs, &u->busy_bufs,
                                         &u->out_bufs, u->output.tag);
             }
-
+//这里说明想要发送的数据都已经发送完毕
             if (u->busy_bufs == NULL) {
-
+//length为0，说明后端这次要发送的数据已经发送完毕
                 if (u->length == 0
                     || upstream->read->eof
                     || upstream->read->error)
                 {
+//此时finalize request，结束这次请求
                     ngx_http_upstream_finalize_request(r, u, 0);
                     return;
                 }
-
+//否则重置u->buffer，以便下次使用
                 b->pos = b->start;
                 b->last = b->start;
             }
         }
-
+//得到当前buf的剩余空间
         size = b->end - b->last;
-
+//如果还有数据需要接受，并且upstream可读，则读取数据
         if (size && upstream->read->ready) {
 
             n = upstream->recv(upstream, b->last, size);
@@ -2566,13 +2575,13 @@ ngx_http_upstream_process_non_buffered_request(ngx_http_request_t *r,
 
             if (n > 0) {
                 u->state->response_length += n;
-
+//再次调用input_filter，这里没有reset u->buffer.last这是因为这个值并没有更新
                 if (u->input_filter(u->input_filter_ctx, n) == NGX_ERROR) {
                     ngx_http_upstream_finalize_request(r, u, 0);
                     return;
                 }
             }
-
+//设置do_write，然后发送数据
             do_write = 1;
 
             continue;
@@ -2612,6 +2621,11 @@ ngx_http_upstream_process_non_buffered_request(ngx_http_request_t *r,
     }
 }
 
+//u->input_filter hook主要是对upstream发送的body进行一些处理，类似body filter，
+// 上面的分析中我们可以看到当调用u->input_filter之前将u->buffer.last重置为pos，
+//这个做法我有些不太理解， 我的猜测是让代码更清晰一些，因为在u->input_filter中我们会真正更新u->buffer.last.
+//在u->input_filter中，主要是会分配一个chain，然后挂载到u->out_bufs上，因为最终nginx会发送u->out_bufs
+//这个chain(后面的代码会看到).并且u->buffer的last也会被更新，我们来看使用最多，也就是默认的u->input_filter的实现:
 
 static ngx_int_t
 ngx_http_upstream_non_buffered_filter_init(void *data)
@@ -2630,7 +2644,7 @@ ngx_http_upstream_non_buffered_filter(void *data, ssize_t bytes)
     ngx_http_upstream_t  *u;
 
     u = r->upstream;
-
+//遍历u->out_bufs
     for (cl = u->out_bufs, ll = &u->out_bufs; cl; cl = cl->next) {
         ll = &cl->next;
     }
@@ -2644,14 +2658,15 @@ ngx_http_upstream_non_buffered_filter(void *data, ssize_t bytes)
 
     cl->buf->flush = 1;
     cl->buf->memory = 1;
-
+//取出将要发送的buffer
     b = &u->buffer;
-
+//更新last
     cl->buf->pos = b->last;
     b->last += bytes;
     cl->buf->last = b->last;
     cl->buf->tag = u->output.tag;
-
+//u->length 表示将要发送的数据的大小（content_length)如果为NGX_MAX_SIZE_T_VALUE，则说明
+//后端协议并没有指定需要发送的大小，此时我们只需要发送我们接受到的
     if (u->length == -1) {
         return NGX_OK;
     }
@@ -2731,6 +2746,10 @@ ngx_http_upstream_process_downstream(ngx_http_request_t *r)
 
     ngx_http_upstream_process_request(r);
 }
+//
+//这个函数首先会判断是否超时，如果超时则设置错误，否则调用ngx_event_pipe进入pipe的读处理，
+//然后调用ngx_http_upstream_process_request对upstream进行处理，比如退出等一系列操作，
+//因此这里最核心的函数就是ngx_event_pipe
 
 
 static void
@@ -2752,6 +2771,7 @@ ngx_http_upstream_process_upstream(ngx_http_request_t *r,
         ngx_connection_error(c, NGX_ETIMEDOUT, "upstream timed out");
 
     } else {
+//调用event_pipe对读取数据进行处理
         if (ngx_event_pipe(u->pipe, 0) == NGX_ABORT) {
             ngx_http_upstream_finalize_request(r, u, 0);
             return;

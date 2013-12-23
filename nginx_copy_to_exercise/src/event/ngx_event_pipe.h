@@ -23,13 +23,14 @@ typedef ngx_int_t (*ngx_event_pipe_output_filter_pt)(void *data,
 
 
 struct ngx_event_pipe_s {
+//表示nginx和cilent，以及和后端的两条连接
     ngx_connection_t  *upstream;
     ngx_connection_t  *downstream;
-
+//保存了从upstream读取的数据（没有经过任何处理的）以及缓存的buf
     ngx_chain_t       *free_raw_bufs;
     ngx_chain_t       *in;
     ngx_chain_t      **last_in;
-
+//buf到tempfile的数据会放到out中
     ngx_chain_t       *out;
     ngx_chain_t       *free;
     ngx_chain_t       *busy;
@@ -41,10 +42,10 @@ struct ngx_event_pipe_s {
 
     ngx_event_pipe_input_filter_pt    input_filter;
     void                             *input_ctx;
-
+//这个filter就是输出内容到client的函数，一般设置为ngx_chain_writer
     ngx_event_pipe_output_filter_pt   output_filter;
     void                             *output_ctx;
-
+//一些状态以及属性
     unsigned           read:1;
     unsigned           cacheable:1;
     unsigned           single_buf:1;
@@ -56,8 +57,9 @@ struct ngx_event_pipe_s {
     unsigned           downstream_done:1;
     unsigned           downstream_error:1;
     unsigned           cyclic_temp_file:1;
-
+//配合bufs使用，表示已经分配了的buf的个数
     ngx_int_t          allocated;
+//对应xxx_buffers，也就是读取后端的数据时的bufer大小以及个数
     ngx_bufs_t         bufs;
     ngx_buf_tag_t      tag;
 
@@ -65,21 +67,22 @@ struct ngx_event_pipe_s {
 
     off_t              read_length;
     off_t              length;
-
+//cache相关，max_temp_file_size表示最大的temp file的大小，temp_file_write_size表示buf将会flush到temp file中的大小
     off_t              max_temp_file_size;
     ssize_t            temp_file_write_size;
-
+//网络相关的参数，定时器，以及lowat
     ngx_msec_t         read_timeout;
     ngx_msec_t         send_timeout;
     ssize_t            send_lowat;
 
     ngx_pool_t        *pool;
     ngx_log_t         *log;
-
+//预读的buf以及大小，这里预读是指已经从upstream读取了的buf
     ngx_chain_t       *preread_bufs;
     size_t             preread_size;
+//cache相关表示将要cache到文件的buf
     ngx_buf_t         *buf_to_file;
-
+//cache相关，表示temp file 
     ngx_temp_file_t   *temp_file;
 
     /* STUB */ int     num;
