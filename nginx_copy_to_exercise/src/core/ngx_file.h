@@ -14,11 +14,11 @@
 
 
 struct ngx_file_s {
-    ngx_fd_t                   fd;
+    ngx_fd_t                   fd; //文件描述符
     ngx_str_t                  name;
     ngx_file_info_t            info;
 
-    off_t                      offset;
+    off_t                      offset;// offset
     off_t                      sys_offset;
 
     ngx_log_t                 *log;

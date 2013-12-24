@@ -19,10 +19,13 @@ ngx_uint_t  ngx_file_aio = 1;
 ssize_t
 ngx_read_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t  n;
 
-    ngx_log_debug4(NGX_LOG_DEBUG_CORE, file->log, 0,
-                   "read: %d, %p, %uz, %O", file->fd, buf, size, offset);
+    ngx_log_debug6(NGX_LOG_DEBUG_CORE, file->log, 0,
+                   "[%s:%d]read: %d, %p, %uz, %O", 
+										__func__, __LINE__,
+										file->fd, buf, size, offset);
 
 #if (NGX_HAVE_PREAD)
 
@@ -30,7 +33,9 @@ ngx_read_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 
     if (n == -1) {
         ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                      "pread() \"%s\" failed", file->name.data);
+                      "[%s:%d]pread() \"%s\" failed", 
+											__func__, __LINE__,
+											file->name.data);
         return NGX_ERROR;
     }
 
@@ -39,7 +44,9 @@ ngx_read_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
     if (file->sys_offset != offset) {
         if (lseek(file->fd, offset, SEEK_SET) == -1) {
             ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                          "lseek() \"%s\" failed", file->name.data);
+                          "[%s:%d]lseek() \"%s\" failed",
+														__func__, __LINE__,
+													 file->name.data);
             return NGX_ERROR;
         }
 
@@ -50,7 +57,9 @@ ngx_read_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 
     if (n == -1) {
         ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                      "read() \"%s\" failed", file->name.data);
+                      "[%s:%d]read() \"%s\" failed", 
+											__func__, __LINE__,
+											file->name.data);
         return NGX_ERROR;
     }
 
@@ -67,10 +76,13 @@ ngx_read_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 ssize_t
 ngx_write_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t  n, written;
 
-    ngx_log_debug4(NGX_LOG_DEBUG_CORE, file->log, 0,
-                   "write: %d, %p, %uz, %O", file->fd, buf, size, offset);
+    ngx_log_debug6(NGX_LOG_DEBUG_CORE, file->log, 0,
+                   "write: %d, %p, %uz, %O",
+									__func__, __LINE__,
+									 file->fd, buf, size, offset);
 
     written = 0;
 
@@ -81,7 +93,9 @@ ngx_write_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 
         if (n == -1) {
             ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                          "pwrite() \"%s\" failed", file->name.data);
+                          "[%s:%d]pwrite() \"%s\" failed",
+												__func__, __LINE__,
+												 file->name.data);
             return NGX_ERROR;
         }
 
@@ -101,7 +115,9 @@ ngx_write_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
     if (file->sys_offset != offset) {
         if (lseek(file->fd, offset, SEEK_SET) == -1) {
             ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                          "lseek() \"%s\" failed", file->name.data);
+                          "[%s:%d]lseek() \"%s\" failed",
+														__func__, __LINE__,
+													 file->name.data);
             return NGX_ERROR;
         }
 
@@ -113,7 +129,9 @@ ngx_write_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 
         if (n == -1) {
             ngx_log_error(NGX_LOG_CRIT, file->log, ngx_errno,
-                          "write() \"%s\" failed", file->name.data);
+                          "[%s:%d]write() \"%s\" failed",
+														__func__, __LINE__,
+													 file->name.data);
             return NGX_ERROR;
         }
 
@@ -133,6 +151,7 @@ ngx_write_file(ngx_file_t *file, u_char *buf, size_t size, off_t offset)
 ngx_fd_t
 ngx_open_tempfile(u_char *name, ngx_uint_t persistent, ngx_uint_t access)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_fd_t  fd;
 
     fd = open((const char *) name, O_CREAT|O_EXCL|O_RDWR,
@@ -152,6 +171,7 @@ ssize_t
 ngx_write_chain_to_file(ngx_file_t *file, ngx_chain_t *cl, off_t offset,
     ngx_pool_t *pool)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char        *prev;
     size_t         size;
     ssize_t        total, n;
@@ -258,6 +278,7 @@ ngx_write_chain_to_file(ngx_file_t *file, ngx_chain_t *cl, off_t offset,
 ngx_int_t
 ngx_set_file_time(u_char *name, ngx_fd_t fd, time_t s)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval  tv[2];
 
     tv[0].tv_sec = ngx_time();
@@ -276,6 +297,7 @@ ngx_set_file_time(u_char *name, ngx_fd_t fd, time_t s)
 ngx_int_t
 ngx_create_file_mapping(ngx_file_mapping_t *fm)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     fm->fd = ngx_open_file(fm->name, NGX_FILE_RDWR, NGX_FILE_TRUNCATE,
                            NGX_FILE_DEFAULT_ACCESS);
     if (fm->fd == NGX_INVALID_FILE) {
@@ -313,6 +335,7 @@ failed:
 void
 ngx_close_file_mapping(ngx_file_mapping_t *fm)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (munmap(fm->addr, fm->size) == -1) {
         ngx_log_error(NGX_LOG_CRIT, fm->log, ngx_errno,
                       "munmap(%uz) \"%s\" failed", fm->size, fm->name);
@@ -328,6 +351,7 @@ ngx_close_file_mapping(ngx_file_mapping_t *fm)
 ngx_int_t
 ngx_open_dir(ngx_str_t *name, ngx_dir_t *dir)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     dir->dir = opendir((const char *) name->data);
 
     if (dir->dir == NULL) {
@@ -343,6 +367,7 @@ ngx_open_dir(ngx_str_t *name, ngx_dir_t *dir)
 ngx_int_t
 ngx_read_dir(ngx_dir_t *dir)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     dir->de = readdir(dir->dir);
 
     if (dir->de) {
@@ -361,6 +386,7 @@ ngx_read_dir(ngx_dir_t *dir)
 ngx_int_t
 ngx_open_glob(ngx_glob_t *gl)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int  n;
 
     n = glob((char *) gl->pattern, GLOB_NOSORT, NULL, &gl->pglob);
@@ -384,6 +410,7 @@ ngx_open_glob(ngx_glob_t *gl)
 ngx_int_t
 ngx_read_glob(ngx_glob_t *gl, ngx_str_t *name)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t  count;
 
 #ifdef GLOB_NOMATCH
@@ -408,6 +435,7 @@ ngx_read_glob(ngx_glob_t *gl, ngx_str_t *name)
 void
 ngx_close_glob(ngx_glob_t *gl)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     globfree(&gl->pglob);
 }
 
@@ -415,6 +443,7 @@ ngx_close_glob(ngx_glob_t *gl)
 ngx_err_t
 ngx_trylock_fd(ngx_fd_t fd)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct flock  fl;
 
     ngx_memzero(&fl, sizeof(struct flock));
@@ -432,6 +461,7 @@ ngx_trylock_fd(ngx_fd_t fd)
 ngx_err_t
 ngx_lock_fd(ngx_fd_t fd)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct flock  fl;
 
     ngx_memzero(&fl, sizeof(struct flock));
@@ -449,6 +479,7 @@ ngx_lock_fd(ngx_fd_t fd)
 ngx_err_t
 ngx_unlock_fd(ngx_fd_t fd)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct flock  fl;
 
     ngx_memzero(&fl, sizeof(struct flock));
@@ -468,6 +499,7 @@ ngx_unlock_fd(ngx_fd_t fd)
 ngx_int_t
 ngx_read_ahead(ngx_fd_t fd, size_t n)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int  err;
 
     err = posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
@@ -488,6 +520,7 @@ ngx_read_ahead(ngx_fd_t fd, size_t n)
 ngx_int_t
 ngx_directio_on(ngx_fd_t fd)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int  flags;
 
     flags = fcntl(fd, F_GETFL);
@@ -503,6 +536,7 @@ ngx_directio_on(ngx_fd_t fd)
 ngx_int_t
 ngx_directio_off(ngx_fd_t fd)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int  flags;
 
     flags = fcntl(fd, F_GETFL);
@@ -522,6 +556,7 @@ ngx_directio_off(ngx_fd_t fd)
 size_t
 ngx_fs_bsize(u_char *name)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct statfs  fs;
 
     if (statfs((char *) name, &fs) == -1) {
@@ -540,6 +575,7 @@ ngx_fs_bsize(u_char *name)
 size_t
 ngx_fs_bsize(u_char *name)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct statvfs  fs;
 
     if (statvfs((char *) name, &fs) == -1) {
@@ -558,6 +594,7 @@ ngx_fs_bsize(u_char *name)
 size_t
 ngx_fs_bsize(u_char *name)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return 512;
 }
 

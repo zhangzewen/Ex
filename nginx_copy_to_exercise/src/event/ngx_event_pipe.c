@@ -92,6 +92,7 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
 
     return NGX_OK;
 }
+/*
 //
 //																					read upstream
 //															/                 |                     \
@@ -105,7 +106,7 @@ ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
 //                                     p->input_filter_chain
 //                                             |
 //                                        write downstream
-
+*/
 
 
 
