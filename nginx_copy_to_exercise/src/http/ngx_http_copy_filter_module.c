@@ -92,9 +92,9 @@ ngx_http_copy_filter(ngx_http_request_t *r, ngx_chain_t *in)
                    "[%s:%d]http copy filter: \"%V?%V\"",
 										__func__, __LINE__,
 										 &r->uri, &r->args);
-
+//获取ctx
     ctx = ngx_http_get_module_ctx(r, ngx_http_copy_filter_module);
-
+//如果为空，需要初始化ctx
     if (ctx == NULL) {
         ctx = ngx_pcalloc(r->pool, sizeof(ngx_output_chain_ctx_t));
         if (ctx == NULL) {
@@ -105,10 +105,12 @@ ngx_http_copy_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
         conf = ngx_http_get_module_loc_conf(r, ngx_http_copy_filter_module);
         clcf = ngx_http_get_module_loc_conf(r, ngx_http_core_module);
-
+//设置对应的域
         ctx->sendfile = c->sendfile;
+//可以看到如果我们给request设置filter_need_in_memory的话，ctx的这个域就会被设置
         ctx->need_in_memory = r->main_filter_need_in_memory
                               || r->filter_need_in_memory;
+
         ctx->need_in_temp = r->filter_need_temporary;
 
         ctx->alignment = clcf->directio_alignment;
@@ -116,9 +118,10 @@ ngx_http_copy_filter(ngx_http_request_t *r, ngx_chain_t *in)
         ctx->pool = r->pool;
         ctx->bufs = conf->bufs;
         ctx->tag = (ngx_buf_tag_t) &ngx_http_copy_filter_module;
-
+//可以看到output_filter就是body filter的next
         ctx->output_filter = (ngx_output_chain_filter_pt)
                                   ngx_http_next_body_filter;
+//此时filter ctx为当前的请求
         ctx->filter_ctx = r;
 
 #if (NGX_HAVE_FILE_AIO)

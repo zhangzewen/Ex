@@ -37,6 +37,7 @@
 ngx_chain_t *
 ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int            rc, tcp_nodelay;
     off_t          size, send, prev_send, aligned, sent, fprev;
     u_char        *prev;
@@ -98,8 +99,9 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
 #if 1
             if (!ngx_buf_in_memory(cl->buf) && !cl->buf->in_file) {
                 ngx_log_error(NGX_LOG_ALERT, c->log, 0,
-                              "zero size buf in sendfile "
+                              "[%s:%d]zero size buf in sendfile "
                               "t:%d r:%d f:%d %p %p-%p %p %O-%O",
+															__func__, __LINE__,
                               cl->buf->temporary,
                               cl->buf->recycled,
                               cl->buf->in_file,
@@ -213,15 +215,17 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
         }
 
         /* get the file buf */
-
+//可以看到如果header的大小不为0则说明前面有需要发送的buf，因此我们就跳过in file的处理
         if (header.nelts == 0 && cl && cl->buf->in_file && send < limit) {
+//得到file
             file = cl->buf;
 
             /* coalesce the neighbouring file bufs */
-
+//开始合并
             do {
+//得到大小
                 size = cl->buf->file_last - cl->buf->file_pos;
-
+//如果太大则进行对齐处理
                 if (send + size > limit) {
                     size = limit - send;
 
@@ -232,9 +236,11 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
                         size = aligned - cl->buf->file_pos;
                     }
                 }
-
+//设置file_size
                 file_size += (size_t) size;
+//设置需要发送的大小
                 send += size;
+//和上面的in memory处理一样就是保存这次的last 
                 fprev = cl->buf->file_pos + size;
                 cl = cl->next;
 
@@ -318,13 +324,13 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
 
             ngx_log_debug1(NGX_LOG_DEBUG_EVENT, c->log, 0, "writev: %O", sent);
         }
-
+//如果send - prev_send == send则说明该发送的都发送完毕了
         if (send - prev_send == sent) {
             complete = 1;
         }
-
+//更新congnect的sent域
         c->sent += sent;
-
+//开始重新遍历chain，这里是为了防止没有发送完全的情况，此时我们就需要切割buf了
         for (cl = in; cl; cl = cl->next) {
 
             if (ngx_buf_special(cl->buf)) {
@@ -334,23 +340,24 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
             if (sent == 0) {
                 break;
             }
-
+//得到buf size
             size = ngx_buf_size(cl->buf);
-
+//如果大于当前的size，则说明这个buf的数据已经被完全发送完毕了，因此更新它的域
             if (sent >= size) {
+//更新send域
                 sent -= size;
-
+//如果在内存中则更新pos
                 if (ngx_buf_in_memory(cl->buf)) {
                     cl->buf->pos = cl->buf->last;
                 }
-
+//如果在filezhong
                 if (cl->buf->in_file) {
                     cl->buf->file_pos = cl->buf->file_last;
                 }
 
                 continue;
             }
-
+//到这里说明当前buf只有一部分被发送出去了，一次这里我们只需要修改指针，以便下次发送
             if (ngx_buf_in_memory(cl->buf)) {
                 cl->buf->pos += (size_t) sent;
             }
@@ -361,11 +368,13 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
 
             break;
         }
+//nginx中如果发送未完成的话，将会直接返回，返回的计时没有发送完毕的chain，
+//它的buf也已经更新
 
         if (eintr) {
             continue;
         }
-
+//如果未完成，则返回
         if (!complete) {
             wev->ready = 0;
             return cl;
@@ -374,7 +383,7 @@ ngx_linux_sendfile_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
         if (send >= limit || cl == NULL) {
             return cl;
         }
-
+//更新in，也就是开始处理下一个chain 
         in = cl;
     }
 }
