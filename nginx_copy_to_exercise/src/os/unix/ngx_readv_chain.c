@@ -175,6 +175,7 @@ ngx_readv_chain(ngx_connection_t *c, ngx_chain_t *chain)
 ssize_t
 ngx_readv_chain(ngx_connection_t *c, ngx_chain_t *chain)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char        *prev;
     ssize_t        n, size;
     ngx_err_t      err;
@@ -217,8 +218,10 @@ ngx_readv_chain(ngx_connection_t *c, ngx_chain_t *chain)
         chain = chain->next;
     }
 
-    ngx_log_debug2(NGX_LOG_DEBUG_EVENT, c->log, 0,
-                   "readv: %d:%d", vec.nelts, iov->iov_len);
+    ngx_log_debug4(NGX_LOG_DEBUG_EVENT, c->log, 0,
+                   "[%s:%d]readv: %d:%d",
+										__func__, __LINE__,
+										 vec.nelts, iov->iov_len);
 
     rev = c->read;
 

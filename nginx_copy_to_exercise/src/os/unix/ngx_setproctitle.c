@@ -34,6 +34,7 @@ static char *ngx_os_argv_last;
 ngx_int_t
 ngx_init_setproctitle(ngx_log_t *log)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char      *p;
     size_t       size;
     ngx_uint_t   i;
@@ -78,6 +79,7 @@ ngx_init_setproctitle(ngx_log_t *log)
 void
 ngx_setproctitle(char *title)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char     *p;
 
 #if (NGX_SOLARIS)
@@ -128,8 +130,10 @@ ngx_setproctitle(char *title)
         ngx_memset(p, NGX_SETPROCTITLE_PAD, ngx_os_argv_last - (char *) p);
     }
 
-    ngx_log_debug1(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
-                   "setproctitle: \"%s\"", ngx_os_argv[0]);
+    ngx_log_debug3(NGX_LOG_DEBUG_CORE, ngx_cycle->log, 0,
+                   "[%s:%d]setproctitle: \"%s\"",
+										__func__, __LINE__,
+										 ngx_os_argv[0]);
 }
 
 #endif /* NGX_SETPROCTITLE_USES_ENV */

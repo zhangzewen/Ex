@@ -13,6 +13,7 @@
 ssize_t
 ngx_unix_send(ngx_connection_t *c, u_char *buf, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t       n;
     ngx_err_t     err;
     ngx_event_t  *wev;
@@ -33,8 +34,10 @@ ngx_unix_send(ngx_connection_t *c, u_char *buf, size_t size)
     for ( ;; ) {
         n = send(c->fd, buf, size, 0);
 
-        ngx_log_debug3(NGX_LOG_DEBUG_EVENT, c->log, 0,
-                       "send: fd:%d %d of %d", c->fd, n, size);
+        ngx_log_debug5(NGX_LOG_DEBUG_EVENT, c->log, 0,
+                       "[%s:%d]send: fd:%d %d of %d",
+											__func__, __LINE__,
+											 c->fd, n, size);
 
         if (n > 0) {
             if (n < (ssize_t) size) {
@@ -49,7 +52,7 @@ ngx_unix_send(ngx_connection_t *c, u_char *buf, size_t size)
         err = ngx_socket_errno;
 
         if (n == 0) {
-            ngx_log_error(NGX_LOG_ALERT, c->log, err, "send() returned zero");
+            ngx_log_error(NGX_LOG_ALERT, c->log, err, "[%s:%d]send() returned zero", __func__, __LINE__);
             wev->ready = 0;
             return n;
         }
@@ -57,8 +60,8 @@ ngx_unix_send(ngx_connection_t *c, u_char *buf, size_t size)
         if (err == NGX_EAGAIN || err == NGX_EINTR) {
             wev->ready = 0;
 
-            ngx_log_debug0(NGX_LOG_DEBUG_EVENT, c->log, err,
-                           "send() not ready");
+            ngx_log_debug2(NGX_LOG_DEBUG_EVENT, c->log, err,
+                           "[%s:%d]send() not ready", __func__, __LINE__);
 
             if (err == NGX_EAGAIN) {
                 return NGX_AGAIN;

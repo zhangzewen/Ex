@@ -36,6 +36,7 @@ void
 ngx_http_script_flush_complex_value(ngx_http_request_t *r,
     ngx_http_complex_value_t *val)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t *index;
 
     index = val->flushes;
