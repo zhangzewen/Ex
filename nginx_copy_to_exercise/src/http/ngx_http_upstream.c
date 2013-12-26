@@ -575,8 +575,8 @@ ngx_http_upstream_init_request(ngx_http_request_t *r)
         uscf = u->conf->upstream;
 
     } else {
-//如果地址已经被resolve过了，此时创建round robin peer
         if (u->resolved->sockaddr) {
+//如果地址已经被resolve过了，此时创建round robin peer
 
             if (ngx_http_upstream_create_round_robin_peer(r, u->resolved)
                 != NGX_OK)
