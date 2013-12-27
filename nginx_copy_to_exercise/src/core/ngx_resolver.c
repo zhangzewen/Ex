@@ -12,7 +12,7 @@
 
 #define NGX_RESOLVER_UDP_SIZE   4096
 
-
+//http://blog.csdn.net/wan706364166/article/details/8525192
 typedef struct {
     u_char  ident_hi;
     u_char  ident_lo;
@@ -275,18 +275,23 @@ ngx_resolve_start(ngx_resolver_t *r, ngx_resolver_ctx_t *temp)
 
     if (temp) {
         addr = ngx_inet_addr(temp->name.data, temp->name.len);
-
+				//如果要解析的地址以为ip地址，则会设置temp->quick为1，那么在调用ngx_resolve_name时就不会进行域名解析，在后面的代码中可以看到
         if (addr != INADDR_NONE) {
             temp->resolver = r;
             temp->state = NGX_OK;
             temp->naddrs = 1;
             temp->addrs = &temp->addr;
             temp->addr = addr;
+						//不需要再进行域名解析
             temp->quick = 1;
 
             return temp;
         }
     }
+//r->udp_connection如果不为空，则表示在配置文件中有配置dns服务器地址
+//即当ngx_resolver_create在调用时的第二个参数不为空
+//看到这里，如果proxy_pass里面包含变量，而且没有配置resolver，那将会返回错误
+
 
     if (r->udp_connections.nelts == 0) {
         return NGX_NO_RESOLVER;
@@ -312,14 +317,14 @@ ngx_resolve_name(ngx_resolver_ctx_t *ctx)
 
     ngx_log_debug1(NGX_LOG_DEBUG_CORE, r->log, 0,
                    "resolve: \"%V\"", &ctx->name);
-
+//如果已经是ip地址了quick会被设置为1，所以就直接返回了
     if (ctx->quick) {
         ctx->handler(ctx);
         return NGX_OK;
     }
 
     /* lock name mutex */
-
+		//开始查找域名
     rc = ngx_resolve_name_locked(r, ctx);
 
     if (rc == NGX_OK) {
@@ -424,11 +429,12 @@ ngx_resolve_name_locked(ngx_resolver_t *r, ngx_resolver_ctx_t *ctx)
     ngx_resolver_node_t  *rn;
 
     hash = ngx_crc32_short(ctx->name.data, ctx->name.len);
-
+		//现在本地保存的DNS缓存中查找域名
     rn = ngx_resolver_lookup_name(r, &ctx->name, hash);
 
     if (rn) {
-
+				//如果本定缓存中DNS中能找到域名，则判断该值得时效性
+				//当前dns还没有超时
         if (rn->valid >= ngx_time()) {
 
             ngx_log_debug0(NGX_LOG_DEBUG_CORE, r->log, 0, "resolve cached");
@@ -463,12 +469,13 @@ ngx_resolve_name_locked(ngx_resolver_t *r, ngx_resolver_ctx_t *ctx)
                 /* unlock name mutex */
 
                 do {
+										//设置状态与ip地址
                     ctx->state = NGX_OK;
                     ctx->naddrs = naddrs;
                     ctx->addrs = (naddrs == 1) ? &ctx->addr : addrs;
                     ctx->addr = addr;
                     next = ctx->next;
-
+										//执行回调函数
                     ctx->handler(ctx);
 
                     ctx = next;
@@ -482,7 +489,7 @@ ngx_resolve_name_locked(ngx_resolver_t *r, ngx_resolver_ctx_t *ctx)
             }
 
             /* NGX_RESOLVE_CNAME */
-
+						// 如果是CNAME,则回调查询ip地址
             if (ctx->recursion++ < NGX_RESOLVER_MAX_RECURSION) {
 
                 ctx->name.len = rn->cnlen;

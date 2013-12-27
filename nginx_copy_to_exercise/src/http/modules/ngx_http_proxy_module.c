@@ -657,6 +657,8 @@ ngx_http_proxy_handler(ngx_http_request_t *r)
 #endif
 
     } else {
+//只有当proxy_pass里面包含变量事，才解析变量，zaingx_http_proxy_eval中会添加域名解析的需求,此时
+//nginx中就需要配置resolver来指定DNS服务器地址，否则，将直接返回502错误
         if (ngx_http_proxy_eval(r, ctx, plcf) != NGX_OK) {
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -758,11 +760,12 @@ ngx_http_proxy_eval(ngx_http_request_t *r, ngx_http_proxy_ctx_t *ctx,
     u->schema.data = proxy.data;
 
     ngx_memzero(&url, sizeof(ngx_url_t));
-
+		//proxy要转向url
     url.url.len = proxy.len - add;
     url.url.data = proxy.data + add;
     url.default_port = port;
     url.uri_part = 1;
+		//这里设置为不用域名解析
     url.no_resolve = 1;
 
     if (ngx_parse_url(r->pool, &url) != NGX_OK) {
