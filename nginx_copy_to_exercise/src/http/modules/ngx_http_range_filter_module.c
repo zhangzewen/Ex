@@ -146,6 +146,7 @@ static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 static ngx_int_t
 ngx_http_range_header_filter(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                        if_range;
     ngx_http_core_loc_conf_t     *clcf;
     ngx_http_range_filter_ctx_t  *ctx;
@@ -242,6 +243,7 @@ static ngx_int_t
 ngx_http_range_parse(ngx_http_request_t *r, ngx_http_range_filter_ctx_t *ctx,
     ngx_uint_t ranges)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char            *p;
     off_t              start, end, size, content_length;
     ngx_uint_t         suffix;
@@ -350,6 +352,7 @@ static ngx_int_t
 ngx_http_range_singlepart_header(ngx_http_request_t *r,
     ngx_http_range_filter_ctx_t *ctx)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t   *content_range;
     ngx_http_range_t  *range;
 
@@ -394,6 +397,7 @@ static ngx_int_t
 ngx_http_range_multipart_header(ngx_http_request_t *r,
     ngx_http_range_filter_ctx_t *ctx)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t              len;
     ngx_uint_t          i;
     ngx_http_range_t   *range;
@@ -513,6 +517,7 @@ ngx_http_range_multipart_header(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_range_not_satisfiable(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *content_range;
 
     r->headers_out.status = NGX_HTTP_RANGE_NOT_SATISFIABLE;
@@ -547,6 +552,7 @@ ngx_http_range_not_satisfiable(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_range_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_range_filter_ctx_t  *ctx;
 
     if (in == NULL) {
@@ -583,6 +589,7 @@ static ngx_int_t
 ngx_http_range_test_overlapped(ngx_http_request_t *r,
     ngx_http_range_filter_ctx_t *ctx, ngx_chain_t *in)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     off_t              start, last;
     ngx_buf_t         *buf;
     ngx_uint_t         i;
@@ -623,6 +630,7 @@ static ngx_int_t
 ngx_http_range_singlepart_body(ngx_http_request_t *r,
     ngx_http_range_filter_ctx_t *ctx, ngx_chain_t *in)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     off_t              start, last;
     ngx_buf_t         *buf;
     ngx_chain_t       *out, *cl, **ll;
@@ -709,6 +717,7 @@ static ngx_int_t
 ngx_http_range_multipart_body(ngx_http_request_t *r,
     ngx_http_range_filter_ctx_t *ctx, ngx_chain_t *in)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_buf_t         *b, *buf;
     ngx_uint_t         i;
     ngx_chain_t       *out, *hcl, *rcl, *dcl, **ll;
@@ -838,6 +847,7 @@ ngx_http_range_multipart_body(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_range_header_filter_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_range_header_filter;
 
@@ -848,6 +858,7 @@ ngx_http_range_header_filter_init(ngx_conf_t *cf)
 static ngx_int_t
 ngx_http_range_body_filter_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_body_filter = ngx_http_top_body_filter;
     ngx_http_top_body_filter = ngx_http_range_body_filter;
 

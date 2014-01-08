@@ -153,6 +153,7 @@ ngx_http_header_out_t  ngx_http_headers_out[] = {
 static ngx_int_t
 ngx_http_header_filter(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                    *p;
     size_t                     len;
     ngx_str_t                  host, *status_line;
@@ -619,6 +620,7 @@ ngx_http_header_filter(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_header_filter_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_top_header_filter = ngx_http_header_filter;
 
     return NGX_OK;

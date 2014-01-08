@@ -142,6 +142,7 @@ ngx_module_t  ngx_http_limit_conn_module = {
 static ngx_int_t
 ngx_http_limit_conn_handler(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                          len, n;
     uint32_t                        hash;
     ngx_uint_t                      i;
@@ -263,6 +264,7 @@ static void
 ngx_http_limit_conn_rbtree_insert_value(ngx_rbtree_node_t *temp,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_rbtree_node_t           **p;
     ngx_http_limit_conn_node_t   *lcn, *lcnt;
 
@@ -304,6 +306,7 @@ static ngx_rbtree_node_t *
 ngx_http_limit_conn_lookup(ngx_rbtree_t *rbtree, ngx_http_variable_value_t *vv,
     uint32_t hash)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                    rc;
     ngx_rbtree_node_t           *node, *sentinel;
     ngx_http_limit_conn_node_t  *lcn;
@@ -343,6 +346,7 @@ ngx_http_limit_conn_lookup(ngx_rbtree_t *rbtree, ngx_http_variable_value_t *vv,
 static void
 ngx_http_limit_conn_cleanup(void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_limit_conn_cleanup_t  *lccln = data;
 
     ngx_slab_pool_t             *shpool;
@@ -374,6 +378,7 @@ ngx_http_limit_conn_cleanup(void *data)
 static ngx_inline void
 ngx_http_limit_conn_cleanup_all(ngx_pool_t *pool)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_pool_cleanup_t  *cln;
 
     cln = pool->cleanup;
@@ -390,6 +395,7 @@ ngx_http_limit_conn_cleanup_all(ngx_pool_t *pool)
 static ngx_int_t
 ngx_http_limit_conn_init_zone(ngx_shm_zone_t *shm_zone, void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_limit_conn_ctx_t  *octx = data;
 
     size_t                      len;
@@ -453,6 +459,7 @@ ngx_http_limit_conn_init_zone(ngx_shm_zone_t *shm_zone, void *data)
 static void *
 ngx_http_limit_conn_create_conf(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_limit_conn_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_limit_conn_conf_t));
@@ -475,6 +482,7 @@ ngx_http_limit_conn_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_limit_conn_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_limit_conn_conf_t *prev = parent;
     ngx_http_limit_conn_conf_t *conf = child;
 
@@ -491,6 +499,7 @@ ngx_http_limit_conn_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static char *
 ngx_http_limit_conn_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                     *p;
     ssize_t                     size;
     ngx_str_t                  *value, name, s;
@@ -604,6 +613,7 @@ ngx_http_limit_conn_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_limit_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t                     n;
     ngx_str_t                  *value;
     ngx_shm_zone_t             *shm_zone;
@@ -674,6 +684,7 @@ ngx_http_limit_zone(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_limit_conn(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_shm_zone_t               *shm_zone;
     ngx_http_limit_conn_conf_t   *lccf = conf;
     ngx_http_limit_conn_limit_t  *limit, *limits;
@@ -735,6 +746,7 @@ ngx_http_limit_conn(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static ngx_int_t
 ngx_http_limit_conn_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 

@@ -237,6 +237,7 @@ done:
 static void
 ngx_http_read_client_request_body_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  rc;
 
     if (r->connection->read->timedout) {
@@ -256,6 +257,7 @@ ngx_http_read_client_request_body_handler(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                     size;
     ssize_t                    n;
     ngx_buf_t                 *b;
@@ -385,6 +387,7 @@ ngx_http_do_read_client_request_body(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_write_request_body(ngx_http_request_t *r, ngx_chain_t *body)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t                    n;
     ngx_temp_file_t           *tf;
     ngx_http_request_body_t   *rb;
@@ -446,6 +449,7 @@ ngx_http_write_request_body(ngx_http_request_t *r, ngx_chain_t *body)
 ngx_int_t
 ngx_http_discard_request_body(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t       size;
     ngx_event_t  *rev;
 
@@ -506,6 +510,7 @@ ngx_http_discard_request_body(ngx_http_request_t *r)
 void
 ngx_http_discarded_request_body_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                  rc;
     ngx_msec_t                 timer;
     ngx_event_t               *rev;
@@ -571,6 +576,7 @@ ngx_http_discarded_request_body_handler(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_read_discarded_request_body(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t   size;
     ssize_t  n;
     u_char   buffer[NGX_HTTP_DISCARD_BUFFER_SIZE];
@@ -615,6 +621,7 @@ ngx_http_read_discarded_request_body(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_test_expect(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t   n;
     ngx_str_t  *expect;
 

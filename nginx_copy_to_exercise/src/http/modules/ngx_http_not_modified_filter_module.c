@@ -52,6 +52,7 @@ static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 static ngx_int_t
 ngx_http_not_modified_header_filter(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (r->headers_out.status != NGX_HTTP_OK
         || r != r->main
         || r->headers_out.last_modified_time == -1)
@@ -74,6 +75,7 @@ ngx_http_not_modified_header_filter(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_test_precondition(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t  iums;
 
     iums = ngx_http_parse_time(r->headers_in.if_unmodified_since->value.data,
@@ -94,6 +96,7 @@ ngx_http_test_precondition(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_test_not_modified(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                     ims;
     ngx_http_core_loc_conf_t  *clcf;
 
@@ -136,6 +139,7 @@ ngx_http_test_not_modified(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_not_modified_filter_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_not_modified_header_filter;
 

@@ -91,6 +91,7 @@ ngx_module_t  ngx_http_access_module = {
 static ngx_int_t
 ngx_http_access_handler(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct sockaddr_in          *sin;
     ngx_http_access_loc_conf_t  *alcf;
 
@@ -115,6 +116,7 @@ static ngx_int_t
 ngx_http_access_inet(ngx_http_request_t *r, ngx_http_access_loc_conf_t *alcf,
     in_addr_t addr)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t               i;
     ngx_http_access_rule_t  *rule;
 
@@ -138,6 +140,7 @@ ngx_http_access_inet(ngx_http_request_t *r, ngx_http_access_loc_conf_t *alcf,
 static ngx_int_t
 ngx_http_access_found(ngx_http_request_t *r, ngx_uint_t deny)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t  *clcf;
 
     if (deny) {
@@ -158,6 +161,7 @@ ngx_http_access_found(ngx_http_request_t *r, ngx_uint_t deny)
 static char *
 ngx_http_access_rule(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_access_loc_conf_t *alcf = conf;
 
     ngx_int_t                 rc;
@@ -217,6 +221,7 @@ ngx_http_access_rule(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static void *
 ngx_http_access_create_loc_conf(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_access_loc_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_access_loc_conf_t));
@@ -231,6 +236,7 @@ ngx_http_access_create_loc_conf(ngx_conf_t *cf)
 static char *
 ngx_http_access_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_access_loc_conf_t  *prev = parent;
     ngx_http_access_loc_conf_t  *conf = child;
 
@@ -245,6 +251,7 @@ ngx_http_access_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_access_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 

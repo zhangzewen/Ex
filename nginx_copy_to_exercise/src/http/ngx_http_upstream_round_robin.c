@@ -29,6 +29,7 @@ ngx_int_t
 ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
     ngx_http_upstream_srv_conf_t *us)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_url_t                      u;
     ngx_uint_t                     i, j, n, w;
     ngx_http_upstream_server_t    *server;
@@ -219,6 +220,7 @@ ngx_http_upstream_init_round_robin(ngx_conf_t *cf,
 static ngx_int_t
 ngx_http_upstream_cmp_servers(const void *one, const void *two)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_rr_peer_t  *first, *second;
 
     first = (ngx_http_upstream_rr_peer_t *) one;
@@ -232,6 +234,7 @@ ngx_int_t
 ngx_http_upstream_init_round_robin_peer(ngx_http_request_t *r,
     ngx_http_upstream_srv_conf_t *us)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t                         n;
     ngx_http_upstream_rr_peer_data_t  *rrp;
 
@@ -286,6 +289,7 @@ ngx_int_t
 ngx_http_upstream_create_round_robin_peer(ngx_http_request_t *r,
     ngx_http_upstream_resolved_t *ur)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                            *p;
     size_t                             len;
     ngx_uint_t                         i, n;
@@ -391,6 +395,7 @@ ngx_http_upstream_create_round_robin_peer(ngx_http_request_t *r,
 ngx_int_t
 ngx_http_upstream_get_round_robin_peer(ngx_peer_connection_t *pc, void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_rr_peer_data_t  *rrp = data;
 
     ngx_int_t                      rc;
@@ -505,6 +510,7 @@ failed:
 static ngx_http_upstream_rr_peer_t *
 ngx_http_upstream_get_peer(ngx_http_upstream_rr_peer_data_t *rrp)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                        now;
     uintptr_t                     m;
     ngx_int_t                     total;
@@ -574,6 +580,7 @@ void
 ngx_http_upstream_free_round_robin_peer(ngx_peer_connection_t *pc, void *data,
     ngx_uint_t state)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_rr_peer_data_t  *rrp = data;
 
     time_t                       now;
@@ -641,6 +648,7 @@ ngx_int_t
 ngx_http_upstream_set_round_robin_peer_session(ngx_peer_connection_t *pc,
     void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_rr_peer_data_t  *rrp = data;
 
     ngx_int_t                     rc;
@@ -670,6 +678,7 @@ void
 ngx_http_upstream_save_round_robin_peer_session(ngx_peer_connection_t *pc,
     void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_rr_peer_data_t  *rrp = data;
 
     ngx_ssl_session_t            *old_ssl_session, *ssl_session;
@@ -710,6 +719,7 @@ ngx_http_upstream_save_round_robin_peer_session(ngx_peer_connection_t *pc,
 static ngx_int_t
 ngx_http_upstream_empty_set_session(ngx_peer_connection_t *pc, void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return NGX_OK;
 }
 
@@ -717,6 +727,7 @@ ngx_http_upstream_empty_set_session(ngx_peer_connection_t *pc, void *data)
 static void
 ngx_http_upstream_empty_save_session(ngx_peer_connection_t *pc, void *data)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return;
 }
 

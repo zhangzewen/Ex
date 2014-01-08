@@ -139,6 +139,7 @@ static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 static ngx_int_t
 ngx_http_headers_filter(ngx_http_request_t *r)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t                 value;
     ngx_uint_t                i;
     ngx_http_header_val_t    *h;
@@ -187,6 +188,7 @@ ngx_http_headers_filter(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_set_expires(ngx_http_request_t *r, ngx_http_headers_conf_t *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t            len;
     time_t            now, expires_time, max_age;
     ngx_uint_t        i;
@@ -309,6 +311,7 @@ static ngx_int_t
 ngx_http_add_header(ngx_http_request_t *r, ngx_http_header_val_t *hv,
     ngx_str_t *value)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *h;
 
     if (value->len) {
@@ -330,6 +333,7 @@ static ngx_int_t
 ngx_http_add_cache_control(ngx_http_request_t *r, ngx_http_header_val_t *hv,
     ngx_str_t *value)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *cc, **ccp;
 
     ccp = r->headers_out.cache_control.elts;
@@ -368,6 +372,7 @@ static ngx_int_t
 ngx_http_set_last_modified(ngx_http_request_t *r, ngx_http_header_val_t *hv,
     ngx_str_t *value)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t  *h, **old;
 
     old = (ngx_table_elt_t **) ((char *) &r->headers_out + hv->offset);
@@ -407,6 +412,7 @@ ngx_http_set_last_modified(ngx_http_request_t *r, ngx_http_header_val_t *hv,
 static void *
 ngx_http_headers_create_conf(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_headers_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_headers_conf_t));
@@ -430,6 +436,7 @@ ngx_http_headers_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_headers_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_headers_conf_t *prev = parent;
     ngx_http_headers_conf_t *conf = child;
 
@@ -453,6 +460,7 @@ ngx_http_headers_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_headers_filter_init(ngx_conf_t *cf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_headers_filter;
 
@@ -463,6 +471,7 @@ ngx_http_headers_filter_init(ngx_conf_t *cf)
 static char *
 ngx_http_headers_expires(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_headers_conf_t *hcf = conf;
 
     ngx_uint_t   minus, n;
@@ -554,6 +563,7 @@ ngx_http_headers_expires(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_headers_add(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_headers_conf_t *hcf = conf;
 
     ngx_str_t                         *value;
