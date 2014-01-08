@@ -63,6 +63,7 @@ static u_char  ngx_http_file_cache_key[] = { LF, 'K', 'E', 'Y', ':', ' ' };
 static ngx_int_t
 ngx_http_file_cache_init(ngx_shm_zone_t *shm_zone, void *data)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_t  *ocache = data;
 
     size_t                  len;
@@ -151,6 +152,7 @@ ngx_http_file_cache_init(ngx_shm_zone_t *shm_zone, void *data)
 ngx_int_t
 ngx_http_file_cache_new(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_cache_t  *c;
 
     c = ngx_pcalloc(r->pool, sizeof(ngx_http_cache_t));
@@ -173,6 +175,7 @@ ngx_http_file_cache_new(ngx_http_request_t *r)
 ngx_int_t
 ngx_http_file_cache_create(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_cache_t       *c;
     ngx_pool_cleanup_t     *cln;
     ngx_http_file_cache_t  *cache;
@@ -203,6 +206,7 @@ ngx_http_file_cache_create(ngx_http_request_t *r)
 void
 ngx_http_file_cache_create_key(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     size_t             len;
     ngx_str_t         *key;
     ngx_uint_t         i;
@@ -238,6 +242,7 @@ ngx_http_file_cache_create_key(ngx_http_request_t *r)
 ngx_int_t
 ngx_http_file_cache_open(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t                  rc, rv;
     ngx_uint_t                 cold, test;
     ngx_http_cache_t          *c;
@@ -378,6 +383,7 @@ done:
 static ngx_int_t
 ngx_http_file_cache_lock(ngx_http_request_t *r, ngx_http_cache_t *c)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_msec_t                 now, timer;
     ngx_http_file_cache_t     *cache;
 
@@ -429,6 +435,7 @@ ngx_http_file_cache_lock(ngx_http_request_t *r, ngx_http_cache_t *c)
 static void
 ngx_http_file_cache_lock_wait_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t                 wait;
     ngx_msec_t                 timer;
     ngx_http_cache_t          *c;
@@ -478,6 +485,7 @@ wakeup:
 static ngx_int_t
 ngx_http_file_cache_read(ngx_http_request_t *r, ngx_http_cache_t *c)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     time_t                         now;
     ssize_t                        n;
     ngx_int_t                      rc;
@@ -613,6 +621,7 @@ noaio:
 static void
 ngx_http_cache_aio_event_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_event_aio_t     *aio;
     ngx_http_request_t  *r;
 
@@ -631,6 +640,7 @@ ngx_http_cache_aio_event_handler(ngx_event_t *ev)
 static ngx_int_t
 ngx_http_file_cache_exists(ngx_http_file_cache_t *cache, ngx_http_cache_t *c)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t                    rc;
     ngx_http_file_cache_node_t  *fcn;
 
@@ -740,6 +750,7 @@ failed:
 static ngx_int_t
 ngx_http_file_cache_name(ngx_http_request_t *r, ngx_path_t *path)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char            *p;
     ngx_http_cache_t  *c;
 
@@ -775,6 +786,7 @@ ngx_http_file_cache_name(ngx_http_request_t *r, ngx_path_t *path)
 static ngx_http_file_cache_node_t *
 ngx_http_file_cache_lookup(ngx_http_file_cache_t *cache, u_char *key)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t                    rc;
     ngx_rbtree_key_t             node_key;
     ngx_rbtree_node_t           *node, *sentinel;
@@ -821,6 +833,7 @@ static void
 ngx_http_file_cache_rbtree_insert_value(ngx_rbtree_node_t *temp,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_rbtree_node_t           **p;
     ngx_http_file_cache_node_t   *cn, *cnt;
 
@@ -863,6 +876,7 @@ ngx_http_file_cache_rbtree_insert_value(ngx_rbtree_node_t *temp,
 void
 ngx_http_file_cache_set_header(ngx_http_request_t *r, u_char *buf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_header_t  *h = (ngx_http_file_cache_header_t *) buf;
 
     u_char            *p;
@@ -899,6 +913,7 @@ ngx_http_file_cache_set_header(ngx_http_request_t *r, u_char *buf)
 void
 ngx_http_file_cache_update(ngx_http_request_t *r, ngx_temp_file_t *tf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     off_t                   fs_size;
     ngx_int_t               rc;
     ngx_file_uniq_t         uniq;
@@ -973,6 +988,7 @@ ngx_http_file_cache_update(ngx_http_request_t *r, ngx_temp_file_t *tf)
 ngx_int_t
 ngx_http_cache_send(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t          rc;
     ngx_buf_t         *b;
     ngx_chain_t        out;
@@ -1026,6 +1042,7 @@ ngx_http_cache_send(ngx_http_request_t *r)
 void
 ngx_http_file_cache_free(ngx_http_cache_t *c, ngx_temp_file_t *tf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_t       *cache;
     ngx_http_file_cache_node_t  *fcn;
 
@@ -1090,6 +1107,7 @@ ngx_http_file_cache_free(ngx_http_cache_t *c, ngx_temp_file_t *tf)
 static void
 ngx_http_file_cache_cleanup(void *data)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_cache_t  *c = data;
 
     if (c->updated) {
@@ -1111,6 +1129,7 @@ ngx_http_file_cache_cleanup(void *data)
 static time_t
 ngx_http_file_cache_forced_expire(ngx_http_file_cache_t *cache)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                      *name;
     size_t                       len;
     time_t                       wait;
@@ -1174,6 +1193,7 @@ ngx_http_file_cache_forced_expire(ngx_http_file_cache_t *cache)
 static time_t
 ngx_http_file_cache_expire(ngx_http_file_cache_t *cache)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                      *name, *p;
     size_t                       len;
     time_t                       now, wait;
@@ -1264,6 +1284,7 @@ static void
 ngx_http_file_cache_delete(ngx_http_file_cache_t *cache, ngx_queue_t *q,
     u_char *name)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                      *p;
     size_t                       len;
     ngx_path_t                  *path;
@@ -1313,6 +1334,7 @@ ngx_http_file_cache_delete(ngx_http_file_cache_t *cache, ngx_queue_t *q,
 static time_t
 ngx_http_file_cache_manager(void *data)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_t  *cache = data;
 
     off_t   size;
@@ -1353,6 +1375,7 @@ ngx_http_file_cache_manager(void *data)
 static void
 ngx_http_file_cache_loader(void *data)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_t  *cache = data;
 
     ngx_tree_ctx_t  tree;
@@ -1399,6 +1422,7 @@ ngx_http_file_cache_loader(void *data)
 static ngx_int_t
 ngx_http_file_cache_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     return NGX_OK;
 }
 
@@ -1406,6 +1430,7 @@ ngx_http_file_cache_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 static ngx_int_t
 ngx_http_file_cache_manage_file(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_msec_t              elapsed;
     ngx_http_file_cache_t  *cache;
 
@@ -1438,6 +1463,7 @@ ngx_http_file_cache_manage_file(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 static void
 ngx_http_file_cache_loader_sleep(ngx_http_file_cache_t *cache)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_msleep(cache->loader_sleep);
 
     ngx_time_update();
@@ -1450,6 +1476,7 @@ ngx_http_file_cache_loader_sleep(ngx_http_file_cache_t *cache)
 static ngx_int_t
 ngx_http_file_cache_add_file(ngx_tree_ctx_t *ctx, ngx_str_t *name)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                 *p;
     ngx_int_t               n;
     ngx_uint_t              i;
@@ -1493,6 +1520,7 @@ ngx_http_file_cache_add_file(ngx_tree_ctx_t *ctx, ngx_str_t *name)
 static ngx_int_t
 ngx_http_file_cache_add(ngx_http_file_cache_t *cache, ngx_http_cache_t *c)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_file_cache_node_t  *fcn;
 
     ngx_shmtx_lock(&cache->shpool->mutex);
@@ -1546,6 +1574,7 @@ ngx_http_file_cache_add(ngx_http_file_cache_t *cache, ngx_http_cache_t *c)
 static ngx_int_t
 ngx_http_file_cache_delete_file(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, ctx->log, 0,
                    "http file cache delete: \"%s\"", path->data);
 
@@ -1561,6 +1590,7 @@ ngx_http_file_cache_delete_file(ngx_tree_ctx_t *ctx, ngx_str_t *path)
 time_t
 ngx_http_file_cache_valid(ngx_array_t *cache_valid, ngx_uint_t status)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t               i;
     ngx_http_cache_valid_t  *valid;
 
@@ -1587,6 +1617,7 @@ ngx_http_file_cache_valid(ngx_array_t *cache_valid, ngx_uint_t status)
 char *
 ngx_http_file_cache_set_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     off_t                   max_size;
     u_char                 *last, *p;
     time_t                  inactive;
@@ -1817,6 +1848,7 @@ char *
 ngx_http_file_cache_valid_set_slot(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     time_t                    valid;

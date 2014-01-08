@@ -18,6 +18,7 @@ static int ngx_http_busy_lock_look_cacheable(ngx_http_busy_lock_t *bl,
 
 int ngx_http_busy_lock(ngx_http_busy_lock_t *bl, ngx_http_busy_lock_ctx_t *bc)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     if (bl->busy < bl->max_busy) {
         bl->busy++;
 
@@ -64,6 +65,7 @@ int ngx_http_busy_lock(ngx_http_busy_lock_t *bl, ngx_http_busy_lock_ctx_t *bc)
 int ngx_http_busy_lock_cacheable(ngx_http_busy_lock_t *bl,
                                  ngx_http_busy_lock_ctx_t *bc, int lock)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     int  rc;
 
     rc = ngx_http_busy_lock_look_cacheable(bl, bc, lock);
@@ -117,6 +119,7 @@ int ngx_http_busy_lock_cacheable(ngx_http_busy_lock_t *bl,
 void ngx_http_busy_unlock(ngx_http_busy_lock_t *bl,
                           ngx_http_busy_lock_ctx_t *bc)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     if (bl == NULL) {
         return;
     }
@@ -134,6 +137,7 @@ static int ngx_http_busy_lock_look_cacheable(ngx_http_busy_lock_t *bl,
                                              ngx_http_busy_lock_ctx_t *bc,
                                              int lock)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     int    i, b, cacheable, free;
     u_int  mask;
 
@@ -199,6 +203,7 @@ static int ngx_http_busy_lock_look_cacheable(ngx_http_busy_lock_t *bl,
 char *ngx_http_set_busy_lock_slot(ngx_conf_t *cf, ngx_command_t *cmd,
                                   void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     ngx_uint_t             i, dup, invalid;

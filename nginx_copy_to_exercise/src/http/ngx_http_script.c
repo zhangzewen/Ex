@@ -59,6 +59,7 @@ ngx_int_t
 ngx_http_complex_value(ngx_http_request_t *r, ngx_http_complex_value_t *val,
     ngx_str_t *value)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     size_t                        len;
     ngx_http_script_code_pt       code;
     ngx_http_script_len_code_pt   lcode;
@@ -108,6 +109,7 @@ ngx_http_complex_value(ngx_http_request_t *r, ngx_http_complex_value_t *val,
 ngx_int_t
 ngx_http_compile_complex_value(ngx_http_compile_complex_value_t *ccv)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_str_t                  *v;
     ngx_uint_t                  i, n, nv, nc;
     ngx_array_t                 flushes, lengths, values, *pf, *pl, *pv;
@@ -216,6 +218,7 @@ ngx_http_compile_complex_value(ngx_http_compile_complex_value_t *ccv)
 char *
 ngx_http_set_complex_value_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     ngx_str_t                          *value;
@@ -252,6 +255,7 @@ ngx_http_set_complex_value_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 ngx_int_t
 ngx_http_test_predicates(ngx_http_request_t *r, ngx_array_t *predicates)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_str_t                  val;
     ngx_uint_t                 i;
     ngx_http_complex_value_t  *cv;
@@ -279,6 +283,7 @@ ngx_http_test_predicates(ngx_http_request_t *r, ngx_array_t *predicates)
 char *
 ngx_http_set_predicate_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     char  *p = conf;
 
     ngx_str_t                          *value;
@@ -322,6 +327,7 @@ ngx_http_set_predicate_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 ngx_uint_t
 ngx_http_script_variables_count(ngx_str_t *value)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t  i, n;
 
     for (n = 0, i = 0; i < value->len; i++) {
@@ -337,6 +343,7 @@ ngx_http_script_variables_count(ngx_str_t *value)
 ngx_int_t
 ngx_http_script_compile(ngx_http_script_compile_t *sc)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char       ch;
     ngx_str_t    name;
     ngx_uint_t   i, bracket;
@@ -491,6 +498,7 @@ u_char *
 ngx_http_script_run(ngx_http_request_t *r, ngx_str_t *value,
     void *code_lengths, size_t len, void *code_values)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t                    i;
     ngx_http_script_code_pt       code;
     ngx_http_script_len_code_pt   lcode;
@@ -540,6 +548,7 @@ void
 ngx_http_script_flush_no_cacheable_variables(ngx_http_request_t *r,
     ngx_array_t *indices)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t  n, *index;
 
     if (indices) {
@@ -557,6 +566,7 @@ ngx_http_script_flush_no_cacheable_variables(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_script_init_arrays(ngx_http_script_compile_t *sc)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_uint_t   n;
 
     if (sc->flushes && *sc->flushes == NULL) {
@@ -601,6 +611,7 @@ ngx_http_script_init_arrays(ngx_http_script_compile_t *sc)
 static ngx_int_t
 ngx_http_script_done(ngx_http_script_compile_t *sc)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_str_t    zero;
     uintptr_t   *code;
 
@@ -646,6 +657,7 @@ ngx_http_script_done(ngx_http_script_compile_t *sc)
 void *
 ngx_http_script_start_code(ngx_pool_t *pool, ngx_array_t **codes, size_t size)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     if (*codes == NULL) {
         *codes = ngx_array_create(pool, 256, 1);
         if (*codes == NULL) {
@@ -660,6 +672,7 @@ ngx_http_script_start_code(ngx_pool_t *pool, ngx_array_t **codes, size_t size)
 void *
 ngx_http_script_add_code(ngx_array_t *codes, size_t size, void *code)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char  *elts, **p;
     void    *new;
 
@@ -685,6 +698,7 @@ static ngx_int_t
 ngx_http_script_add_copy_code(ngx_http_script_compile_t *sc, ngx_str_t *value,
     ngx_uint_t last)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                       *p;
     size_t                        size, len, zero;
     ngx_http_script_copy_code_t  *code;
@@ -727,6 +741,7 @@ ngx_http_script_add_copy_code(ngx_http_script_compile_t *sc, ngx_str_t *value,
 size_t
 ngx_http_script_copy_len_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_copy_code_t  *code;
 
     code = (ngx_http_script_copy_code_t *) e->ip;
@@ -740,6 +755,7 @@ ngx_http_script_copy_len_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_copy_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                       *p;
     ngx_http_script_copy_code_t  *code;
 
@@ -763,6 +779,7 @@ ngx_http_script_copy_code(ngx_http_script_engine_t *e)
 static ngx_int_t
 ngx_http_script_add_var_code(ngx_http_script_compile_t *sc, ngx_str_t *name)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t                    index, *p;
     ngx_http_script_var_code_t  *code;
 
@@ -807,6 +824,7 @@ ngx_http_script_add_var_code(ngx_http_script_compile_t *sc, ngx_str_t *name)
 size_t
 ngx_http_script_copy_var_len_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_variable_value_t   *value;
     ngx_http_script_var_code_t  *code;
 
@@ -832,6 +850,7 @@ ngx_http_script_copy_var_len_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_copy_var_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                      *p;
     ngx_http_variable_value_t   *value;
     ngx_http_script_var_code_t  *code;
@@ -864,6 +883,7 @@ ngx_http_script_copy_var_code(ngx_http_script_engine_t *e)
 static ngx_int_t
 ngx_http_script_add_args_code(ngx_http_script_compile_t *sc)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     uintptr_t   *code;
 
     code = ngx_http_script_add_code(*sc->lengths, sizeof(uintptr_t), NULL);
@@ -887,6 +907,7 @@ ngx_http_script_add_args_code(ngx_http_script_compile_t *sc)
 size_t
 ngx_http_script_mark_args_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     e->is_args = 1;
     e->ip += sizeof(uintptr_t);
 
@@ -897,6 +918,7 @@ ngx_http_script_mark_args_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_start_args_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, e->request->connection->log, 0,
                    "http script args");
 
@@ -911,6 +933,7 @@ ngx_http_script_start_args_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_regex_start_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     size_t                         len;
     ngx_int_t                      rc;
     ngx_uint_t                     n;
@@ -1068,6 +1091,7 @@ ngx_http_script_regex_start_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_regex_end_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char                            *dst, *src;
     ngx_http_request_t                *r;
     ngx_http_script_regex_end_code_t  *code;
@@ -1172,6 +1196,7 @@ ngx_http_script_regex_end_code(ngx_http_script_engine_t *e)
 static ngx_int_t
 ngx_http_script_add_capture_code(ngx_http_script_compile_t *sc, ngx_uint_t n)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_copy_capture_code_t  *code;
 
     code = ngx_http_script_add_code(*sc->lengths,
@@ -1207,6 +1232,7 @@ ngx_http_script_add_capture_code(ngx_http_script_compile_t *sc, ngx_uint_t n)
 size_t
 ngx_http_script_copy_capture_len_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     int                                  *cap;
     u_char                               *p;
     ngx_uint_t                            n;
@@ -1245,6 +1271,7 @@ ngx_http_script_copy_capture_len_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_copy_capture_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     int                                  *cap;
     u_char                               *p, *pos;
     ngx_uint_t                            n;
@@ -1287,6 +1314,7 @@ ngx_http_script_copy_capture_code(ngx_http_script_engine_t *e)
 static ngx_int_t
 ngx_http_script_add_full_name_code(ngx_http_script_compile_t *sc)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_full_name_code_t  *code;
 
     code = ngx_http_script_add_code(*sc->lengths,
@@ -1316,6 +1344,7 @@ ngx_http_script_add_full_name_code(ngx_http_script_compile_t *sc)
 static size_t
 ngx_http_script_full_name_len_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_full_name_code_t  *code;
 
     code = (ngx_http_script_full_name_code_t *) e->ip;
@@ -1330,6 +1359,7 @@ ngx_http_script_full_name_len_code(ngx_http_script_engine_t *e)
 static void
 ngx_http_script_full_name_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_full_name_code_t  *code;
 
     ngx_str_t  value;
@@ -1359,6 +1389,7 @@ ngx_http_script_full_name_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_return_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_return_code_t  *code;
 
     code = (ngx_http_script_return_code_t *) e->ip;
@@ -1380,6 +1411,7 @@ ngx_http_script_return_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_break_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     e->request->uri_changed = 0;
 
     e->ip = ngx_http_script_exit;
@@ -1389,6 +1421,7 @@ ngx_http_script_break_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_if_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_if_code_t  *code;
 
     code = (ngx_http_script_if_code_t *) e->ip;
@@ -1418,6 +1451,7 @@ ngx_http_script_if_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_equal_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_variable_value_t  *val, *res;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, e->request->connection->log, 0,
@@ -1446,6 +1480,7 @@ ngx_http_script_equal_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_not_equal_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_variable_value_t  *val, *res;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, e->request->connection->log, 0,
@@ -1474,6 +1509,7 @@ ngx_http_script_not_equal_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_file_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_str_t                     path;
     ngx_http_request_t           *r;
     ngx_open_file_info_t          of;
@@ -1609,6 +1645,7 @@ true_value:
 void
 ngx_http_script_complex_value_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     size_t                                 len;
     ngx_http_script_engine_t               le;
     ngx_http_script_len_code_pt            lcode;
@@ -1651,6 +1688,7 @@ ngx_http_script_complex_value_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_value_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_value_code_t  *code;
 
     code = (ngx_http_script_value_code_t *) e->ip;
@@ -1670,6 +1708,7 @@ ngx_http_script_value_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_set_var_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_request_t          *r;
     ngx_http_script_var_code_t  *code;
 
@@ -1706,6 +1745,7 @@ ngx_http_script_set_var_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_var_set_handler_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_script_var_handler_code_t  *code;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, e->request->connection->log, 0,
@@ -1724,6 +1764,7 @@ ngx_http_script_var_set_handler_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_var_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_variable_value_t   *value;
     ngx_http_script_var_code_t  *code;
 
@@ -1754,5 +1795,6 @@ ngx_http_script_var_code(ngx_http_script_engine_t *e)
 void
 ngx_http_script_nop_code(ngx_http_script_engine_t *e)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     e->ip += sizeof(uintptr_t);
 }

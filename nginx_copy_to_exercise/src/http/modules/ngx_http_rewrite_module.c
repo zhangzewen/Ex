@@ -136,6 +136,7 @@ ngx_module_t  ngx_http_rewrite_module = {
 static ngx_int_t
 ngx_http_rewrite_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                     index;
     ngx_http_script_code_pt       code;
     ngx_http_script_engine_t     *e;
@@ -196,6 +197,7 @@ static ngx_int_t
 ngx_http_rewrite_var(ngx_http_request_t *r, ngx_http_variable_value_t *v,
     uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_variable_t          *var;
     ngx_http_core_main_conf_t    *cmcf;
     ngx_http_rewrite_loc_conf_t  *rlcf;
@@ -229,6 +231,7 @@ ngx_http_rewrite_var(ngx_http_request_t *r, ngx_http_variable_value_t *v,
 static void *
 ngx_http_rewrite_create_loc_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_rewrite_loc_conf_t));
@@ -247,6 +250,7 @@ ngx_http_rewrite_create_loc_conf(ngx_conf_t *cf)
 static char *
 ngx_http_rewrite_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t *prev = parent;
     ngx_http_rewrite_loc_conf_t *conf = child;
 
@@ -279,6 +283,7 @@ ngx_http_rewrite_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_rewrite_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 
@@ -305,6 +310,7 @@ ngx_http_rewrite_init(ngx_conf_t *cf)
 static char *
 ngx_http_rewrite(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t  *lcf = conf;
 
     ngx_str_t                         *value;
@@ -444,6 +450,7 @@ ngx_http_rewrite(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_rewrite_return(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t  *lcf = conf;
 
     u_char                            *p;
@@ -515,6 +522,7 @@ ngx_http_rewrite_return(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_rewrite_break(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t *lcf = conf;
 
     ngx_http_script_code_pt  *code;
@@ -533,6 +541,7 @@ ngx_http_rewrite_break(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_rewrite_if(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t  *lcf = conf;
 
     void                         *mconf;
@@ -649,6 +658,7 @@ ngx_http_rewrite_if(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_rewrite_if_condition(ngx_conf_t *cf, ngx_http_rewrite_loc_conf_t *lcf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                        *p;
     size_t                         len;
     ngx_str_t                     *value;
@@ -870,6 +880,7 @@ static char *
 ngx_http_rewrite_variable(ngx_conf_t *cf, ngx_http_rewrite_loc_conf_t *lcf,
     ngx_str_t *value)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                    index;
     ngx_http_script_var_code_t  *var_code;
 
@@ -898,6 +909,7 @@ ngx_http_rewrite_variable(ngx_conf_t *cf, ngx_http_rewrite_loc_conf_t *lcf,
 static char *
 ngx_http_rewrite_set(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_rewrite_loc_conf_t  *lcf = conf;
 
     ngx_int_t                            index;
@@ -971,6 +983,7 @@ static char *
 ngx_http_rewrite_value(ngx_conf_t *cf, ngx_http_rewrite_loc_conf_t *lcf,
     ngx_str_t *value)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                              n;
     ngx_http_script_compile_t              sc;
     ngx_http_script_value_code_t          *val;

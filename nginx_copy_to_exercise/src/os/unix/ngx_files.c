@@ -556,7 +556,7 @@ ngx_directio_off(ngx_fd_t fd)
 size_t
 ngx_fs_bsize(u_char *name)
 {
-		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     struct statfs  fs;
 
     if (statfs((char *) name, &fs) == -1) {
@@ -575,7 +575,7 @@ ngx_fs_bsize(u_char *name)
 size_t
 ngx_fs_bsize(u_char *name)
 {
-		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     struct statvfs  fs;
 
     if (statvfs((char *) name, &fs) == -1) {

@@ -57,6 +57,7 @@ static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 static ngx_int_t
 ngx_http_chunked_header_filter(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_core_loc_conf_t       *clcf;
     ngx_http_chunked_filter_ctx_t  *ctx;
 
@@ -99,6 +100,7 @@ ngx_http_chunked_header_filter(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_chunked_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                         *chunk;
     off_t                           size;
     ngx_int_t                       rc;
@@ -232,6 +234,7 @@ ngx_http_chunked_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 static ngx_int_t
 ngx_http_chunked_filter_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_chunked_header_filter;
 

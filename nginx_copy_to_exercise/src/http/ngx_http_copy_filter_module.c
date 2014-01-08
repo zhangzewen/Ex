@@ -80,6 +80,7 @@ static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 static ngx_int_t
 ngx_http_copy_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_int_t                     rc;
     ngx_connection_t             *c;
     ngx_output_chain_ctx_t       *ctx;
@@ -219,6 +220,7 @@ ngx_http_copy_filter(ngx_http_request_t *r, ngx_chain_t *in)
 static void
 ngx_http_copy_aio_handler(ngx_output_chain_ctx_t *ctx, ngx_file_t *file)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_request_t *r;
 
     r = ctx->filter_ctx;
@@ -235,6 +237,7 @@ ngx_http_copy_aio_handler(ngx_output_chain_ctx_t *ctx, ngx_file_t *file)
 static void
 ngx_http_copy_aio_event_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_event_aio_t     *aio;
     ngx_http_request_t  *r;
 
@@ -253,6 +256,7 @@ ngx_http_copy_aio_event_handler(ngx_event_t *ev)
 static void
 ngx_http_copy_aio_sendfile_event_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_event_aio_t     *aio;
     ngx_http_request_t  *r;
 
@@ -273,6 +277,7 @@ ngx_http_copy_aio_sendfile_event_handler(ngx_event_t *ev)
 static void *
 ngx_http_copy_filter_create_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_copy_filter_conf_t *conf;
 
     conf = ngx_palloc(cf->pool, sizeof(ngx_http_copy_filter_conf_t));
@@ -289,6 +294,7 @@ ngx_http_copy_filter_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_copy_filter_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_copy_filter_conf_t *prev = parent;
     ngx_http_copy_filter_conf_t *conf = child;
 
@@ -301,6 +307,7 @@ ngx_http_copy_filter_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_copy_filter_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_next_body_filter = ngx_http_top_body_filter;
     ngx_http_top_body_filter = ngx_http_copy_filter;
 

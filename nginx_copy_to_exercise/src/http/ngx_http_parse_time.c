@@ -15,6 +15,7 @@ static ngx_uint_t  mday[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 time_t
 ngx_http_parse_time(u_char *value, size_t len)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     u_char      *p, *end;
     ngx_int_t    month;
     ngx_uint_t   day, year, hour, min, sec;

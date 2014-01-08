@@ -87,6 +87,7 @@ ngx_pid_t
 ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
     char *name, ngx_int_t respawn)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_long     on;
     ngx_pid_t  pid;
     ngx_int_t  s;
@@ -260,6 +261,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 ngx_pid_t
 ngx_execute(ngx_cycle_t *cycle, ngx_exec_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_spawn_process(cycle, ngx_execute_proc, ctx, ctx->name,
                              NGX_PROCESS_DETACHED);
 }
@@ -268,6 +270,7 @@ ngx_execute(ngx_cycle_t *cycle, ngx_exec_ctx_t *ctx)
 static void
 ngx_execute_proc(ngx_cycle_t *cycle, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_exec_ctx_t  *ctx = data;
 
     if (execve(ctx->path, ctx->argv, ctx->envp) == -1) {
@@ -283,6 +286,7 @@ ngx_execute_proc(ngx_cycle_t *cycle, void *data)
 ngx_int_t
 ngx_init_signals(ngx_log_t *log)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_signal_t      *sig;
     struct sigaction   sa;
 
@@ -304,6 +308,7 @@ ngx_init_signals(ngx_log_t *log)
 void
 ngx_signal_handler(int signo)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char            *action;
     ngx_int_t        ignore;
     ngx_err_t        err;
@@ -447,6 +452,7 @@ ngx_signal_handler(int signo)
 static void
 ngx_process_get_status(void)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int              status;
     char            *process;
     ngx_pid_t        pid;
@@ -541,6 +547,7 @@ ngx_process_get_status(void)
 static void
 ngx_unlock_mutexes(ngx_pid_t pid)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t        i;
     ngx_shm_zone_t   *shm_zone;
     ngx_list_part_t  *part;
@@ -588,6 +595,7 @@ ngx_unlock_mutexes(ngx_pid_t pid)
 void
 ngx_debug_point(void)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_core_conf_t  *ccf;
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(ngx_cycle->conf_ctx,
@@ -608,6 +616,7 @@ ngx_debug_point(void)
 ngx_int_t
 ngx_os_signal_process(ngx_cycle_t *cycle, char *name, ngx_int_t pid)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_signal_t  *sig;
 
     for (sig = signals; sig->signo != 0; sig++) {

@@ -82,6 +82,7 @@ static ngx_open_file_t  ngx_exit_log_file;
 void
 ngx_master_process_cycle(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char              *title;
     u_char            *p;
     size_t             size;
@@ -293,6 +294,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 void
 ngx_single_process_cycle(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  i;
 
     if (ngx_set_environment(cycle, NULL) == NULL) {
@@ -350,6 +352,7 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
 static void
 ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t      i;
     ngx_channel_t  ch;
 
@@ -374,6 +377,7 @@ ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
 static void
 ngx_start_cache_manager_processes(ngx_cycle_t *cycle, ngx_uint_t respawn)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t       i, manager, loader;
     ngx_path_t     **path;
     ngx_channel_t    ch;
@@ -428,6 +432,7 @@ ngx_start_cache_manager_processes(ngx_cycle_t *cycle, ngx_uint_t respawn)
 static void
 ngx_pass_open_channel(ngx_cycle_t *cycle, ngx_channel_t *ch)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  i;
 
     for (i = 0; i < ngx_last_process; i++) {
@@ -456,6 +461,7 @@ ngx_pass_open_channel(ngx_cycle_t *cycle, ngx_channel_t *ch)
 static void
 ngx_signal_worker_processes(ngx_cycle_t *cycle, int signo)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t      i;
     ngx_err_t      err;
     ngx_channel_t  ch;
@@ -556,6 +562,7 @@ ngx_signal_worker_processes(ngx_cycle_t *cycle, int signo)
 static ngx_uint_t
 ngx_reap_children(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t         i, n;
     ngx_uint_t        live;
     ngx_channel_t     ch;
@@ -681,6 +688,7 @@ ngx_reap_children(ngx_cycle_t *cycle)
 static void
 ngx_master_process_exit(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  i;
 
     ngx_delete_pidfile(cycle);
@@ -721,6 +729,7 @@ ngx_master_process_exit(ngx_cycle_t *cycle)
 static void
 ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t worker = (intptr_t) data;
 
     ngx_uint_t         i;
@@ -791,6 +800,7 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 static void
 ngx_worker_process_init(ngx_cycle_t *cycle, ngx_int_t worker)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     sigset_t          set;
     uint64_t          cpu_affinity;
     ngx_int_t         n;
@@ -965,6 +975,7 @@ ngx_worker_process_init(ngx_cycle_t *cycle, ngx_int_t worker)
 static void
 ngx_worker_process_exit(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t         i;
     ngx_connection_t  *c;
 
@@ -1030,6 +1041,7 @@ ngx_worker_process_exit(ngx_cycle_t *cycle)
 static void
 ngx_channel_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t          n;
     ngx_channel_t      ch;
     ngx_connection_t  *c;
@@ -1120,6 +1132,7 @@ ngx_channel_handler(ngx_event_t *ev)
 static void
 ngx_wakeup_worker_threads(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t   i;
     ngx_uint_t  live;
 
@@ -1163,6 +1176,7 @@ ngx_wakeup_worker_threads(ngx_cycle_t *cycle)
 static ngx_thread_value_t
 ngx_worker_thread_cycle(void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_thread_t  *thr = data;
 
     sigset_t          set;
@@ -1246,6 +1260,7 @@ ngx_worker_thread_cycle(void *data)
 static void
 ngx_cache_manager_process_cycle(ngx_cycle_t *cycle, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_cache_manager_ctx_t *ctx = data;
 
     void         *ident[4];
@@ -1297,6 +1312,7 @@ ngx_cache_manager_process_cycle(ngx_cycle_t *cycle, void *data)
 static void
 ngx_cache_manager_process_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t        next, n;
     ngx_uint_t    i;
     ngx_path_t  **path;
@@ -1326,6 +1342,7 @@ ngx_cache_manager_process_handler(ngx_event_t *ev)
 static void
 ngx_cache_loader_process_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t     i;
     ngx_path_t   **path;
     ngx_cycle_t   *cycle;

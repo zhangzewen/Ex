@@ -47,6 +47,7 @@ ngx_module_t  ngx_http_write_filter_module = {
 ngx_int_t
 ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     off_t                      size, sent, nsent, limit;
     ngx_uint_t                 last, flush;
     ngx_msec_t                 delay;
@@ -315,6 +316,7 @@ ngx_http_write_filter(ngx_http_request_t *r, ngx_chain_t *in)
 static ngx_int_t
 ngx_http_write_filter_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "%s:%s:%d", __FILE__, __func__, __LINE__);
     ngx_http_top_body_filter = ngx_http_write_filter;
 
     return NGX_OK;

@@ -14,6 +14,7 @@ ngx_int_t
 ngx_write_channel(ngx_socket_t s, ngx_channel_t *ch, size_t size,
     ngx_log_t *log)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     ssize_t             n;
     ngx_err_t           err;
     struct iovec        iov[1];
@@ -93,6 +94,7 @@ ngx_write_channel(ngx_socket_t s, ngx_channel_t *ch, size_t size,
 ngx_int_t
 ngx_read_channel(ngx_socket_t s, ngx_channel_t *ch, size_t size, ngx_log_t *log)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     ssize_t             n;
     ngx_err_t           err;
     struct iovec        iov[1];
@@ -197,6 +199,7 @@ ngx_int_t
 ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
     ngx_event_handler_pt handler)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     ngx_event_t       *ev, *rev, *wev;
     ngx_connection_t  *c;
 
@@ -248,6 +251,7 @@ ngx_add_channel_event(ngx_cycle_t *cycle, ngx_fd_t fd, ngx_int_t event,
 void
 ngx_close_channel(ngx_fd_t *fd, ngx_log_t *log)
 {
+    syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     if (close(fd[0]) == -1) {
         ngx_log_error(NGX_LOG_ALERT, log, ngx_errno, "close() channel failed");
     }

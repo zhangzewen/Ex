@@ -237,6 +237,7 @@ static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 static ngx_int_t
 ngx_http_gzip_header_filter(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_table_elt_t       *h;
     ngx_http_gzip_ctx_t   *ctx;
     ngx_http_gzip_conf_t  *conf;
@@ -314,6 +315,7 @@ ngx_http_gzip_header_filter(ngx_http_request_t *r)
 static ngx_int_t
 ngx_http_gzip_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                   rc;
     ngx_chain_t          *cl;
     ngx_http_gzip_ctx_t  *ctx;
@@ -481,6 +483,7 @@ failed:
 static void
 ngx_http_gzip_filter_memory(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                    wbits, memlevel;
     ngx_http_gzip_conf_t  *conf;
 
@@ -521,6 +524,7 @@ ngx_http_gzip_filter_memory(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 static ngx_int_t
 ngx_http_gzip_filter_buffer(ngx_http_gzip_ctx_t *ctx, ngx_chain_t *in)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                 size, buffered;
     ngx_buf_t             *b, *buf;
     ngx_chain_t           *cl, **ll;
@@ -590,6 +594,7 @@ static ngx_int_t
 ngx_http_gzip_filter_deflate_start(ngx_http_request_t *r,
     ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                    rc;
     ngx_http_gzip_conf_t  *conf;
 
@@ -626,6 +631,7 @@ ngx_http_gzip_filter_deflate_start(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_gzip_filter_gzheader(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_buf_t      *b;
     ngx_chain_t    *cl;
     static u_char  gzheader[10] =
@@ -658,6 +664,7 @@ ngx_http_gzip_filter_gzheader(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 static ngx_int_t
 ngx_http_gzip_filter_add_data(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (ctx->zstream.avail_in || ctx->flush != Z_NO_FLUSH || ctx->redo) {
         return NGX_OK;
     }
@@ -720,6 +727,7 @@ ngx_http_gzip_filter_add_data(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 static ngx_int_t
 ngx_http_gzip_filter_get_buf(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_gzip_conf_t  *conf;
 
     if (ctx->zstream.avail_out) {
@@ -758,6 +766,7 @@ ngx_http_gzip_filter_get_buf(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 static ngx_int_t
 ngx_http_gzip_filter_deflate(ngx_http_request_t *r, ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                    rc;
     ngx_buf_t             *b;
     ngx_chain_t           *cl;
@@ -884,6 +893,7 @@ static ngx_int_t
 ngx_http_gzip_filter_deflate_end(ngx_http_request_t *r,
     ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                rc;
     ngx_buf_t         *b;
     ngx_chain_t       *cl;
@@ -971,6 +981,7 @@ ngx_http_gzip_filter_deflate_end(ngx_http_request_t *r,
 static void *
 ngx_http_gzip_filter_alloc(void *opaque, u_int items, u_int size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_gzip_ctx_t *ctx = opaque;
 
     void        *p;
@@ -1013,6 +1024,7 @@ ngx_http_gzip_filter_alloc(void *opaque, u_int items, u_int size)
 static void
 ngx_http_gzip_filter_free(void *opaque, void *address)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if 0
     ngx_http_gzip_ctx_t *ctx = opaque;
 
@@ -1026,6 +1038,7 @@ static void
 ngx_http_gzip_filter_free_copy_buf(ngx_http_request_t *r,
     ngx_http_gzip_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_chain_t  *cl;
 
     for (cl = ctx->copied; cl; cl = cl->next) {
@@ -1039,6 +1052,7 @@ ngx_http_gzip_filter_free_copy_buf(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_gzip_add_variables(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_variable_t  *var;
 
     var = ngx_http_add_variable(cf, &ngx_http_gzip_ratio, NGX_HTTP_VAR_NOHASH);
@@ -1056,6 +1070,7 @@ static ngx_int_t
 ngx_http_gzip_ratio_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t            zint, zfrac;
     ngx_http_gzip_ctx_t  *ctx;
 
@@ -1099,6 +1114,7 @@ ngx_http_gzip_ratio_variable(ngx_http_request_t *r,
 static void *
 ngx_http_gzip_create_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_gzip_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_gzip_conf_t));
@@ -1130,6 +1146,7 @@ ngx_http_gzip_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_gzip_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_gzip_conf_t *prev = parent;
     ngx_http_gzip_conf_t *conf = child;
 
@@ -1162,6 +1179,7 @@ ngx_http_gzip_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_gzip_filter_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_gzip_header_filter;
 
@@ -1175,6 +1193,7 @@ ngx_http_gzip_filter_init(ngx_conf_t *cf)
 static char *
 ngx_http_gzip_window(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t *np = data;
 
     size_t  wbits, wsize;
@@ -1199,6 +1218,7 @@ ngx_http_gzip_window(ngx_conf_t *cf, void *post, void *data)
 static char *
 ngx_http_gzip_hash(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t *np = data;
 
     size_t  memlevel, hsize;
