@@ -18,6 +18,7 @@ static void ngx_close_accepted_connection(ngx_connection_t *c);
 void
 ngx_event_accept(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     socklen_t          socklen;
     ngx_err_t          err;
     ngx_log_t         *log;
@@ -376,6 +377,7 @@ ngx_event_accept(ngx_event_t *ev)
 ngx_int_t
 ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 		//使用进程间的同步锁，视图获取accept_mutex锁。注意，ngx_shmtx_trylock返回1表示成功拿到锁，返回0表示获取锁失败。这个获取锁的过程是
 		//非阻塞的，此时一旦锁被其他worker子进程占用，就立即返回
     if (ngx_shmtx_trylock(&ngx_accept_mutex)) {
@@ -422,6 +424,7 @@ ngx_trylock_accept_mutex(ngx_cycle_t *cycle)
 static ngx_int_t
 ngx_enable_accept_events(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t         i;
     ngx_listening_t   *ls;
     ngx_connection_t  *c;
@@ -455,6 +458,7 @@ ngx_enable_accept_events(ngx_cycle_t *cycle)
 static ngx_int_t
 ngx_disable_accept_events(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t         i;
     ngx_listening_t   *ls;
     ngx_connection_t  *c;
@@ -489,6 +493,7 @@ ngx_disable_accept_events(ngx_cycle_t *cycle)
 static void
 ngx_close_accepted_connection(ngx_connection_t *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_socket_t  fd;
 
     ngx_free_connection(c);
@@ -514,6 +519,7 @@ ngx_close_accepted_connection(ngx_connection_t *c)
 u_char *
 ngx_accept_log_error(ngx_log_t *log, u_char *buf, size_t len)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_snprintf(buf, len, "[%s:%d] while accepting new connection on %V",
                         __func__, __LINE__, log->data);
 }

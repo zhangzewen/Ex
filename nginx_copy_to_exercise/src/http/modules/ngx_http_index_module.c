@@ -96,6 +96,7 @@ ngx_module_t  ngx_http_index_module = {
 static ngx_int_t
 ngx_http_index_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                       *p, *name;
     size_t                        len, root, reserve, allocated;
     ngx_int_t                     rc;
@@ -285,6 +286,7 @@ static ngx_int_t
 ngx_http_index_test_dir(ngx_http_request_t *r, ngx_http_core_loc_conf_t *clcf,
     u_char *path, u_char *last)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                c;
     ngx_str_t             dir;
     ngx_open_file_info_t  of;
@@ -368,6 +370,7 @@ static ngx_int_t
 ngx_http_index_error(ngx_http_request_t *r, ngx_http_core_loc_conf_t  *clcf,
     u_char *file, ngx_err_t err)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (err == NGX_EACCES) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, err,
                       "\"%s\" is forbidden", file);
@@ -387,6 +390,7 @@ ngx_http_index_error(ngx_http_request_t *r, ngx_http_core_loc_conf_t  *clcf,
 static void *
 ngx_http_index_create_loc_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_index_loc_conf_t  *conf;
 
     conf = ngx_palloc(cf->pool, sizeof(ngx_http_index_loc_conf_t));
@@ -404,6 +408,7 @@ ngx_http_index_create_loc_conf(ngx_conf_t *cf)
 static char *
 ngx_http_index_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_index_loc_conf_t  *prev = parent;
     ngx_http_index_loc_conf_t  *conf = child;
 
@@ -442,6 +447,7 @@ ngx_http_index_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_index_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_handler_pt        *h;
     ngx_http_core_main_conf_t  *cmcf;
 
@@ -463,6 +469,7 @@ ngx_http_index_init(ngx_conf_t *cf)
 static char *
 ngx_http_index_set_index(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_index_loc_conf_t *ilcf = conf;
 
     ngx_str_t                  *value;

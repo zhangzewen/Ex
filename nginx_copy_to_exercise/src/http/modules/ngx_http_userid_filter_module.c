@@ -196,6 +196,7 @@ static ngx_uint_t  ngx_http_userid_reset_index;
 static ngx_int_t
 ngx_http_userid_filter(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_ctx_t   *ctx;
     ngx_http_userid_conf_t  *conf;
 
@@ -227,6 +228,7 @@ static ngx_int_t
 ngx_http_userid_got_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_ctx_t   *ctx;
     ngx_http_userid_conf_t  *conf;
 
@@ -257,6 +259,7 @@ static ngx_int_t
 ngx_http_userid_set_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_ctx_t   *ctx;
     ngx_http_userid_conf_t  *conf;
 
@@ -289,6 +292,7 @@ ngx_http_userid_set_variable(ngx_http_request_t *r,
 static ngx_http_userid_ctx_t *
 ngx_http_userid_get_uid(ngx_http_request_t *r, ngx_http_userid_conf_t *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t                n;
     ngx_str_t                src, dst;
     ngx_table_elt_t        **cookies;
@@ -360,6 +364,7 @@ static ngx_int_t
 ngx_http_userid_set_uid(ngx_http_request_t *r, ngx_http_userid_ctx_t *ctx,
     ngx_http_userid_conf_t *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char           *cookie, *p;
     size_t            len;
     ngx_str_t         src, dst;
@@ -456,6 +461,7 @@ static ngx_int_t
 ngx_http_userid_create_uid(ngx_http_request_t *r, ngx_http_userid_ctx_t *ctx,
     ngx_http_userid_conf_t *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t           *c;
     struct sockaddr_in         *sin;
     ngx_http_variable_value_t  *vv;
@@ -551,6 +557,7 @@ static ngx_int_t
 ngx_http_userid_variable(ngx_http_request_t *r, ngx_http_variable_value_t *v,
     ngx_str_t *name, uint32_t *uid)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     v->len = name->len + sizeof("=00001111222233334444555566667777") - 1;
     v->data = ngx_pnalloc(r->pool, v->len);
     if (v->data == NULL) {
@@ -572,6 +579,7 @@ static ngx_int_t
 ngx_http_userid_reset_variable(ngx_http_request_t *r,
     ngx_http_variable_value_t *v, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     *v = ngx_http_variable_null_value;
 
     return NGX_OK;
@@ -581,6 +589,7 @@ ngx_http_userid_reset_variable(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_userid_add_variables(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t             n;
     ngx_http_variable_t  *var;
 
@@ -620,6 +629,7 @@ ngx_http_userid_add_variables(ngx_conf_t *cf)
 static void *
 ngx_http_userid_create_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_userid_conf_t));
@@ -648,6 +658,7 @@ ngx_http_userid_create_conf(ngx_conf_t *cf)
 static char *
 ngx_http_userid_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_conf_t *prev = parent;
     ngx_http_userid_conf_t *conf = child;
 
@@ -677,6 +688,7 @@ ngx_http_userid_merge_conf(ngx_conf_t *cf, void *parent, void *child)
 static ngx_int_t
 ngx_http_userid_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_next_header_filter = ngx_http_top_header_filter;
     ngx_http_top_header_filter = ngx_http_userid_filter;
 
@@ -687,6 +699,7 @@ ngx_http_userid_init(ngx_conf_t *cf)
 static char *
 ngx_http_userid_domain(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t  *domain = data;
 
     u_char  *p, *new;
@@ -714,6 +727,7 @@ ngx_http_userid_domain(ngx_conf_t *cf, void *post, void *data)
 static char *
 ngx_http_userid_path(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t  *path = data;
 
     u_char  *p, *new;
@@ -736,6 +750,7 @@ ngx_http_userid_path(ngx_conf_t *cf, void *post, void *data)
 static char *
 ngx_http_userid_expires(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_conf_t *ucf = conf;
 
     ngx_str_t  *value;
@@ -768,6 +783,7 @@ ngx_http_userid_expires(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static char *
 ngx_http_userid_p3p(ngx_conf_t *cf, void *post, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t  *p3p = data;
 
     if (ngx_strcmp(p3p->data, "none") == 0) {
@@ -781,6 +797,7 @@ ngx_http_userid_p3p(ngx_conf_t *cf, void *post, void *data)
 static char *
 ngx_http_userid_mark(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_userid_conf_t *ucf = conf;
 
     ngx_str_t  *value;
@@ -814,6 +831,7 @@ ngx_http_userid_mark(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static ngx_int_t
 ngx_http_userid_init_worker(ngx_cycle_t *cycle)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval  tp;
 
     ngx_gettimeofday(&tp);

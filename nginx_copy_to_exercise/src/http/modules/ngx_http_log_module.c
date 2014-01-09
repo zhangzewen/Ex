@@ -229,6 +229,7 @@ static ngx_http_log_var_t  ngx_http_log_vars[] = {
 static ngx_int_t
 ngx_http_log_handler(ngx_http_request_t *r)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                   *line, *p;
     size_t                    len;
     ngx_uint_t                i, l;
@@ -327,6 +328,7 @@ static void
 ngx_http_log_write(ngx_http_request_t *r, ngx_http_log_t *log, u_char *buf,
     size_t len)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char     *name;
     time_t      now;
     ssize_t     n;
@@ -378,6 +380,7 @@ static ssize_t
 ngx_http_log_script_write(ngx_http_request_t *r, ngx_http_log_script_t *script,
     u_char **name, u_char *buf, size_t len)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t                     root;
     ssize_t                    n;
     ngx_str_t                  log, path;
@@ -486,6 +489,7 @@ static u_char *
 ngx_http_log_copy_short(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t     len;
     uintptr_t  data;
 
@@ -505,6 +509,7 @@ static u_char *
 ngx_http_log_copy_long(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_cpymem(buf, (u_char *) op->data, op->len);
 }
 
@@ -512,6 +517,7 @@ ngx_http_log_copy_long(ngx_http_request_t *r, u_char *buf,
 static u_char *
 ngx_http_log_pipe(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (r->pipeline) {
         *buf = 'p';
     } else {
@@ -525,6 +531,7 @@ ngx_http_log_pipe(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 static u_char *
 ngx_http_log_time(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_cpymem(buf, ngx_cached_http_log_time.data,
                       ngx_cached_http_log_time.len);
 }
@@ -532,6 +539,7 @@ ngx_http_log_time(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 static u_char *
 ngx_http_log_iso8601(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_cpymem(buf, ngx_cached_http_log_iso8601.data,
                       ngx_cached_http_log_iso8601.len);
 }
@@ -539,6 +547,7 @@ ngx_http_log_iso8601(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 static u_char *
 ngx_http_log_msec(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_time_t  *tp;
 
     tp = ngx_timeofday();
@@ -551,6 +560,7 @@ static u_char *
 ngx_http_log_request_time(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_time_t      *tp;
     ngx_msec_int_t   ms;
 
@@ -567,6 +577,7 @@ ngx_http_log_request_time(ngx_http_request_t *r, u_char *buf,
 static u_char *
 ngx_http_log_status(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t  status;
 
     if (r->err_status) {
@@ -590,6 +601,7 @@ static u_char *
 ngx_http_log_bytes_sent(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_sprintf(buf, "%O", r->connection->sent);
 }
 
@@ -603,6 +615,7 @@ static u_char *
 ngx_http_log_body_bytes_sent(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     off_t  length;
 
     length = r->connection->sent - r->header_size;
@@ -621,6 +634,7 @@ static u_char *
 ngx_http_log_request_length(ngx_http_request_t *r, u_char *buf,
     ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ngx_sprintf(buf, "%O", r->request_length);
 }
 
@@ -629,6 +643,7 @@ static ngx_int_t
 ngx_http_log_variable_compile(ngx_conf_t *cf, ngx_http_log_op_t *op,
     ngx_str_t *value)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t  index;
 
     index = ngx_http_get_variable_index(cf, value);
@@ -648,6 +663,7 @@ ngx_http_log_variable_compile(ngx_conf_t *cf, ngx_http_log_op_t *op,
 static size_t
 ngx_http_log_variable_getlen(ngx_http_request_t *r, uintptr_t data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uintptr_t                   len;
     ngx_http_variable_value_t  *value;
 
@@ -668,6 +684,7 @@ ngx_http_log_variable_getlen(ngx_http_request_t *r, uintptr_t data)
 static u_char *
 ngx_http_log_variable(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_variable_value_t  *value;
 
     value = ngx_http_get_indexed_variable(r, op->data);
@@ -689,6 +706,7 @@ ngx_http_log_variable(ngx_http_request_t *r, u_char *buf, ngx_http_log_op_t *op)
 static uintptr_t
 ngx_http_log_escape(u_char *dst, u_char *src, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_uint_t      n;
     static u_char   hex[] = "0123456789ABCDEF";
 
@@ -749,6 +767,7 @@ ngx_http_log_escape(u_char *dst, u_char *src, size_t size)
 static void *
 ngx_http_log_create_main_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_main_conf_t  *conf;
 
     ngx_http_log_fmt_t  *fmt;
@@ -785,6 +804,7 @@ ngx_http_log_create_main_conf(ngx_conf_t *cf)
 static void *
 ngx_http_log_create_loc_conf(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_loc_conf_t  *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_log_loc_conf_t));
@@ -801,6 +821,7 @@ ngx_http_log_create_loc_conf(ngx_conf_t *cf)
 static char *
 ngx_http_log_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_loc_conf_t *prev = parent;
     ngx_http_log_loc_conf_t *conf = child;
 
@@ -863,6 +884,7 @@ ngx_http_log_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 static char *
 ngx_http_log_set_log(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_loc_conf_t *llcf = conf;
 
     ssize_t                     buf;
@@ -1010,6 +1032,7 @@ buffer:
 static char *
 ngx_http_log_set_format(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_main_conf_t *lmcf = conf;
 
     ngx_str_t           *value;
@@ -1061,6 +1084,7 @@ static char *
 ngx_http_log_compile_format(ngx_conf_t *cf, ngx_array_t *flushes,
     ngx_array_t *ops, ngx_array_t *args, ngx_uint_t s)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char              *data, *p, ch;
     size_t               i, len;
     ngx_str_t           *value, var;
@@ -1218,6 +1242,7 @@ invalid:
 static char *
 ngx_http_log_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_log_loc_conf_t *llcf = conf;
 
     time_t       inactive, valid;
@@ -1326,6 +1351,7 @@ ngx_http_log_open_file_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 static ngx_int_t
 ngx_http_log_init(ngx_conf_t *cf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t                  *value;
     ngx_array_t                 a;
     ngx_http_handler_pt        *h;

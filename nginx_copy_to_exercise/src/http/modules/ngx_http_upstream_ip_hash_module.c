@@ -83,6 +83,7 @@ static u_char ngx_http_upstream_ip_hash_pseudo_addr[3];
 static ngx_int_t
 ngx_http_upstream_init_ip_hash(ngx_conf_t *cf, ngx_http_upstream_srv_conf_t *us)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (ngx_http_upstream_init_round_robin(cf, us) != NGX_OK) {
         return NGX_ERROR;
     }
@@ -97,6 +98,7 @@ static ngx_int_t
 ngx_http_upstream_init_ip_hash_peer(ngx_http_request_t *r,
     ngx_http_upstream_srv_conf_t *us)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct sockaddr_in                     *sin;
     ngx_http_upstream_ip_hash_peer_data_t  *iphp;
 
@@ -138,6 +140,7 @@ ngx_http_upstream_init_ip_hash_peer(ngx_http_request_t *r,
 static ngx_int_t
 ngx_http_upstream_get_ip_hash_peer(ngx_peer_connection_t *pc, void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_ip_hash_peer_data_t  *iphp = data;
 
     time_t                        now;
@@ -238,6 +241,7 @@ ngx_http_upstream_get_ip_hash_peer(ngx_peer_connection_t *pc, void *data)
 static char *
 ngx_http_upstream_ip_hash(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_http_upstream_srv_conf_t  *uscf;
 
     uscf = ngx_http_conf_get_module_srv_conf(cf, ngx_http_upstream_module);
