@@ -96,6 +96,7 @@ static u_char *ngx_resolver_log_error(ngx_log_t *log, u_char *buf, size_t len);
 ngx_resolver_t *
 ngx_resolver_create(ngx_conf_t *cf, ngx_str_t *names, ngx_uint_t n)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_str_t              s;
     ngx_url_t              u;
     ngx_uint_t             i, j;
@@ -207,6 +208,7 @@ ngx_resolver_create(ngx_conf_t *cf, ngx_str_t *names, ngx_uint_t n)
 static void
 ngx_resolver_cleanup(void *data)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_resolver_t  *r = data;
 
     ngx_uint_t             i;
@@ -241,6 +243,7 @@ ngx_resolver_cleanup(void *data)
 static void
 ngx_resolver_cleanup_tree(ngx_resolver_t *r, ngx_rbtree_t *tree)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_resolver_ctx_t   *ctx, *next;
     ngx_resolver_node_t  *rn;
 
@@ -270,6 +273,7 @@ ngx_resolver_cleanup_tree(ngx_resolver_t *r, ngx_rbtree_t *tree)
 ngx_resolver_ctx_t *
 ngx_resolve_start(ngx_resolver_t *r, ngx_resolver_ctx_t *temp)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     in_addr_t            addr;
     ngx_resolver_ctx_t  *ctx;
 
@@ -310,6 +314,7 @@ ngx_resolve_start(ngx_resolver_t *r, ngx_resolver_ctx_t *temp)
 ngx_int_t
 ngx_resolve_name(ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t        rc;
     ngx_resolver_t  *r;
 
@@ -352,6 +357,7 @@ ngx_resolve_name(ngx_resolver_ctx_t *ctx)
 void
 ngx_resolve_name_done(ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uint32_t              hash;
     ngx_resolver_t       *r;
     ngx_resolver_ctx_t   *w, **p;
@@ -421,6 +427,7 @@ done:
 static ngx_int_t
 ngx_resolve_name_locked(ngx_resolver_t *r, ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uint32_t              hash;
     in_addr_t             addr, *addrs;
     ngx_int_t             rc;
@@ -636,6 +643,7 @@ failed:
 ngx_int_t
 ngx_resolve_addr(ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char               *name;
     ngx_resolver_t       *r;
     ngx_resolver_node_t  *rn;
@@ -775,6 +783,7 @@ failed:
 void
 ngx_resolve_addr_done(ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     in_addr_t             addr;
     ngx_resolver_t       *r;
     ngx_resolver_ctx_t   *w, **p;
@@ -840,6 +849,7 @@ done:
 static void
 ngx_resolver_expire(ngx_resolver_t *r, ngx_rbtree_t *tree, ngx_queue_t *queue)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                now;
     ngx_uint_t            i;
     ngx_queue_t          *q;
@@ -877,6 +887,7 @@ ngx_resolver_expire(ngx_resolver_t *r, ngx_rbtree_t *tree, ngx_queue_t *queue)
 static ngx_int_t
 ngx_resolver_send_query(ngx_resolver_t *r, ngx_resolver_node_t *rn)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t                n;
     ngx_udp_connection_t  *uc;
 
@@ -921,6 +932,7 @@ ngx_resolver_send_query(ngx_resolver_t *r, ngx_resolver_node_t *rn)
 static void
 ngx_resolver_resend_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t           timer, atimer, ntimer;
     ngx_resolver_t  *r;
 
@@ -960,6 +972,7 @@ ngx_resolver_resend_handler(ngx_event_t *ev)
 static time_t
 ngx_resolver_resend(ngx_resolver_t *r, ngx_rbtree_t *tree, ngx_queue_t *queue)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t                now;
     ngx_queue_t          *q;
     ngx_resolver_node_t  *rn;
@@ -1006,6 +1019,7 @@ ngx_resolver_resend(ngx_resolver_t *r, ngx_rbtree_t *tree, ngx_queue_t *queue)
 static void
 ngx_resolver_read_response(ngx_event_t *rev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ssize_t            n;
     ngx_connection_t  *c;
     u_char             buf[NGX_RESOLVER_UDP_SIZE];
@@ -1028,6 +1042,7 @@ ngx_resolver_read_response(ngx_event_t *rev)
 static void
 ngx_resolver_process_response(ngx_resolver_t *r, u_char *buf, size_t n)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char                  *err;
     size_t                 len;
     ngx_uint_t             i, times, ident, qident, flags, code, nqs, nan,
@@ -1180,6 +1195,7 @@ static void
 ngx_resolver_process_a(ngx_resolver_t *r, u_char *buf, size_t last,
     ngx_uint_t ident, ngx_uint_t code, ngx_uint_t nan, ngx_uint_t ans)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char                 *err;
     u_char               *cname;
     size_t                len;
@@ -1497,6 +1513,7 @@ static void
 ngx_resolver_process_ptr(ngx_resolver_t *r, u_char *buf, size_t n,
     ngx_uint_t ident, ngx_uint_t code, ngx_uint_t nan)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char                 *err;
     size_t                len;
     in_addr_t             addr;
@@ -1690,6 +1707,7 @@ failed:
 static ngx_resolver_node_t *
 ngx_resolver_lookup_name(ngx_resolver_t *r, ngx_str_t *name, uint32_t hash)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_int_t             rc;
     ngx_rbtree_node_t    *node, *sentinel;
     ngx_resolver_node_t  *rn;
@@ -1731,6 +1749,7 @@ ngx_resolver_lookup_name(ngx_resolver_t *r, ngx_str_t *name, uint32_t hash)
 static ngx_resolver_node_t *
 ngx_resolver_lookup_addr(ngx_resolver_t *r, in_addr_t addr)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_rbtree_node_t  *node, *sentinel;
 
     node = r->addr_rbtree.root;
@@ -1763,6 +1782,7 @@ static void
 ngx_resolver_rbtree_insert_value(ngx_rbtree_node_t *temp,
     ngx_rbtree_node_t *node, ngx_rbtree_node_t *sentinel)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_rbtree_node_t    **p;
     ngx_resolver_node_t   *rn, *rn_temp;
 
@@ -1803,6 +1823,7 @@ ngx_resolver_rbtree_insert_value(ngx_rbtree_node_t *temp,
 static ngx_int_t
 ngx_resolver_create_name_query(ngx_resolver_node_t *rn, ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                *p, *s;
     size_t                 len, nlen;
     ngx_uint_t             ident;
@@ -1892,6 +1913,7 @@ ngx_resolver_create_name_query(ngx_resolver_node_t *rn, ngx_resolver_ctx_t *ctx)
 static ngx_int_t
 ngx_resolver_create_addr_query(ngx_resolver_node_t *rn, ngx_resolver_ctx_t *ctx)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                *p, *d;
     size_t                 len;
     ngx_int_t              n;
@@ -1947,6 +1969,7 @@ static ngx_int_t
 ngx_resolver_copy(ngx_resolver_t *r, ngx_str_t *name, u_char *buf, u_char *src,
     u_char *last)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char        *err;
     u_char      *p, *dst;
     ssize_t      len;
@@ -2041,6 +2064,7 @@ done:
 static void
 ngx_resolver_timeout_handler(ngx_event_t *ev)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_resolver_ctx_t  *ctx;
 
     ctx = ev->data;
@@ -2054,6 +2078,7 @@ ngx_resolver_timeout_handler(ngx_event_t *ev)
 static void
 ngx_resolver_free_node(ngx_resolver_t *r, ngx_resolver_node_t *rn)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* lock alloc mutex */
 
     if (rn->query) {
@@ -2081,6 +2106,7 @@ ngx_resolver_free_node(ngx_resolver_t *r, ngx_resolver_node_t *rn)
 static void *
 ngx_resolver_alloc(ngx_resolver_t *r, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p;
 
     /* lock alloc mutex */
@@ -2096,6 +2122,7 @@ ngx_resolver_alloc(ngx_resolver_t *r, size_t size)
 static void *
 ngx_resolver_calloc(ngx_resolver_t *r, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char  *p;
 
     p = ngx_resolver_alloc(r, size);
@@ -2111,6 +2138,7 @@ ngx_resolver_calloc(ngx_resolver_t *r, size_t size)
 static void
 ngx_resolver_free(ngx_resolver_t *r, void *p)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* lock alloc mutex */
 
     ngx_free(p);
@@ -2122,6 +2150,7 @@ ngx_resolver_free(ngx_resolver_t *r, void *p)
 static void
 ngx_resolver_free_locked(ngx_resolver_t *r, void *p)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_free(p);
 }
 
@@ -2129,6 +2158,7 @@ ngx_resolver_free_locked(ngx_resolver_t *r, void *p)
 static void *
 ngx_resolver_dup(ngx_resolver_t *r, void *src, size_t size)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     void  *dst;
 
     dst = ngx_resolver_alloc(r, size);
@@ -2146,6 +2176,7 @@ ngx_resolver_dup(ngx_resolver_t *r, void *src, size_t size)
 static in_addr_t *
 ngx_resolver_rotate(ngx_resolver_t *r, in_addr_t *src, ngx_uint_t n)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     void        *dst, *p;
     ngx_uint_t   j;
 
@@ -2172,6 +2203,7 @@ ngx_resolver_rotate(ngx_resolver_t *r, in_addr_t *src, ngx_uint_t n)
 char *
 ngx_resolver_strerror(ngx_int_t err)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     static char *errors[] = {
         "Format error",     /* FORMERR */
         "Server failure",   /* SERVFAIL */
@@ -2195,6 +2227,7 @@ ngx_resolver_strerror(ngx_int_t err)
 static u_char *
 ngx_resolver_log_error(ngx_log_t *log, u_char *buf, size_t len)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     u_char                *p;
     ngx_udp_connection_t  *uc;
 
@@ -2218,6 +2251,7 @@ ngx_resolver_log_error(ngx_log_t *log, u_char *buf, size_t len)
 ngx_int_t
 ngx_udp_connect(ngx_udp_connection_t *uc)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int                rc;
     ngx_int_t          event;
     ngx_event_t       *rev, *wev;
