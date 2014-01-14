@@ -1339,9 +1339,9 @@ ngx_http_file_cache_manager(void *data)
 
     off_t   size;
     time_t  next, wait;
-
+//如果有超时的cache，对超时对应的cache
     next = ngx_http_file_cache_expire(cache);
-
+//最后访问时间
     cache->last = ngx_current_msec;
     cache->files = 0;
 
@@ -1354,11 +1354,11 @@ ngx_http_file_cache_manager(void *data)
 
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, ngx_cycle->log, 0,
                        "http file cache size: %O", size);
-
+//如果没有超过最大的大小限制，则直接返回
         if (size < cache->max_size) {
             return next;
         }
-
+//否则遍历所有的cache文件，然后删除过期的cache
         wait = ngx_http_file_cache_forced_expire(cache);
 
         if (wait > 0) {
@@ -1808,7 +1808,7 @@ ngx_http_file_cache_set_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            &cmd->name);
         return NGX_CONF_ERROR;
     }
-
+//初始话cache对象
     cache->path->manager = ngx_http_file_cache_manager;
     cache->path->loader = ngx_http_file_cache_loader;
     cache->path->data = cache;
@@ -1817,11 +1817,12 @@ ngx_http_file_cache_set_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     cache->loader_files = loader_files;
     cache->loader_sleep = loader_sleep;
     cache->loader_threshold = loader_threshold;
+//将path添加到全局的路径管理中
 
     if (ngx_add_path(cf, &cache->path) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
-
+//创建共享内存
     cache->shm_zone = ngx_shared_memory_add(cf, &name, size, cmd->post);
     if (cache->shm_zone == NULL) {
         return NGX_CONF_ERROR;
@@ -1832,11 +1833,11 @@ ngx_http_file_cache_set_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            "duplicate zone \"%V\"", &name);
         return NGX_CONF_ERROR;
     }
-
+//设置初始化函数
 
     cache->shm_zone->init = ngx_http_file_cache_init;
     cache->shm_zone->data = cache;
-
+//设置cache
     cache->inactive = inactive;
     cache->max_size = max_size;
 

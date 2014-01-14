@@ -37,20 +37,29 @@ typedef struct {
 
     u_char                           key[NGX_HTTP_CACHE_KEY_LEN
                                          - sizeof(ngx_rbtree_key_t)];
-
+//引用计数
     unsigned                         count:20;
+//多少请求在使用
     unsigned                         uses:10;
     unsigned                         valid_msec:10;
+//cache的状态
     unsigned                         error:10;
+//是存在对应的cache文件
     unsigned                         exists:1;
+//是否正在更新
     unsigned                         updating:1;
+//是否正在删除
     unsigned                         deleting:1;
                                      /* 11 unused bits */
-
+//文件的uniq
     ngx_file_uniq_t                  uniq;
+//cache的失效时间
     time_t                           expire;
+//比如cache control中的max-age
     time_t                           valid_sec;
+//其实应该是body的大小
     size_t                           body_start;
+//文件大小
     off_t                            fs_size;
 } ngx_http_file_cache_node_t;
 
@@ -110,7 +119,9 @@ typedef struct {
     ngx_rbtree_t                     rbtree;
     ngx_rbtree_node_t                sentinel;
     ngx_queue_t                      queue;
+//cold表示这个cache是否已经被loader进程load过了
     ngx_atomic_t                     cold;
+//那个进程正在load这个cache
     ngx_atomic_t                     loading;
     off_t                            size;
 } ngx_http_file_cache_sh_t;
@@ -119,20 +130,24 @@ typedef struct {
 struct ngx_http_file_cache_s {
     ngx_http_file_cache_sh_t        *sh;
     ngx_slab_pool_t                 *shpool;
-
+//cache的目录
     ngx_path_t                      *path;
-
+//当前path下的所有cache文件的最大值
     off_t                            max_size;
     size_t                           bsize;
-
+//如果多久不使用就删除
     time_t                           inactive;
-
+//当前有多少个cache（超过loader_files之后就会被清0）
     ngx_uint_t                       files;
+//这个值也就是一个阀值，当load的文件个树大于这个值之后，load进程就会短暂的休眠（loader_sleep）
     ngx_uint_t                       loader_files;
+//最后被manage或者loader访问的时间
     ngx_msec_t                       last;
+//和上面的loader_files配合使用，当文件个数大于loader_files，就会休眠
     ngx_msec_t                       loader_sleep;
+//配合上面的last，也就是loader便利的休眠间隔
     ngx_msec_t                       loader_threshold;
-
+//共享内存的地址
     ngx_shm_zone_t                  *shm_zone;
 };
 

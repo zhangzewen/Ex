@@ -373,7 +373,16 @@ ngx_start_worker_processes(ngx_cycle_t *cycle, ngx_int_t n, ngx_int_t type)
     }
 }
 
-
+/*
+ * 然后来看cache系统的启动。当配置解析完毕之后就会进入进程的初始化部分也就是ngx_master_process_cycle 这个函数，
+ * 而在这个函数中将会启动nginx的worker。 并且会启动对应的cache manger和cache loader，也就是说cache manger和cache loader是一对子进程，并且独立于worker。
+ *
+ * cache manger的作用是用来定时删除无用的cache文件(引用计数为0),一般来说只有manger会删除无用的cache(特殊情况，
+ * 比如在loader中分配共享内存失败可能会强制删除一些cache， 或者说 loader的时候遇到一些特殊文件).
+ *
+ * cache loader的的主要作用是定时遍历cache目录，然后加载一些没有被加载的文件(比如nginx重启后，也就是上次遗留的文件),
+ * 或者说将cache文件重新插入(因为删除是使用LRU算法),后续能够看到代码细节
+ */
 static void
 ngx_start_cache_manager_processes(ngx_cycle_t *cycle, ngx_uint_t respawn)
 {
@@ -1280,6 +1289,7 @@ ngx_cache_manager_process_cycle(ngx_cycle_t *cycle, void *data)
     ngx_worker_process_init(cycle, -1);
 
     ngx_memzero(&ev, sizeof(ngx_event_t));
+//最核心的在这里设置传递进来的ctx->handler为定时器回调
     ev.handler = ctx->handler;
     ev.data = ident;
     ev.log = cycle->log;
@@ -1288,9 +1298,9 @@ ngx_cache_manager_process_cycle(ngx_cycle_t *cycle, void *data)
     ngx_use_accept_mutex = 0;
 
     ngx_setproctitle(ctx->name);
-
+//添加定时器
     ngx_add_timer(&ev, ctx->delay);
-
+//进入时间循环
     for ( ;; ) {
 
         if (ngx_terminate || ngx_quit) {
