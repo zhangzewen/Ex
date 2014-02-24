@@ -28,6 +28,7 @@ void ngethostbyname (unsigned char* , int);
 void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
 unsigned char* ReadName (unsigned char*,unsigned char*,int*);
 void get_dns_servers();
+static create_query();
 
 //DNS header structure
 struct DNS_HEADER

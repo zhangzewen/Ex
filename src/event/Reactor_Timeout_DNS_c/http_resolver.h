@@ -22,6 +22,9 @@ typedef struct resolver_st resolver;
 struct resolver_st{
 	struct dns_server *DServer; //dns servers
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
+	struct list_head name_queue;
+	struct list_head address_queue;
+	struct event_base *base; //reacotr 模式
 };
 
 

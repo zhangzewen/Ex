@@ -70,4 +70,8 @@ void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
 unsigned char* ReadName (unsigned char*,unsigned char*,int*);
 void get_local_dns_servers();
 
+static create_query();
+
+
+
 
