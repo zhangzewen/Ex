@@ -16,9 +16,6 @@ struct resolver_result{
 	char **value; //解析后得到的ip列表
 };
 
-
-typedef struct resolver_st resolver;
-
 struct resolver_st{
 	struct dns_server *DServer; //dns servers
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
@@ -28,9 +25,8 @@ struct resolver_st{
 };
 
 
-resolver_init();
-resolve_name();
-resolver_distory();
-
+void resolver_init(struct resolver_st *resolver);
+struct resolver_result *resolve_name(struct resolver_st *resolver, const char *host);
+void resolver_distory(struct resolver_st *resolver);
 
 #endif
