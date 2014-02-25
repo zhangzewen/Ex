@@ -1,3 +1,7 @@
+//just copy of loopup.c(http://burtleburtle.net/bob/c/lookup3.c)
+
+
+
 /*
 -------------------------------------------------------------------------------
 lookup3.c, by Bob Jenkins, May 2006, Public Domain.

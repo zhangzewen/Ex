@@ -99,12 +99,12 @@ static rbtree_node_t *rb_search_auxiliary(uintptr_t key, rbtree_node_t *root, rb
 	return NULL;
 }
 
-rbtree_node_t *rb_search(uintptr_t key, rbtree_node_t *root)
+static rbtree_node_t *rb_search(uintptr_t key, rbtree_node_t *root)
 {
 	return rb_search_auxiliary(key, root, NULL);
 }
 
-rbtree_node_t *rb_insert(uintptr_t key, void* data, rbtree_node_t *root)
+static rbtree_node_t *rb_insert(uintptr_t key, void* data, rbtree_node_t *root)
 {
 	rbtree_node_t *parent = NULL;
 	rbtree_node_t *node = NULL;
@@ -185,7 +185,7 @@ static rbtree_node_t *rb_insert_rebalance(rbtree_node_t *node, rbtree_node_t *ro
 	root->color = BLACK;
 	return root;
 }
-rbtree_node_t *rb_erase(uintptr_t key, rbtree_node_t *root)
+static rbtree_node_t *rb_erase(uintptr_t key, rbtree_node_t *root)
 {
 	rbtree_node_t *child;	
 	rbtree_node_t *parent;
@@ -375,12 +375,12 @@ void rbtree_init(rbtree_t *tree)
 	tree->empty = rbtree_empty;
 }
 
-int rbtree_empty(rbtree_node_t *root)
+static int rbtree_empty(rbtree_node_t *root)
 {
 	return root == NULL;
 }
 //找到最小节点，就在根节点最左边的左子树
-rbtree_node_t *rb_min(struct rbtree_node_st *root)
+static rbtree_node_t *rb_min(struct rbtree_node_st *root)
 {
 
 	if (NULL == root) {
