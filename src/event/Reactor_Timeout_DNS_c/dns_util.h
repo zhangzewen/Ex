@@ -1,5 +1,6 @@
-char dns_servers[10][100];
-int dns_server_count = 0;
+#ifndef _HTTP_DNS_UTIL_H_INCLUDED_
+#define _HTTP_DNS_UTIL_H_INCLUDED_
+
 
 #define T_A 1 //Ipv4 address
 #define T_NS 2 //Nameserver
@@ -7,6 +8,13 @@ int dns_server_count = 0;
 #define T_SOA 6 /* start of authority zone */
 #define T_PTR 12 /* domain name pointer */
 #define T_MX 15 //Mail server
+
+//Function Prototypes
+void ngethostbyname (unsigned char* , int);
+void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
+unsigned char* ReadName (unsigned char*,unsigned char*,int*);
+void get_dns_servers();
+static create_query();
 
 //DNS header structure
 struct DNS_HEADER
@@ -64,14 +72,11 @@ typedef struct
 	struct QUESTION *ques;
 } QUERY;
 
-//Function Prototypes
-void ngethostbyname (unsigned char* , int);
-void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
-unsigned char* ReadName (unsigned char*,unsigned char*,int*);
-void get_local_dns_servers();
+void ngethostbyname(unsigned char *host , int query_type);
 
-static create_query();
+u_char* ReadName(unsigned char* reader,unsigned char* buffer,int* count);
 
+void get_dns_servers();
 
-
-
+void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host);
+#endif

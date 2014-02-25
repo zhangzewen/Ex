@@ -1,8 +1,3 @@
-//DNS Query Program on Linux
-////Author : Silver Moon (m00n.silv3r@gmail.com)
-////Dated : 29/4/2009
-// 
-// //Header Files
 #include<stdio.h> //printf
 #include<string.h>    //strlen
 #include<stdlib.h>    //malloc
@@ -16,19 +11,11 @@ char dns_servers[10][100];
 int dns_server_count = 0;
 //  //Types of DNS resource records :)
 
-#define T_A 1 //Ipv4 address
-#define T_NS 2 //Nameserver
-#define T_CNAME 5 // canonical name
-#define T_SOA 6 /* start of authority zone */
-#define T_PTR 12 /* domain name pointer */
-#define T_MX 15 //Mail server
-
 //Function Prototypes
 void ngethostbyname (unsigned char* , int);
 void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
 unsigned char* ReadName (unsigned char*,unsigned char*,int*);
 void get_dns_servers();
-static create_query();
 
 //DNS header structure
 struct DNS_HEADER
