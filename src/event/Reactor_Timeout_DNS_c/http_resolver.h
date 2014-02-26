@@ -18,6 +18,7 @@ struct resolver_result{
 
 struct resolver_st{
 	struct dns_server *DServer; //dns servers
+	unsigned int DSelts;//dns Server的个数
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
 	struct list_head name_queue;
 	struct list_head address_queue;

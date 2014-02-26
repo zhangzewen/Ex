@@ -11,6 +11,8 @@ event.o: http_epoll.h event.h event.c list.h event_base.h http_epoll.h RBTree.h 
 	gcc -c $(CFLAGS) event.c -g -o event.o
 evbuf.o: evbuf.c evbuf.h
 	gcc -c $(CFLAGS) evbuf.c -o evbuf.o
+http_resolver.o: http_resolver.h dns_util.h
+	gcc -c $(CFLAGS) http_resolver.c -o http_resolver.o
 main.o: main.c event.h evbuf.h  
 	gcc -c $(CFLAGS) main.c -g -o main.o
 clean:

@@ -2,11 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void init_rebree()
-{
-	
-}
-
 struct resolver_create()
 {
 
