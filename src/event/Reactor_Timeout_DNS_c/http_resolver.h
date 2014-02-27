@@ -4,11 +4,11 @@
 //struct dns_server record
 //the dns server ip,port
 //eg. infomations
+
 struct dns_server{
 	char host[200];
-	char dot_address[128];
-	int default_port;
 	int port;
+	//int quick; //如果/etc/resolve.conf中的nameserver是url，quick = 0，否则, quick = 1
 };
 
 struct resolver_result{
@@ -18,7 +18,8 @@ struct resolver_result{
 
 struct resolver_st{
 	struct dns_server *DServer; //dns servers
-	unsigned int DSelts;//dns Server的个数
+	//unsigned int DSmax; //dns servers 的最大个数
+	//unsigned int DSs;//dns Server的当前个数
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
 	struct list_head name_queue;
 	struct list_head address_queue;
