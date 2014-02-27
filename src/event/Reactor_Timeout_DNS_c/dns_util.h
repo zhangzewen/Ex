@@ -9,15 +9,9 @@
 #define T_PTR 12 /* domain name pointer */
 #define T_MX 15 //Mail server
 
-//Function Prototypes
-void ngethostbyname (unsigned char* , int);
-void ChangetoDnsNameFormat (unsigned char*,unsigned char*);
-unsigned char* ReadName (unsigned char*,unsigned char*,int*);
-void get_dns_servers();
-static create_query();
 
 //DNS header structure
-struct DNS_HEADER
+struct dns_header 
 {
 	unsigned short id; // identification number
 
@@ -40,7 +34,7 @@ struct DNS_HEADER
 };
 
 //Constant sized fields of query structure
-struct QUESTION
+struct question 
 {
 	unsigned short qtype;
 	unsigned short qclass;
@@ -48,7 +42,7 @@ struct QUESTION
 
 //Constant sized fields of the resource record structure
 #pragma pack(push, 1)
-struct R_DATA
+struct r_data 
 {
 	unsigned short type;
 	unsigned short _class;
@@ -58,10 +52,10 @@ struct R_DATA
 #pragma pack(pop)
 
 //Pointers to resource record contents
-struct RES_RECORD
+struct res_record
 {
 	unsigned char *name;
-	struct R_DATA *resource;
+	struct r_data *resource;
 	unsigned char *rdata;
 };
 
@@ -69,8 +63,8 @@ struct RES_RECORD
 typedef struct
 {
 	unsigned char *name;
-	struct QUESTION *ques;
-} QUERY;
+	struct question *ques;
+} query;
 
 void ngethostbyname(unsigned char *host , int query_type);
 

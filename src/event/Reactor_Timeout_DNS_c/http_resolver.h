@@ -4,6 +4,7 @@
 //struct dns_server record
 //the dns server ip,port
 //eg. infomations
+#include <netinet/in.h>
 
 struct dns_server{
 	char host[200];
@@ -21,9 +22,11 @@ struct resolver_st{
 	//unsigned int DSmax; //dns servers 的最大个数
 	//unsigned int DSs;//dns Server的当前个数
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
-	struct list_head name_queue;
-	struct list_head address_queue;
 	struct event_base *base; //reacotr 模式
+	int fd;
+	int sockfd;
+	struct sockaddr_in local;
+	
 };
 
 struct resolver_st *resolver_create();

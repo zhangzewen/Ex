@@ -365,16 +365,6 @@ static rbtree_node_t *rb_erase_rebalance(rbtree_node_t *node, rbtree_node_t *par
 }
 
 
-void rbtree_init(rbtree_t *tree)
-{
-	tree->root = NULL;
-	tree->insert = rb_insert;
-	tree->min = rb_min;
-	tree->search = rb_search;
-	tree->erase = rb_erase;
-	tree->empty = rbtree_empty;
-}
-
 static int rbtree_empty(rbtree_node_t *root)
 {
 	return root == NULL;
@@ -398,5 +388,15 @@ static rbtree_node_t *rb_min(struct rbtree_node_st *root)
 	}
 
 	return current;
+}
+
+void rbtree_init(rbtree_t *tree)
+{
+	tree->root = NULL;
+	tree->insert = rb_insert;
+	tree->min = rb_min;
+	tree->search = rb_search;
+	tree->erase = rb_erase;
+	tree->empty = rbtree_empty;
 }
 

@@ -1,12 +1,14 @@
 #include "http_resolver.h"
+#include "RBTree.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unit.h>
 
-struct resolver_create()
+struct resolver_st* resolver_create()
 {
 
 	struct resolver_st *new;
-	new = (struct resolver_st *)malloc(sizeof(struct resovler_st));
+	new = (struct resolver_st *)malloc(sizeof(struct resolver_st));
 	if (NULL == new) {
 		perror("malloc resolver_st error!\n");
 		return NULL;
@@ -14,15 +16,15 @@ struct resolver_create()
 
 	new->DServer = NULL;
 	
-	new->address_rebtree = (struct rbtree_st *)malloc(sizeof(struct rbtree_st));
+	new->addr_rbtree = (struct rbtree_st *)malloc(sizeof(struct rbtree_st));
 	
-	if (NULL == new->address_rbtree) {
+	if (NULL == new->addr_rbtree) {
 		perror("malloc rbtree cache error!\n");
 		free(new);
 		return NULL;
 	}
 	
-	new->base = (struct event_base *)malloc(sizeof(struct event_base));
+	new->base = event_init();
 	
 	if (NULL == new->base) {
 		perror("malloc event_base error!\n");
@@ -31,19 +33,43 @@ struct resolver_create()
 		return NULL:
 	}
 
-	INIT_LIST_HEAD(&new->name_queue);	
-	INIT_LIST_HEAD(&new->address_queue);
 	return new;
-	
 }
 
-void resolver_init(struct resolver_st *resolver)
+int resolver_init(struct resolver_st *resolver)
 {
 	//Get_Dns_Server这个函数主要是从/etc/resolv.conf中获取nameserver，如果该/etc/resolve.conf没有配置dns服务器，就使用默认的google域名服务器：8.8.8.8:53
-	resolver->DServer = Get_Dns_Server(); 
+	//resolver->DServer = Get_Dns_Server(); 
+	fprintf(stderr, "init dns server ....\n");	
+	resolver->DServer = (struct dns_server *)malloc(sizeof(struct dns_server));
+	
+	if (NULL == resolver->DServer) {
+		return -1;
+	}
+
+	strcpy(resolver->DServer->host, 8.8.8.8);
+	resolver->DServer->port = 53;
+	fprintf(stderr, "init dns server Done!\n");
+	fprintf(stderr, "init dns cache");
 	resolver->addr_rbtree = init_rbtree();
-	resolver->base = base_init();
+	fprintf(stderr, "Done!\n");
+	
+	fprintf(stderr, "init net....\n");
+	
+	resolver->fd = socket(AF_INET, DGRAM, 0);
+	
+	if (fd < 0) {
+		fprintf(stderr, "init net error!\n");
+		return -1;
+	}
+
+	resolver->local.sin_family = AF_INET;
+	resolver->local.sin_port = htons(resolver->DServer->port);
+	resolver->local.sin_addr = inet_addr(resolver->DServer->host);
 		
+	fprintf(stderr, "init net Done!\n");
+
+	return 0;
 }
 
 struct resolve_result *resolve_name(struct resolver_st *resolver, const char *host)
