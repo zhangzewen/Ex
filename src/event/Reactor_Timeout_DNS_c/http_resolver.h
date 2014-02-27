@@ -30,8 +30,8 @@ struct resolver_st{
 };
 
 struct resolver_st *resolver_create();
-void resolver_init(struct resolver_st *resolver);
-struct resolver_result *resolve_name(struct resolver_st *resolver, const char *host);
+int resolver_init(struct resolver_st *resolver);
+struct resolve_result *resolve_name(struct resolver_st *resolver, const char *host);
 void resolver_distory(struct resolver_st *resolver);
 
 #endif
