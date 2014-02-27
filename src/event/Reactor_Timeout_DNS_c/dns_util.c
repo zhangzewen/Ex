@@ -6,10 +6,6 @@
 #include<netinet/in.h>
 #include<unistd.h>
 
-#if 0
-char dns_servers[10][100];
-int dns_server_count = 0;
-#endif
 
 //DNS header structure
 struct dns_header 
