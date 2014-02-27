@@ -42,8 +42,21 @@ void create_dns_query(unsigned char *host, int query_type, unsigned char *buf)
 	qinfo->qclass = htons(1);
 }
 
-void parse_response(unsigned char *buf)
+void parse_response(unsigned char *buf, size_t qname_len) //strlen((const char *)qname) == qname_len ,and qname end with '\0', so it will add 1 when count!
 {
+	struct dns_header *dns = NULL;
+	unsigned char *reader = NULL;
+	dns = (struct dns_header *)buf;
+
+
+	reader = &buf[sizeof(struct dns_header) + (qname_len + 1) + sizeof(struct question)]; 
+
+	fprintf(stderr, "The response contains: ");
+	fprintf(stderr, "\n %d Questions.", noths(dns->q_count));
+	fprintf(stderr, "\n %d Answers", ntohs(dns->ans_count));
+	fprintf(stderr, "\n %d Authoritative servers.", ntohs(dns->auth_count));
+	fprintf(stderr, "\n %d Additional records\n\n", ntohs(dns->add_count));
+
 }
 
 
