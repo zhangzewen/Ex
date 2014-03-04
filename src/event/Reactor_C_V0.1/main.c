@@ -62,7 +62,7 @@ void ServerRead(int fd, short events, void *arg)
 		return;
 	} else if (ret == -1) {
 		//释放资源
-		return  -1;
+		return ;
 	}
 	printf("\n----------------------------------------\n");
 	strncpy(request, r->buffer->start, r->buffer->end - r->buffer->start);
@@ -83,8 +83,6 @@ void ServerAccept(int fd, short events, void *arg)
 	http_connection_t *c;
 	socklen_t addrlen = sizeof(addr);
 	cli_ev = calloc(1, sizeof(struct event));
-	int yes = 1;
-	int retval;
 	
 	c = init_connection();
 
@@ -114,7 +112,6 @@ void ServerAccept(int fd, short events, void *arg)
 int main(int argc, char *argv[])
 {
 	int listen_fd;
-	int epfd;
 	
 	event_init();
 	struct event ev;
