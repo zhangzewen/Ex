@@ -7,6 +7,7 @@
 static void thread_libevent_process(int fd, short which, void *arg);
 static struct conn_queue_item *cqi_freelist;
 static struct pthread_mutex_t cqi_freelist_lock;
+
 static pthread_mutex_t *item_locks;
 
 #define hashsize(n) ((unsigned long int)1 << (n))
@@ -336,7 +337,16 @@ void thread_init(int nthreads, struct event_base *main_base)
 	pthread_mutex_lock(&init_lock);
 	wait_for_thread_registration(nthreads);
 	pthread_mutex_unlock(&init_lock)	
-	
 }
 
 
+conn *conn_new(const int sfd, enum conn_states init_state,
+								const int event_flags,
+								const int read_buffer_size, enum network_transport transport,
+								struct event_base *base)
+{
+///
+//可以参照/root/Desktop/project/Http/trunk/src/event/Reactor_C
+//无非就是各种连接的各种状态，如buf
+//drive_machine相当于一个状态机
+}
