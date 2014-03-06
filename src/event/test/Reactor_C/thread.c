@@ -5,10 +5,10 @@
 
 
 static void thread_libevent_process(int fd, short which, void *arg);
-pthread_mutex_t cache_lock;
 static struct conn_queue_item *cqi_freelist;
 static struct pthread_mutex_t cqi_freelist_lock;
 static pthread_mutex_t *item_locks;
+
 #define hashsize(n) ((unsigned long int)1 << (n))
 #define hashmask(n) (hashsize(n) - 1)
 
@@ -17,7 +17,8 @@ static struct libevent_thread *threads;
 static int init_count = 0;
 static pthread_mutex_t init_lock;
 static pthread_cond_t init_cond;
-static libevent_dispatcher_thread dispatcher_thread;
+
+static libevent_dispatcher_thread dispatcher_thread; //主线程
 
 static void conn_queue_init(struct conn_queue *cq)
 {
@@ -26,7 +27,7 @@ static void conn_queue_init(struct conn_queue *cq)
 	cp->tail = NULL;
 }
 
-
+//从头部开始pop
 static struct conn_queue_item *cq_pop(struct conn_queue *cq)
 {
 	struct conn_queue_item *item;
@@ -45,7 +46,7 @@ static struct conn_queue_item *cq_pop(struct conn_queue *cq)
 	return item;
 }
 
-
+//从尾部push
 static void cp_push(struct conn_queue *cq, struct conn_queue_item *item) {
 	item->next = NULL;
 	pthread_mutex_lock(&cq->lock);
@@ -59,10 +60,11 @@ static void cp_push(struct conn_queue *cq, struct conn_queue_item *item) {
 	pthread_mutex_unlock(&cq->lock);
 }	
 
+
 static struct conn_queue_item *cqi_new()
 {
 	struct conn_queue_item *item = NULL;
-	pthread_mutex_lock(&cqi_free_list_lock);
+	pthread_mutex_lock(&cqi_freelist_lock);
 	if (cqi_freelist) {
 		item = cqi_freelist;
 		cqi_freelist = item->next;
