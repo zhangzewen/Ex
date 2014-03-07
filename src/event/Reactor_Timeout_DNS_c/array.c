@@ -52,7 +52,7 @@ void array_push(struct array_st *array)
 	void *new;
 	
 	if (array->nelts >= array->nalloc) {
-		
+			
 	}
 }
 
