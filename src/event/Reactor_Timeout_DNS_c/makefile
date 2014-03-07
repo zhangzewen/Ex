@@ -1,5 +1,5 @@
 CFLAGS = -g3 -Werror -Wall
-LIB = main.o event.o http_epoll.o evbuf.o RBTree.o timer.o dns_util.o http_resolver.o hash.o
+LIB = main.o event.o http_epoll.o evbuf.o RBTree.o timer.o dns_util.o http_resolver.o hash.o vector.o
 server: $(LIB)
 	gcc $(CFLAGS) $(LIB) $(CFLAGS) -o server
 http_epoll.o: http_epoll.c http_epoll.h event_base.h 
@@ -18,7 +18,8 @@ dns_util.o: dns_util.h http_resolver.h
 	gcc -c $(CFLAGS) dns_util.c  -o dns_util.o
 hash.o: hash.h
 	gcc -c $(CFLAGS) hash.c -o hash.o
-
+vector.o: vector.h
+	gcc -c ${CFLAGS} vector.c -o vector.o
 main.o: main.c event.h evbuf.h http_resolver.h
 	gcc -c $(CFLAGS) main.c -g -o main.o
 clean:

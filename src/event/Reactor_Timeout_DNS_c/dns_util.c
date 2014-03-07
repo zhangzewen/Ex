@@ -51,12 +51,13 @@ void parse_response(unsigned char *buf, size_t qname_len) //strlen((const char *
 
 	reader = &buf[sizeof(struct dns_header) + (qname_len + 1) + sizeof(struct question)]; 
 
+#if 0
 	fprintf(stderr, "The response contains: ");
 	fprintf(stderr, "\n %d Questions.", noths(dns->q_count));
-	fprintf(stderr, "\n %d Answers", ntohs(dns->ans_count));
+	fprintf(stderr, "\n %d Answers", ntohs(dns->q_count));
 	fprintf(stderr, "\n %d Authoritative servers.", ntohs(dns->auth_count));
 	fprintf(stderr, "\n %d Additional records\n\n", ntohs(dns->add_count));
-
+#endif
 }
 
 
