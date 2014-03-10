@@ -155,3 +155,159 @@ void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host)
 	}
 	dns[i-1]='\0'; //remove the last dot
 }
+
+
+void parse_dns(const unsigned char *buf, size_t question_len)
+{
+	struct dns_header *dns = NULL;
+	
+	dns = (struct dns_header *)buf;
+	
+	unsigned char *reader = NULL;
+
+	reader = &buf[sizeof(struct dns_header) + (question_len + 1) + sizeof(struct question)];
+
+	printf("\n The respose contains:");
+	printf("\n Questions: %d", ntohs(dns->q_count));
+	printf("\n Answers: %d", ntohs(dns->ans_count));
+	printf("\n Authoritative Servers: %d", ntohs(dns->auth_count));
+	printf("\n Additional records: %d", ntohs(dns->add_count));
+
+	stop = 0;
+
+	for (i = 0; i< ntohs(dns->ans_count); i++)
+	{
+		answers[i].name = ReadName(reader, buf, &stop);
+		reader = reader + stop;
+		
+		answers[i].resource = (struct r_data *)(reader);
+		reader = reader + sizeof(struct r_data);
+
+		if (ntohs(answers[i].resource->type) == 1) {
+			answers[i].rdata = (unsigned char *)malloc(ntohs(answers[i].resource->data_len));
+			
+			for(j = 0; j < ntohs(answers[i].resource->data_len); j++)
+			{
+				answers[i].rdata[j] = reader[j];
+			}
+
+			answers[i].rdata[ntohs(answers[i].resource->data_len)] = '\0';
+			reader = reader + ntohs(answers[i].resource->data_len);
+		}
+
+		else
+		{
+			addit[i].rdata = ReadName(reader, buf, &stop);
+			reader += stop;
+		}
+	}
+
+
+	printf("\n Answer Records: %d\n", ntohs(dns->ans_count));
+
+	for (i = 0; i < ntohs(dns->ans_count); i++)
+	{
+		printf("Name: %s", answers[i].name);
+
+		if (ntos(answers[i].resource->type) == T_A) {
+			long *p;
+			p = (long *)answers[i].rdata;
+
+			a.sin_addr.s_addr = (*p);
+			printf("has IPv4 address : %s", inet_ntoa(a.sin_addr));
+		}
+
+		if (ntohs(answers[i].resource->type) == 5) {
+			printf("has alias name : %s", answers[i].rdata);
+		}
+
+	}
+
+	printf("\nAuthoritive Records: %d\n", ntohs(dns->auth_count));
+	for (i = 0; i < ntohs(dns->auth_count); i++)
+	{
+		printf("Name: %s", auth[i].name);
+
+		if (ntohs(auth[i].resource->type) == 2)
+		{
+			printf("has nameserver : %s", auth[i].rdata);
+		}
+		
+		printf("\n");
+	}
+
+
+	printf("\nAdditional Records: %d\n", ntohs(dns->add_count));
+
+	for (i = 0; i < ntohs(dns->add_count); i++) 
+	{
+		printf("Name: %s", addit[i].name);
+	
+		if (ntohs(addit[i].resourc->type) == 1) {
+			long *p;
+			p = (long *)addit[i].rdata;
+			a.sin_addr.s_addr(*p);
+			printf("has IPv4 address: %s", inet_ntoa(a.sin_addr));
+		}
+		printf("\n");
+	}
+
+	return;
+}
+
+
+unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count)
+{
+	unsigned char *name;
+	unsigned int p = 0;
+	unsigned jumpd = 0;
+	unsigned offset = 0;
+
+	*count = 1;
+
+	name = (unsigned char *)malloc(256);
+
+	name[0] = '\0';
+
+	while(*reader != 0)
+	{
+		if (*reader >= 192) {
+			offset = (*reader) * 256 + *(reader + 1) - 49152;
+			reader = buffer + offset -1;
+
+			jumped = 1;
+		}	else {
+			name[p++] = *reader;
+		}
+
+		reader = reader + 1;
+
+		if (jumped == 0) {
+			*count = *count + 1;
+		}
+	}
+
+	name[p] = '\0';
+
+	if (jumped == 1)
+	{
+		*count = *count + 1;
+	}
+
+	for (i = 0; i < (int)strlen((const char *)name); i++)
+	{
+		p = name[i];
+		for (j = 0; j < (int)p; j ++) {
+			name[i] = name[i + 1];
+			i = i + 1;
+		}
+
+		name[i] = '.';
+	}
+
+	name[i - 1] = '\0';
+	return name;
+}
+
+
+

@@ -66,11 +66,4 @@ typedef struct
 	struct question *ques;
 } query;
 
-void ngethostbyname(unsigned char *host , int query_type);
-
-u_char* ReadName(unsigned char* reader,unsigned char* buffer,int* count);
-
-void get_dns_servers();
-
-void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host);
 #endif
