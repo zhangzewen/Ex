@@ -1,5 +1,7 @@
 #include "http_resolver.h"
+#include "dns_util.h"
 #include "event_base.h"
+#include "dns_util.h"
 #include "event.h"
 #include "RBTree.h"
 #include <stdio.h>
@@ -11,6 +13,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <errno.h>
 
 struct resolver_st* resolver_create()
 {
@@ -71,19 +74,62 @@ int resolver_init(struct resolver_st *resolver)
 		return -1;
 	}
 
-	resolver->local.sin_family = AF_INET;
-	resolver->local.sin_port = htons(resolver->DServer->port);
-	resolver->local.sin_addr.s_addr = inet_addr(resolver->DServer->host);
+	resolver->resolve.sin_family = AF_INET;
+	resolver->resolve.sin_port = htons(resolver->DServer->port);
+	resolver->resolve.sin_addr.s_addr = inet_addr(resolver->DServer->host);
 		
 	fprintf(stderr, "init net Done!\n");
 
 	return 0;
 }
 
-struct resolve_result *resolve_name(struct resolver_st *resolver, const char *host)
+void resolve_name(struct resolver_st *resolver, const unsigned char *host)
 {
-	struct resolve_result *result = NULL;
-	return result;
+	struct resolver_result *result = NULL;
+	struct event ev;
+	ssize_t nwrite = 0;
+	size_t len = 0;
+	unsigned char buf[65536] = {0};
+	
+	int sfd = -1;
+
+	sfd = connect(resolver->fd, (struct sockaddr *)&resolver->resolve, sizeof(struct sockaddr_in));
+
+	if (sfd < 0) {
+		if (errno == ENETUNREACH) { //网络不可达!
+			return;
+		}
+	}
+
+	result = calloc(1, sizeof(struct resolver_result));
+	
+	if (NULL == result) {
+		close(sfd); //close fd
+		return;
+	}
+
+
+	/*
+ *构造dns请求结构体
+ */
+
+	create_dns_query(host, T_A, buf, &result->question_len);
+
+	result->key  =	NULL; 
+	
+	
+	nwrite = write(sfd, buf, len);
+	
+	if (nwrite < 0) {
+		fprintf(stderr, "Can not send dns request!\n");
+		return;
+	}
+
+	event_set(&ev, sfd, EV_READ | EV_PERSIST, parse_dns, (void *)result, NULL);
+	event_add(&ev, NULL);
+	
+	
+	return ;
 	//1.查找/etc/host
 	//2.查找rbtree cache,查找到了且TTL没有过期，直接返回结果，没有查找到转第3步, 如果找到了但是TTL过期了，删除记录，转到第3步 
 	//3.通过DNS服务器查询，并把结果插入rbtree cache
@@ -105,4 +151,6 @@ static char **name_fine_host(const char *host) //  从/etc/host找ip地址
 	
 }
 #endif
+
+
 

@@ -13,6 +13,7 @@
 #include "evbuf.h"
 #include "event.h"
 #include "event_base.h"
+#include "http_resolver.h"
 
 #if 0
 static char return_ok[] = "HTTP/1.1 200 OK\r\nHost: 192.168.10.65\r\nConnection: close\r\n\r\n尼玛，终于让老子给你跑通了啊！混蛋！";
@@ -138,6 +139,7 @@ int main(int argc, char *argv[])
 
 #endif
 
+#if 0
 static void timeout_cb1(int fd, short event, void *arg)
 {
 	printf("1 timeout now!\n");
@@ -244,6 +246,25 @@ int main(int argc, char *argv[])
 	event_add(&timeout7, &tv7);
 #endif
 	event_dispatch();
+
+	return 0;
+}
+
+
+#endif 
+
+int main(int argc, char *argv[])
+{
+	struct resolver_st* resolve = NULL;
+	
+	resolver_init(resolve);
+
+	resolve_name(resolve, (const unsigned char *)"www.google.com");
+	resolve_name(resolve, (const unsigned char *)"www.baidu.com");
+	resolve_name(resolve, (const unsigned char *)"www.csdn.com");
+	resolve_name(resolve, (const unsigned char *)"www.kuwo.com");
+	resolve_name(resolve, (const unsigned char *)"www.163.com");
+	resolve_name(resolve, (const unsigned char *)"www.qq.com");
 
 	return 0;
 }

@@ -15,6 +15,7 @@ struct dns_server{
 struct resolver_result{
 	char *key; // 需要解析的host
 	char **value; //解析后得到的ip列表
+	int question_len; //把key转换成question后的长度，注意，通过strlen求直，需要加1（结尾'\0'）
 };
 
 struct resolver_st{
@@ -25,13 +26,13 @@ struct resolver_st{
 	struct event_base *base; //reacotr 模式
 	int fd;
 	int sockfd;
-	struct sockaddr_in local;
+	struct sockaddr_in resolve;
 	
 };
 
 struct resolver_st *resolver_create();
 int resolver_init(struct resolver_st *resolver);
-struct resolve_result *resolve_name(struct resolver_st *resolver, const char *host);
+void resolve_name(struct resolver_st *resolver, const unsigned char *host);
 void resolver_distory(struct resolver_st *resolver);
 
 #endif

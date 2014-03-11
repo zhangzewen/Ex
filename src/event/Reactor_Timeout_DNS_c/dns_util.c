@@ -6,9 +6,13 @@
 #include<netinet/in.h>
 #include<unistd.h>
 #include "dns_util.h"
+#include "http_resolver.h"
 
 
-void create_dns_query(unsigned char *host, int query_type, unsigned char *buf)
+unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
+void ChangetoDnsNameFormat(unsigned char* dns, const unsigned char* host);
+void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host);
+void create_dns_query(const unsigned char *host, int query_type, unsigned char *buf, int *question_len)
 {
 	
 	struct dns_header *dns;
@@ -40,12 +44,16 @@ void create_dns_query(unsigned char *host, int query_type, unsigned char *buf)
 	
 	qinfo->qtype = htons(query_type);
 	qinfo->qclass = htons(1);
+	*question_len = strlen((const char *)qname);
+	return;
 }
-
+#if 0
 void parse_response(unsigned char *buf, size_t qname_len) //strlen((const char *)qname) == qname_len ,and qname end with '\0', so it will add 1 when count!
 {
 	struct dns_header *dns = NULL;
-	unsigned char *reader = NULL;
+	
+	nread = read(
+	
 	dns = (struct dns_header *)buf;
 
 
@@ -59,7 +67,7 @@ void parse_response(unsigned char *buf, size_t qname_len) //strlen((const char *
 	fprintf(stderr, "\n %d Additional records\n\n", ntohs(dns->add_count));
 #endif
 }
-
+#endif
 
 
 #if 0
@@ -115,7 +123,7 @@ void get_dns_servers(struct dns_server** DSserver)
  * This will convert "www.google.com" to "\3www\6google\3com\0" 
  * got it :)
  * */
-void ChangetoDnsNameFormat(unsigned char* dns,unsigned char* host) 
+void ChangetoDnsNameFormat(unsigned char* dns, const unsigned char* host) 
 {
 	int lock = 0 , i;
 	strcat((char*)host,".");
@@ -156,16 +164,38 @@ void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host)
 	dns[i-1]='\0'; //remove the last dot
 }
 
-
+#if 0
 void parse_dns(const unsigned char *buf, size_t question_len)
+#endif
+
+void parse_dns(int fd, short events, void *arg)
 {
+	struct resolver_result* result = (struct resolver_result *)arg;
 	struct dns_header *dns = NULL;
+	struct res_record answers[20];
+	struct res_record auth[20];
+	struct res_record addit[20];
+	struct sockaddr_in a;
+	int i = 0;
+	int j = 0;
+		
+	
+	unsigned char buf[65536] = {0};
+	ssize_t nread = 0;
+
+	//read data
+	nread = read(fd, buf, 65536);
+	
+	if (nread < 0) {
+		fprintf(stderr, "Wrong Dns response!\n");
+		return;
+	}
 	
 	dns = (struct dns_header *)buf;
 	
 	unsigned char *reader = NULL;
 
-	reader = &buf[sizeof(struct dns_header) + (question_len + 1) + sizeof(struct question)];
+	reader = &buf[sizeof(struct dns_header) + (result->question_len + 1) + sizeof(struct question)];
 
 	printf("\n The respose contains:");
 	printf("\n Questions: %d", ntohs(dns->q_count));
@@ -173,7 +203,7 @@ void parse_dns(const unsigned char *buf, size_t question_len)
 	printf("\n Authoritative Servers: %d", ntohs(dns->auth_count));
 	printf("\n Additional records: %d", ntohs(dns->add_count));
 
-	stop = 0;
+	int stop = 0;
 
 	for (i = 0; i< ntohs(dns->ans_count); i++)
 	{
@@ -209,7 +239,7 @@ void parse_dns(const unsigned char *buf, size_t question_len)
 	{
 		printf("Name: %s", answers[i].name);
 
-		if (ntos(answers[i].resource->type) == T_A) {
+		if (ntohs(answers[i].resource->type) == T_A) {
 			long *p;
 			p = (long *)answers[i].rdata;
 
@@ -243,16 +273,15 @@ void parse_dns(const unsigned char *buf, size_t question_len)
 	{
 		printf("Name: %s", addit[i].name);
 	
-		if (ntohs(addit[i].resourc->type) == 1) {
+		if (ntohs(addit[i].resource->type) == 1) {
 			long *p;
 			p = (long *)addit[i].rdata;
-			a.sin_addr.s_addr(*p);
+			a.sin_addr.s_addr = (*p);
 			printf("has IPv4 address: %s", inet_ntoa(a.sin_addr));
 		}
 		printf("\n");
 	}
-
-	return;
+	close(fd);
 }
 
 
@@ -260,8 +289,10 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
 {
 	unsigned char *name;
 	unsigned int p = 0;
-	unsigned jumpd = 0;
-	unsigned offset = 0;
+	unsigned int jumpd = 0;
+	unsigned int offset = 0;
+	int i = 0;
+	int j = 0;
 
 	*count = 1;
 
@@ -275,21 +306,21 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
 			offset = (*reader) * 256 + *(reader + 1) - 49152;
 			reader = buffer + offset -1;
 
-			jumped = 1;
+			jumpd = 1;
 		}	else {
 			name[p++] = *reader;
 		}
 
 		reader = reader + 1;
 
-		if (jumped == 0) {
+		if (jumpd == 0) {
 			*count = *count + 1;
 		}
 	}
 
 	name[p] = '\0';
 
-	if (jumped == 1)
+	if (jumpd == 1)
 	{
 		*count = *count + 1;
 	}
