@@ -93,7 +93,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	
 	int sfd = -1;
 
-	sfd = connect(resolver->fd, (struct sockaddr *)&resolver->resolve, sizeof(struct sockaddr_in));
+	sfd = connect(resolver->fd, (struct sockaddr *)&(resolver->resolve), sizeof(struct sockaddr_in));
 
 	if (sfd < 0) {
 		if (errno == ENETUNREACH) { //网络不可达!
@@ -124,8 +124,8 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 		fprintf(stderr, "Can not send dns request!\n");
 		return;
 	}
-
-	event_set(&ev, sfd, EV_READ | EV_PERSIST, parse_dns, (void *)result, NULL);
+	
+	event_set(&ev, resolver->fd, EV_READ | EV_PERSIST, parse_dns, (void *)result, NULL);
 	event_add(&ev, NULL);
 	
 	
