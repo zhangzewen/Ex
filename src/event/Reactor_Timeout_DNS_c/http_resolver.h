@@ -32,7 +32,7 @@ struct resolver_st{
 
 struct resolver_st *resolver_create();
 int resolver_init(struct resolver_st *resolver);
-void resolve_name(struct resolver_st *resolver, const unsigned char *host);
+void resolve_name(struct resolver_st *resolver, unsigned char *host);
 void resolver_distory(struct resolver_st *resolver);
 
 #endif

@@ -259,13 +259,20 @@ int main(int argc, char *argv[])
 	resolve = resolver_create();
 	
 	resolver_init(resolve);
+	
+	unsigned char name_1[60] = "www.google.com";
+	unsigned char name_2[60] = "www.baidu.com";
+	unsigned char name_3[60] = "www.csdn.com";
+	unsigned char name_4[60] = "www.kuwo.com";
+	unsigned char name_5[60] = "www.163.com";
+	unsigned char name_6[60] = "www.qq.com";
 
-	resolve_name(resolve, (const unsigned char *)"www.google.com");
-	resolve_name(resolve, (const unsigned char *)"www.baidu.com");
-	resolve_name(resolve, (const unsigned char *)"www.csdn.com");
-	resolve_name(resolve, (const unsigned char *)"www.kuwo.com");
-	resolve_name(resolve, (const unsigned char *)"www.163.com");
-	resolve_name(resolve, (const unsigned char *)"www.qq.com");
+	resolve_name(resolve, name_1);
+	resolve_name(resolve, name_2);
+	resolve_name(resolve, name_3);
+	resolve_name(resolve, name_4);
+	resolve_name(resolve, name_5);
+	resolve_name(resolve, name_6);
 
 	return 0;
 }

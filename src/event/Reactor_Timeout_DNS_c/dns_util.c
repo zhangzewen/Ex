@@ -10,9 +10,9 @@
 
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
-void ChangetoDnsNameFormat(unsigned char* dns, const unsigned char* host);
+void ChangetoDnsNameFormat(unsigned char* dns, unsigned char* host);
 void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host);
-void create_dns_query(const unsigned char *host, int query_type, unsigned char *buf, int *question_len)
+void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, int *question_len)
 {
 	
 	struct dns_header *dns;
@@ -123,7 +123,7 @@ void get_dns_servers(struct dns_server** DSserver)
  * This will convert "www.google.com" to "\3www\6google\3com\0" 
  * got it :)
  * */
-void ChangetoDnsNameFormat(unsigned char* dns, const unsigned char* host) 
+void ChangetoDnsNameFormat(unsigned char* dns, unsigned char* host) 
 {
 	int lock = 0 , i;
 	strcat((char*)host,".");

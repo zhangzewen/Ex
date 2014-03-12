@@ -83,7 +83,7 @@ int resolver_init(struct resolver_st *resolver)
 	return 0;
 }
 
-void resolve_name(struct resolver_st *resolver, const unsigned char *host)
+void resolve_name(struct resolver_st *resolver, unsigned char *host)
 {
 	struct resolver_result *result = NULL;
 	struct event ev;
