@@ -274,7 +274,8 @@ int main(int argc, char *argv[])
 	resolve_name(resolve, name_5);
 	resolve_name(resolve, name_6);
 
-	event_dispatch();
+	//event_dispatch();
+	event_base_loop(resolve->base, 0);
 
 	return 0;
 }

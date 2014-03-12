@@ -15,6 +15,21 @@
 #include <sys/types.h>
 #include <errno.h>
 
+int SetNoblock(int fd)
+{
+	int flags;
+	
+	if((flags = fcntl(fd, F_GETFL)) == -1) {
+		return -1;
+	}
+
+	if((fcntl(fd, F_SETFL, flags | O_NONBLOCK)) == -1) {
+		return -1;
+	}
+
+	return 0;
+}
+
 struct resolver_st* resolver_create()
 {
 
@@ -73,10 +88,18 @@ int resolver_init(struct resolver_st *resolver)
 		fprintf(stderr, "init net error!\n");
 		return -1;
 	}
+	
+	if (SetNoblock(resolver->fd) != 0) {
+		fprintf(stderr, "set noblocking error!\n");
+		return -1;
+	}
 
 	resolver->resolve.sin_family = AF_INET;
 	resolver->resolve.sin_port = htons(resolver->DServer->port);
 	resolver->resolve.sin_addr.s_addr = inet_addr(resolver->DServer->host);
+	fprintf(stderr, "init Reactor...\n");
+	resolver->base = event_init();
+	fprintf(stderr, "Reactor init done!\n");
 		
 	fprintf(stderr, "init net Done!\n");
 
@@ -88,7 +111,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	struct resolver_result *result = NULL;
 	struct event ev;
 	ssize_t nwrite = 0;
-	size_t len = 0;
+	//size_t len = 0;
 	unsigned char buf[65536] = {0};
 	
 	int sfd = -1;
@@ -118,7 +141,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	result->key  =	NULL; 
 	
 	
-	nwrite = write(sfd, buf, len);
+	nwrite = write(sfd, buf, 65536);
 	
 	if (nwrite < 0) {
 		fprintf(stderr, "Can not send dns request!\n");
