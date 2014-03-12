@@ -256,6 +256,7 @@ int main(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	struct resolver_st* resolve = NULL;
+	resolve = resolver_create();
 	
 	resolver_init(resolve);
 
