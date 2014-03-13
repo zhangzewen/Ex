@@ -244,11 +244,11 @@ void parse_dns(int fd, short events, void *arg)
 			p = (long *)answers[i].rdata;
 
 			a.sin_addr.s_addr = (*p);
-			printf("has IPv4 address : %s", inet_ntoa(a.sin_addr));
+			printf("has IPv4 address : %s\n", inet_ntoa(a.sin_addr));
 		}
 
 		if (ntohs(answers[i].resource->type) == 5) {
-			printf("has alias name : %s", answers[i].rdata);
+			printf("has alias name : %s\n", answers[i].rdata);
 		}
 
 	}
