@@ -141,7 +141,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	result->key  =	NULL; 
 	
 	
-	nwrite = write(sfd, buf, 65536);
+	nwrite = write(resolver->fd, buf, 65536);
 	
 	if (nwrite < 0) {
 		fprintf(stderr, "Can not send dns request!\n");

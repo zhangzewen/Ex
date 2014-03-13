@@ -104,7 +104,11 @@ int main( int argc , char *argv[])
  * */
 void ngethostbyname(unsigned char *host , int query_type)
 {
-	unsigned char buf[65536],*qname,*reader;
+	unsigned char buf[65536] = {0};
+	unsigned char *qname = NULL;
+	unsigned char *reader = NULL;
+	ssize_t nsend = 0;
+	ssize_t nrecv = 0;
 	int i , j , stop , s;
 
 	struct sockaddr_in a;
@@ -152,7 +156,7 @@ void ngethostbyname(unsigned char *host , int query_type)
 	qinfo->qclass = htons(1); //its internet (lol)
 
 	printf("\nSending Packet...");
-	if( sendto(s,(char*)buf,sizeof(struct DNS_HEADER) + (strlen((const char*)qname)+1) + sizeof(struct QUESTION),0,(struct sockaddr*)&dest,sizeof(dest)) < 0)
+	if((nsend = sendto(s,(char*)buf,sizeof(struct DNS_HEADER) + (strlen((const char*)qname)+1) + sizeof(struct QUESTION),0,(struct sockaddr*)&dest,sizeof(dest))) < 0)
 	{
 		perror("sendto failed");
 	}
@@ -161,7 +165,7 @@ void ngethostbyname(unsigned char *host , int query_type)
 	//Receive the answer
 	i = sizeof dest;
 	printf("\nReceiving answer...");
-	if(recvfrom (s,(char*)buf , 65536 , 0 , (struct sockaddr*)&dest , (socklen_t*)&i ) < 0)
+	if((nrecv = recvfrom (s,(char*)buf , 65536 , 0 , (struct sockaddr*)&dest , (socklen_t*)&i )) < 0)
 	{
 		perror("recvfrom failed");
 	}

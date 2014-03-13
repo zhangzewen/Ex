@@ -14,12 +14,12 @@ void ChangetoDnsNameFormat(unsigned char* dns, unsigned char* host);
 void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host);
 void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, int *question_len)
 {
-	
 	struct dns_header *dns;
 	unsigned char *qname = NULL;
 	struct question* qinfo = NULL;
-	memset(buf, '\0', 65536);
+
 	dns = (struct dns_header*)buf;
+
 	dns->id = (unsigned short) htons(getpid());
 	dns->qr = 0;
 	dns->opcode = 0;
