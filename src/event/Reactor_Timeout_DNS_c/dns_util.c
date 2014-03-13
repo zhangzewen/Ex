@@ -281,7 +281,6 @@ void parse_dns(int fd, short events, void *arg)
 		}
 		printf("\n");
 	}
-	close(fd);
 }
 
 
