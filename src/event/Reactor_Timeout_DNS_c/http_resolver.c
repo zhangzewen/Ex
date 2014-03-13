@@ -110,7 +110,6 @@ int resolver_init(struct resolver_st *resolver)
 void resolve_name(struct resolver_st *resolver, unsigned char *host)
 {
 	struct resolver_result *result = NULL;
-	struct event ev;
 	ssize_t nwrite = 0;
 	//size_t len = 0;
 	unsigned char buf[65536] = {0};
@@ -145,32 +144,12 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	//nwrite = send(resolver->fd, buf, 65536, 0);
 	
 	if (nwrite < 0) {
-		if (errno == EAGAIN) {
-			fprintf(stderr, "EAGAIN");
-		} else if (errno == EBADF){
-			fprintf(stderr, "EBADF");
-		} else if (errno == EFAULT){
-			fprintf(stderr, "EFAULT");
-		} else if (errno == EFBIG){
-			fprintf(stderr, "EFBIG");
-		} else if (errno == EINTR){
-			fprintf(stderr, "EINTR");
-		} else if (errno == EINVAL){
-			fprintf(stderr, "EINVAL");
-		} else if (errno == EIO){
-			fprintf(stderr, "EIO");
-		} else if (errno == ENOSPC){
-			fprintf(stderr, "ENOSPC");
-		} else if (errno == EPIPE){
-			fprintf(stderr, "EPIPE");
-		}else {
-			fprintf(stderr, "Can not send dns request!\n");
-		}
+		fprintf(stderr, "Can not send dns request!\n");
 		return;
 	}
 	
-	event_set(&ev, resolver->fd, EV_READ | EV_PERSIST, parse_dns, (void *)result, NULL);
-	event_add(&ev, NULL);
+	event_set(&result->ev, resolver->fd, EV_READ, parse_dns, (void *)result, NULL);
+	event_add(&result->ev, NULL);
 	
 	
 	return ;

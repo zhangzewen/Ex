@@ -5,6 +5,7 @@
 //the dns server ip,port
 //eg. infomations
 #include <netinet/in.h>
+#include "event_base.h"
 
 struct dns_server{
 	char host[200];
@@ -13,6 +14,7 @@ struct dns_server{
 };
 
 struct resolver_result{
+	struct event ev;
 	char *key; // 需要解析的host
 	char **value; //解析后得到的ip列表
 	int question_len; //把key转换成question后的长度，注意，通过strlen求直，需要加1（结尾'\0'）
