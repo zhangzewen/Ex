@@ -81,7 +81,7 @@ int resolver_init(struct resolver_st *resolver)
 	rbtree_init(resolver->addr_rbtree);
 	fprintf(stderr, "Done!\n");
 	
-	fprintf(stderr, "init net....\n");
+#if 0
 	
 	resolver->fd = socket(AF_INET, SOCK_DGRAM, 0);
 	
@@ -95,15 +95,16 @@ int resolver_init(struct resolver_st *resolver)
 		return -1;
 	}
 
+#endif
+	fprintf(stderr, "init net....\n");
 	resolver->resolve.sin_family = AF_INET;
 	resolver->resolve.sin_port = htons(resolver->DServer->port);
 	resolver->resolve.sin_addr.s_addr = inet_addr(resolver->DServer->host);
+	fprintf(stderr, "init net Done!\n");
 	fprintf(stderr, "init Reactor...\n");
 	resolver->base = event_init();
 	fprintf(stderr, "Reactor init done!\n");
 		
-	fprintf(stderr, "init net Done!\n");
-
 	return 0;
 }
 
@@ -111,18 +112,11 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 {
 	struct resolver_result *result = NULL;
 	ssize_t nwrite = 0;
+	int fd = -1;
 	//size_t len = 0;
 	unsigned char buf[65536] = {0};
 	
 	int sfd = -1;
-
-	sfd = connect(resolver->fd, (struct sockaddr *)&(resolver->resolve), sizeof(struct sockaddr_in));
-
-	if (sfd < 0) {
-		if (errno == ENETUNREACH) { //网络不可达!
-			return;
-		}
-	}
 
 	result = calloc(1, sizeof(struct resolver_result));
 	
@@ -130,6 +124,29 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 		close(sfd); //close fd
 		return;
 	}
+
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (fd < 0) {
+		fprintf(stderr,"socket error!=\n");
+		return;
+	}
+
+	if (SetNoblock(fd) != 0) {
+		fprintf(stderr, "set noblocking error!\n");
+		return ;
+	}
+	
+
+
+	sfd = connect(fd, (struct sockaddr *)&(resolver->resolve), sizeof(struct sockaddr_in));
+
+	if (sfd < 0) {
+		if (errno == ENETUNREACH) { //网络不可达!
+			return;
+		}
+	}
+
 
 
 	/*
@@ -140,7 +157,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 
 	result->key  =	NULL; 
 	
-	nwrite = write(resolver->fd, buf, (sizeof(struct dns_header) + (result->question_len + 1) + sizeof(struct question)));
+	nwrite = write(fd, buf, (sizeof(struct dns_header) + (result->question_len + 1) + sizeof(struct question)));
 	//nwrite = send(resolver->fd, buf, 65536, 0);
 	
 	if (nwrite < 0) {
@@ -148,7 +165,7 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 		return;
 	}
 	
-	event_set(&result->ev, resolver->fd, EV_READ, parse_dns, (void *)result, NULL);
+	event_set(&result->ev, fd, EV_READ, parse_dns, (void *)result, NULL);
 	event_add(&result->ev, NULL);
 	
 	

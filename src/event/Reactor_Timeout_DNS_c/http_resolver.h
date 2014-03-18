@@ -26,8 +26,8 @@ struct resolver_st{
 	//unsigned int DSs;//dns Server的当前个数
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
 	struct event_base *base; //reacotr 模式
-	int fd;
-	int sockfd;
+//	int fd;
+	//int sockfd;
 	struct sockaddr_in resolve;
 	
 };
