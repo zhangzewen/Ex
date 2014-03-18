@@ -35,13 +35,13 @@ void vector_free(vector *v)
 	free(v->data);
 }
 
-int vector_push(vector *v, void *data)
+void *vector_push(vector *v)
 {
 	if (v->current >= v->total) {
 		vector *tmp = NULL;
 		tmp = (vector *)calloc(v->total + VECTOR_INCREASE_SIZE, sizeof(void *));
 		if (NULL == tmp) {
-			return -1;	
+			return NULL;	
 		}
 
 		memcpy(tmp, v, (sizeof(void *) * v->current));
@@ -52,8 +52,7 @@ int vector_push(vector *v, void *data)
 	}	
 	
 	v->current++;
-	v->data[v->current] = data;	
-	return 0;
+	return	(v->data + v->current);
 }
 
 int vector_empty(vector *v)

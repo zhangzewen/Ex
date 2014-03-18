@@ -266,6 +266,11 @@ int main(int argc, char *argv[])
 	unsigned char name_4[60] = "www.kuwo.com";
 	unsigned char name_5[60] = "www.163.com";
 	unsigned char name_6[60] = "www.qq.com";
+	unsigned char name_7[60] = "ww.stackoverflow.com";
+	unsigned char name_8[60] = "www.youtube.com";
+	unsigned char name_9[60] = "www.openrice.com";
+	unsigned char name_10[60] = "www.beecrazy.com";
+	unsigned char name_11[60] = "www.zhangzewen.sinaapp.com";
 
 	resolve_name(resolve, name_1);
 	resolve_name(resolve, name_2);
@@ -273,6 +278,11 @@ int main(int argc, char *argv[])
 	resolve_name(resolve, name_4);
 	resolve_name(resolve, name_5);
 	resolve_name(resolve, name_6);
+	resolve_name(resolve, name_7);
+	resolve_name(resolve, name_8);
+	resolve_name(resolve, name_9);
+	resolve_name(resolve, name_10);
+	resolve_name(resolve, name_11);
 
  //event_dispatch();
 	event_base_loop(resolve->base, 0);

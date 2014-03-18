@@ -16,6 +16,50 @@
 #include <errno.h>
 #include <errno.h>
 
+static unsigned int dnserver_index;
+
+int get_dns_server(struct dns_server *dns)
+{
+	FILE * fp;
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char *ptr = NULL;
+	int count = 0;
+	
+	fp = fopen(RESOLVER_CONFIG_FILE "r");
+	if (fp == NULL) {
+		return -1;
+	}
+
+	while ((read = getline(&line, &len, fp)) != -1) {
+		printf("%s", line);
+		
+		if (line[0] == "#") {
+			continue;
+		}
+
+		if (strncmp(line, "nameserver", 10) == 0) {
+			if (count >= MAX_DNS_SERVERS) {
+				break;
+			}
+			char host[DEFAULT_HOST_LENGTH] = {0};
+			sscanf(line, "%*%*[ \t]%s%*", host);
+			strcpy(dns[count].host, host);
+			dns[count].port = 53;
+			count++;
+		} 	
+		
+	}
+
+	if (line)
+		free(line);
+
+	close(fp);
+	return 1;
+}
+
+
 int SetNoblock(int fd)
 {
 	int flags;

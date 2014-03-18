@@ -17,7 +17,7 @@ vector* vector_create();
 
 void vector_free(vector *v);
 
-int vector_push(vector *v, void *data);
+void *vector_push(vector *v);
 
 int vector_empty(vector *v);
 void *vector_get(vector *v, unsigned int index);

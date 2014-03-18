@@ -7,6 +7,11 @@
 #include <netinet/in.h>
 #include "event_base.h"
 
+#define DEFAULT_HOST_LENGTH 256
+#define MAX_DNS_SERVERS 10
+#define DEFAULT_PORT 53
+#define RESOLVER_CONFIG_FILE  "/etc/resolv.conf"
+
 struct dns_server{
 	char host[200];
 	int port;
@@ -21,15 +26,11 @@ struct resolver_result{
 };
 
 struct resolver_st{
-	struct dns_server *DServer; //dns servers
-	//unsigned int DSmax; //dns servers 的最大个数
-	//unsigned int DSs;//dns Server的当前个数
+  //vector *DServer; //存储struct dns_server *DServer; dns servers
+	struct dns_server[MAX_DNS_SERVERS];//轮询
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
 	struct event_base *base; //reacotr 模式
-//	int fd;
-	//int sockfd;
-	struct sockaddr_in resolve;
-	
+	struct sockaddr_in dnserver[MAX_DNS_SERVERS];
 };
 
 struct resolver_st *resolver_create();
