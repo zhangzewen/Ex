@@ -1895,6 +1895,7 @@ found:
 static void
 ngx_http_request_handler(ngx_event_t *ev)
 {
+		//当处理完了epoll底层的事件随着http数据的解析处理完之后，控制全都移交到http业务上去了，正式处理http业务
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     ngx_connection_t    *c;
     ngx_http_request_t  *r;

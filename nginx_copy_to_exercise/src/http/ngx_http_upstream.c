@@ -424,33 +424,33 @@ ngx_http_upstream_create(ngx_http_request_t *r)
 void
 ngx_http_upstream_init(ngx_http_request_t *r)
 {
-		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
-    ngx_connection_t     *c;
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
+	ngx_connection_t     *c;
 
-    c = r->connection;
+	c = r->connection;
 
-    ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
-                   "[%s:%d]http init upstream, client timer: %d",
-										__func__, __LINE__,
-										 c->read->timer_set);
-//删除定时器
-    if (c->read->timer_set) {
-        ngx_del_timer(c->read);
-    }
-//挂载写事件
-    if (ngx_event_flags & NGX_USE_CLEAR_EVENT) {
+	ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
+			"[%s:%d]http init upstream, client timer: %d",
+			__func__, __LINE__,
+			c->read->timer_set);
+	//删除定时器
+	if (c->read->timer_set) {
+		ngx_del_timer(c->read);
+	}
+	//挂载写事件
+	if (ngx_event_flags & NGX_USE_CLEAR_EVENT) {
 
-        if (!c->write->active) {
-            if (ngx_add_event(c->write, NGX_WRITE_EVENT, NGX_CLEAR_EVENT)
-                == NGX_ERROR)
-            {
-                ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
-                return;
-            }
-        }
-    }
-//进入upstream的初始化
-    ngx_http_upstream_init_request(r);
+		if (!c->write->active) {
+			if (ngx_add_event(c->write, NGX_WRITE_EVENT, NGX_CLEAR_EVENT)
+					== NGX_ERROR)
+			{
+				ngx_http_finalize_request(r, NGX_HTTP_INTERNAL_SERVER_ERROR);
+				return;
+			}
+		}
+	}
+	//进入upstream的初始化
+	ngx_http_upstream_init_request(r);
 }
 
 

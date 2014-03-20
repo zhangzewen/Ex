@@ -103,6 +103,7 @@ static uint32_t  usual[] = {
 ngx_int_t
 ngx_http_parse_request_line(ngx_http_request_t *r, ngx_buf_t *b)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char  c, ch, *p, *m;
     enum {
         sw_start = 0,
@@ -822,6 +823,7 @@ ngx_int_t
 ngx_http_parse_header_line(ngx_http_request_t *r, ngx_buf_t *b,
     ngx_uint_t allow_underscores)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char      c, ch, *p;
     ngx_uint_t  hash, i;
     enum {
@@ -1077,6 +1079,7 @@ header_done:
 ngx_int_t
 ngx_http_parse_complex_uri(ngx_http_request_t *r, ngx_uint_t merge_slashes)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char  c, ch, decoded, *p, *u;
     enum {
         sw_usual = 0,
@@ -1419,6 +1422,7 @@ ngx_int_t
 ngx_http_parse_status_line(ngx_http_request_t *r, ngx_buf_t *b,
     ngx_http_status_t *status)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char   ch;
     u_char  *p;
     enum {
@@ -1629,6 +1633,7 @@ ngx_int_t
 ngx_http_parse_unsafe_uri(ngx_http_request_t *r, ngx_str_t *uri,
     ngx_str_t *args, ngx_uint_t *flags)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char  ch, *p;
     size_t  len;
 
@@ -1692,6 +1697,7 @@ ngx_int_t
 ngx_http_parse_multi_header_lines(ngx_array_t *headers, ngx_str_t *name,
     ngx_str_t *value)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     ngx_uint_t         i;
     u_char            *start, *last, *end, ch;
     ngx_table_elt_t  **h;
@@ -1766,6 +1772,7 @@ ngx_http_parse_multi_header_lines(ngx_array_t *headers, ngx_str_t *name,
 ngx_int_t
 ngx_http_arg(ngx_http_request_t *r, u_char *name, size_t len, ngx_str_t *value)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char  *p, *last;
 
     if (r->args.len == 0) {
@@ -1808,6 +1815,7 @@ ngx_http_arg(ngx_http_request_t *r, u_char *name, size_t len, ngx_str_t *value)
 void
 ngx_http_split_args(ngx_http_request_t *r, ngx_str_t *uri, ngx_str_t *args)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]\n", __FILE__, __func__, __LINE__);
     u_char  *p, *last;
 
     last = uri->data + uri->len;

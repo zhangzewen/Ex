@@ -399,7 +399,7 @@ extern ngx_event_actions_t   ngx_event_actions;
 
 
 #elif (NGX_HAVE_EPOLL)
-
+//-----------------------epoll we are here!-----------------------
 #define NGX_READ_EVENT     EPOLLIN
 #define NGX_WRITE_EVENT    EPOLLOUT
 
@@ -409,6 +409,7 @@ extern ngx_event_actions_t   ngx_event_actions;
 #if 0
 #define NGX_ONESHOT_EVENT  EPOLLONESHOT
 #endif
+//-----------------------epoll we are here!-----------------------
 
 
 #elif (NGX_HAVE_POLL)
