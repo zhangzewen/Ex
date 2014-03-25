@@ -19,6 +19,7 @@ struct dns_server{
 };
 
 struct resolver_result{
+	struct event_base *base;
 	struct event ev;
 	char *key; // 需要解析的host
 	char **value; //解析后得到的ip列表
@@ -26,11 +27,11 @@ struct resolver_result{
 };
 
 struct resolver_st{
-  //vector *DServer; //存储struct dns_server *DServer; dns servers
-	struct dns_server[MAX_DNS_SERVERS];//轮询
+/*vector *DServer; //存储struct dns_server *DServer; dns servers*/
+	struct dns_server DServer[MAX_DNS_SERVERS]; //轮询
+	int count; //current dns_servers counts
 	struct rbtree_st *addr_rbtree; //存放查询的结果，key为查询的url，value为查询的dns结果
 	struct event_base *base; //reacotr 模式
-	struct sockaddr_in dnserver[MAX_DNS_SERVERS];
 };
 
 struct resolver_st *resolver_create();

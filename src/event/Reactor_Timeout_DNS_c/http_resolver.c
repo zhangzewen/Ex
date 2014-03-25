@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "http_resolver.h"
 #include "dns_util.h"
 #include "event_base.h"
@@ -18,16 +19,15 @@
 
 static unsigned int dnserver_index;
 
-int get_dns_server(struct dns_server *dns)
+int get_dns_server(struct dns_server *dns int *count)
 {
 	FILE * fp;
 	char * line = NULL;
 	size_t len = 0;
 	ssize_t read;
-	char *ptr = NULL;
-	int count = 0;
+	int current = 0;
 	
-	fp = fopen(RESOLVER_CONFIG_FILE "r");
+	fp = fopen(RESOLVER_CONFIG_FILE, "r");
 	if (fp == NULL) {
 		return -1;
 	}
@@ -35,28 +35,31 @@ int get_dns_server(struct dns_server *dns)
 	while ((read = getline(&line, &len, fp)) != -1) {
 		printf("%s", line);
 		
-		if (line[0] == "#") {
+		if (line[0] == '#') {
 			continue;
 		}
 
 		if (strncmp(line, "nameserver", 10) == 0) {
-			if (count >= MAX_DNS_SERVERS) {
+			if (current >= MAX_DNS_SERVERS) {
 				break;
 			}
 			char host[DEFAULT_HOST_LENGTH] = {0};
-			sscanf(line, "%*%*[ \t]%s%*", host);
-			strcpy(dns[count].host, host);
-			dns[count].port = 53;
-			count++;
+			sscanf(line, "%*s%*[ \t]%s%*s", host);
+			strcpy(dns[current].host, host);
+			dns[current].port = 53;
+			current++;
 		} 	
 		
 	}
 
-	if (line)
+	if (line) {
 		free(line);
+	}
 
-	close(fp);
-	return 1;
+	fclose(fp);
+	*count = current;
+
+	return 0;
 }
 
 
@@ -85,7 +88,8 @@ struct resolver_st* resolver_create()
 		return NULL;
 	}
 
-	new->DServer = NULL;
+	//new->DServer = NULL;
+
 	
 	new->addr_rbtree = (struct rbtree_st *)malloc(sizeof(struct rbtree_st));
 	
@@ -107,44 +111,25 @@ struct resolver_st* resolver_create()
 	return new;
 }
 
-int resolver_init(struct resolver_st *resolver)
+
+int resolver_init(struct resolver_st *resolve)
 {
 	//Get_Dns_Server这个函数主要是从/etc/resolv.conf中获取nameserver，如果该/etc/resolve.conf没有配置dns服务器，就使用默认的google域名服务器：8.8.8.8:53
 	//resolver->DServer = Get_Dns_Server(); 
+//=========int dns server====================
 	fprintf(stderr, "init dns server ....\n");	
-	resolver->DServer = (struct dns_server *)malloc(sizeof(struct dns_server));
-	
-	if (NULL == resolver->DServer) {
+	memset(resolve->DServer, 0, (sizeof(struct dns_server)* MAX_DNS_SERVERS));
+	if (get_dns_server(resolve->DServer, &resolve->count) == -1) {
+		fprintf(stderr, "get dns servers error!\n");
 		return -1;
 	}
-
-	strcpy(resolver->DServer->host, "8.8.8.8");
-	resolver->DServer->port = 53;
-	fprintf(stderr, "init dns server Done!\n");
+	fprintf(stderr, "Done!\n");
+//=======init rbtree===============
 	fprintf(stderr, "init dns cache");
 	rbtree_init(resolver->addr_rbtree);
 	fprintf(stderr, "Done!\n");
 	
-#if 0
-	
-	resolver->fd = socket(AF_INET, SOCK_DGRAM, 0);
-	
-	if (resolver->fd < 0) {
-		fprintf(stderr, "init net error!\n");
-		return -1;
-	}
-	
-	if (SetNoblock(resolver->fd) != 0) {
-		fprintf(stderr, "set noblocking error!\n");
-		return -1;
-	}
-
-#endif
-	fprintf(stderr, "init net....\n");
-	resolver->resolve.sin_family = AF_INET;
-	resolver->resolve.sin_port = htons(resolver->DServer->port);
-	resolver->resolve.sin_addr.s_addr = inet_addr(resolver->DServer->host);
-	fprintf(stderr, "init net Done!\n");
+//=======init  reactor============
 	fprintf(stderr, "init Reactor...\n");
 	resolver->base = event_init();
 	fprintf(stderr, "Reactor init done!\n");
@@ -155,9 +140,10 @@ int resolver_init(struct resolver_st *resolver)
 void resolve_name(struct resolver_st *resolver, unsigned char *host)
 {
 	struct resolver_result *result = NULL;
+	struct sockaddr_in remote;
 	ssize_t nwrite = 0;
 	int fd = -1;
-	//size_t len = 0;
+	int robin = -1;
 	unsigned char buf[65536] = {0};
 	
 	int sfd = -1;
@@ -180,18 +166,22 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 		fprintf(stderr, "set noblocking error!\n");
 		return ;
 	}
-	
+
+	robin = dnserver_index % resolver->count;
+	dnserver_index = robin + 1;
+
+	remote.sin_family = AF_INET;
+	remote.sin_port = htons(resolver->DServer[robin].prot);
+	inet_pton(AF_INET, resolver->DServer[robin].host, &remote.sin_addr)
 
 
-	sfd = connect(fd, (struct sockaddr *)&(resolver->resolve), sizeof(struct sockaddr_in));
+	sfd = connect(fd, (struct sockaddr *)&remote, sizeof(struct sockaddr_in));
 
 	if (sfd < 0) {
 		if (errno == ENETUNREACH) { //网络不可达!
 			return;
 		}
 	}
-
-
 
 	/*
  *构造dns请求结构体

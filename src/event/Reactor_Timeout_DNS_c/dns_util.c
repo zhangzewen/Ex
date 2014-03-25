@@ -6,7 +6,6 @@
 #include<netinet/in.h>
 #include<unistd.h>
 #include "dns_util.h"
-#include "http_resolver.h"
 
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
@@ -168,9 +167,18 @@ void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host)
 void parse_dns(const unsigned char *buf, size_t question_len)
 #endif
 
-void parse_dns(int fd, short events, void *arg)
+int  parse_dns(int fd, short events, void *arg)
 {
 	struct resolver_result* result = (struct resolver_result *)arg;
+	
+	if (do_parse_dns(result) == -1) {
+		return -1;
+	}
+
+	return 0;
+}
+int do_parse_dns(struct resolver_result *resutl)
+{
 	struct dns_header *dns = NULL;
 	struct res_record answers[20];
 	struct res_record auth[20];
@@ -184,7 +192,7 @@ void parse_dns(int fd, short events, void *arg)
 	ssize_t nread = 0;
 
 	//read data
-	nread = read(fd, buf, 65536);
+	//nread = read(fd, buf, 65536);
 	
 	if (nread < 0) {
 		fprintf(stderr, "Wrong Dns response!\n");
