@@ -177,7 +177,7 @@ int  parse_dns(int fd, short events, void *arg)
 
 	return 0;
 }
-int do_parse_dns(struct resolver_result *resutl)
+static int do_parse_dns(struct resolver_result *resutl)
 {
 	struct dns_header *dns = NULL;
 	struct res_record answers[20];

@@ -137,9 +137,14 @@ int resolver_init(struct resolver_st *resolve)
 	return 0;
 }
 
+	//1.查找/etc/host
+	//2.查找rbtree cache,查找到了且TTL没有过期，直接返回结果，没有查找到转第3步, 如果找到了但是TTL过期了，删除记录，转到第3步 
+	//3.通过DNS服务器查询，并把结果插入rbtree cache
+
 void resolve_name(struct resolver_st *resolver, unsigned char *host)
 {
 	struct resolver_result *result = NULL;
+	struct dns_server *dns = NULL;
 	struct sockaddr_in remote;
 	ssize_t nwrite = 0;
 	int fd = -1;
@@ -166,13 +171,15 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 		fprintf(stderr, "set noblocking error!\n");
 		return ;
 	}
+	// just round robin
+	robin = (dnserver_index + 1) % resolver->count;
+	dnserver_index = robin;
 
-	robin = dnserver_index % resolver->count;
-	dnserver_index = robin + 1;
+	dns = resolver->DServer + robin;
 
 	remote.sin_family = AF_INET;
-	remote.sin_port = htons(resolver->DServer[robin].prot);
-	inet_pton(AF_INET, resolver->DServer[robin].host, &remote.sin_addr)
+	remote.sin_port = htons(dns->prot);
+	inet_pton(AF_INET, dns->host, &remote.sin_addr)
 
 
 	sfd = connect(fd, (struct sockaddr *)&remote, sizeof(struct sockaddr_in));
@@ -204,9 +211,6 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	
 	
 	return ;
-	//1.查找/etc/host
-	//2.查找rbtree cache,查找到了且TTL没有过期，直接返回结果，没有查找到转第3步, 如果找到了但是TTL过期了，删除记录，转到第3步 
-	//3.通过DNS服务器查询，并把结果插入rbtree cache
 }
 
 void resolver_distory(struct resolver_st *resolver)
