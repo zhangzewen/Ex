@@ -71,7 +71,7 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
 void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, int *question_len);
 void ChangetoDnsNameFormat(unsigned char* dns,  unsigned char* host);
 void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host);
-int parse_dns(int fd, short events, void *arg);
+void parse_dns(int fd, short events, void *arg);
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
 
 #endif

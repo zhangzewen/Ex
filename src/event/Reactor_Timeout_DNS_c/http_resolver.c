@@ -19,7 +19,7 @@
 
 static unsigned int dnserver_index;
 
-int get_dns_server(struct dns_server *dns int *count)
+int get_dns_server(struct dns_server *dns, int *count)
 {
 	FILE * fp;
 	char * line = NULL;
@@ -126,12 +126,12 @@ int resolver_init(struct resolver_st *resolve)
 	fprintf(stderr, "Done!\n");
 //=======init rbtree===============
 	fprintf(stderr, "init dns cache");
-	rbtree_init(resolver->addr_rbtree);
+	rbtree_init(resolve->addr_rbtree);
 	fprintf(stderr, "Done!\n");
 	
 //=======init  reactor============
 	fprintf(stderr, "init Reactor...\n");
-	resolver->base = event_init();
+	resolve->base = event_init();
 	fprintf(stderr, "Reactor init done!\n");
 		
 	return 0;
@@ -178,8 +178,8 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	dns = resolver->DServer + robin;
 
 	remote.sin_family = AF_INET;
-	remote.sin_port = htons(dns->prot);
-	inet_pton(AF_INET, dns->host, &remote.sin_addr)
+	remote.sin_port = htons(dns->port);
+	inet_pton(AF_INET, dns->host, &remote.sin_addr);
 
 
 	sfd = connect(fd, (struct sockaddr *)&remote, sizeof(struct sockaddr_in));
