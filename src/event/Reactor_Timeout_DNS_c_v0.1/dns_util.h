@@ -1,7 +1,7 @@
 #ifndef _HTTP_DNS_UTIL_H_INCLUDED_
 #define _HTTP_DNS_UTIL_H_INCLUDED_
 
-
+#if 0
 #define T_A 1 //Ipv4 address
 #define T_NS 2 //Nameserver
 #define T_CNAME 5 // canonical name
@@ -80,6 +80,7 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
 
 #ifndef __DP_MAIN
 #define __DP_MAIN
+#endif
 
 #include <pcap.h>
 // For standard int type declarations.

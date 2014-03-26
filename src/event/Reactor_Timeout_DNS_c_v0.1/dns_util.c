@@ -1,3 +1,4 @@
+#if 0
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -343,7 +344,7 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
 }
 
 
-
+#endif
 #include <getopt.h>
 #include <pcap.h>
 #include <stdio.h>
