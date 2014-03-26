@@ -1,0 +1,75 @@
+-- OVERVIEW --
+dns_parse takes as input a pcap of DNS data and produces a complete, trivially
+parsable, human readable ASCII version of the same data. It's generally useful
+for network monitoring (send the data to Splunk or similar). The most common
+carrying protocols are supported, as well as packet deduplication.
+
+-- SUPPORTED PROTOCOLS --
+Ethernet
+MPLS
+IPv4 (including fragment reassembly)
+IPv6 (including fragment reassembly)
+UDP
+TCP (with flow state saving and loading between pcaps)
+DNS (on any port)
+
+-- AUTHOR INFO --
+Paul Ferrell
+pferrell@lanl.gov
+
+-- CONTENTS --
+Code to build bin/dns_parse.
+init/dnscapture - An init script for running tcpdump on an interface as a
+service to generate regular pcap files.
+bin/dns_parse_cron - A python cron job script for periodically running dns_parse
+on regularly output pcap files (generally from using the -C or -G options in
+tcpdump).
+pkgs/dns_parse.spec - An RPM spec file, for those dinosaurs that still use these
+things (like me).
+etc/* - example config files for init/dnscapture and bin/dns_parse_cron
+
+-- DEPENDENCIES --
+libpcap
+
+-- OS Dependencies --
+This has been tested primarily on x86_64 linux, but there shouldn't be any typing issues on 32 bit machines. 
+
+-- BUILDING AND INSTALLING --
+make
+make install
+
+-- Running --
+"./bin/dns_parse -h" should tell you everything you need to know.
+
+A reasonable set of options is:
+./bin/dns_parse -m "" -t -r <dns_captured.pcap>
+This gets you newline separated resource records an empty main record separator,
+pretty printed dates, and the shorthand for the record types (ie. A or CNAME).
+Printing of additional and name server records is disabled (by default).
+The output will look like this:
+
+2013-02-13 14:56:06.002102,75.32.12.33,75.32.37.16,61,u,r,AA
+? mass.blah.com A
+! mass.blah.com A 75.32.37.40
+
+2013-02-13 14:56:06.002471,33.53.3.59,112.78.117.89,54,u,q,NA
+? getsystemsinc.com MX
+
+2013-02-13 14:56:06.005718,75.32.207.52,75.32.12.33,53,u,q,NA
+? 11.207.165.128.in-addr.arpa PTR
+
+2013-02-13 14:56:06.006109,75.32.12.33,75.32.207.52,80,u,r,AA
+? 11.207.165.128.in-addr.arpa PTR
+! 11.207.165.128.in-addr.arpa PTR cato.blah.com
+
+2013-02-13 14:56:06.006189,75.32.157.134,75.32.12.33,47,u,q,NA
+? blerg-dd.blah.com A
+
+2013-02-13 14:56:06.006212,192.12.184.7,33.53.3.1,42,u,q,NA
+? api.flyertown.ca A
+
+2013-02-13 14:56:06.006570,75.32.12.33,75.32.157.134,63,u,r,AA
+? blerg-dd.blah.com A
+! blerg-dd.blah.com A 172.16.236.126
+
+
