@@ -164,7 +164,7 @@ void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host)
 }
 
 
-static int do_parse_dns(struct resolver_result *result)
+static int do_parse_dns(struct resolver_result *result, unsigned char *buf)
 {
 	struct dns_header *dns = NULL;
 	struct res_record answers[20];
@@ -175,16 +175,6 @@ static int do_parse_dns(struct resolver_result *result)
 	int j = 0;
 		
 	
-	unsigned char buf[65536] = {0};
-	ssize_t nread = 0;
-
-	//read data
-	//nread = read(fd, buf, 65536);
-	
-	if (nread < 0) {
-		fprintf(stderr, "Wrong Dns response!\n");
-		return -1;
-	}
 	
 	dns = (struct dns_header *)buf;
 	
@@ -283,8 +273,18 @@ static int do_parse_dns(struct resolver_result *result)
 void parse_dns(int fd, short events, void *arg)
 {
 	struct resolver_result* result = (struct resolver_result *)arg;
+	unsigned char buf[65536] = {0};
+	ssize_t nread = 0;
+
+	//read data
+	nread = read(fd, buf, 65536);
 	
-	do_parse_dns(result);
+	if (nread < 0) {
+		fprintf(stderr, "Wrong Dns response!\n");
+		return ;
+	}
+	
+	do_parse_dns(result, buf);
 }
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count)
