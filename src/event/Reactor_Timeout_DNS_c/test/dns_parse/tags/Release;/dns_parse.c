@@ -355,6 +355,7 @@ void print_summary(ip_info * ip, transport_info * trns, dns_info * dns,
     dns_rr *next;
     dns_question *qnext;
 
+#if 0
     // Print the time stamp.
     if (conf->PRETTY_DATE) {
         struct tm *time;
@@ -369,6 +370,7 @@ void print_summary(ip_info * ip, transport_info * trns, dns_info * dns,
         sprintf(date, "%d.%06d", (int)header->ts.tv_sec, 
                                  (int)header->ts.tv_usec);
    
+#endif
     // Print the transport protocol indicator.
     if (ip->proto == 17) {
         proto = 'u';
@@ -379,14 +381,17 @@ void print_summary(ip_info * ip, transport_info * trns, dns_info * dns,
     dnslength = trns->length;
 
     // Print the IP addresses and the basic query information.
+#if 0
     printf("%s,%s,", date, iptostr(&ip->src));
     printf("%s,%d,%c,%c,%s", iptostr(&ip->dst),
            dnslength, proto, dns->qr ? 'r':'q', dns->AA?"AA":"NA");
-
+#endif
+#if 0
     if (conf->COUNTS) {
         printf(",%u?,%u!,%u$,%u+", dns->qdcount, dns->ancount, 
                                    dns->nscount, dns->arcount);
     }
+#endif
 
     // Go through the list of queries, and print each one.
     qnext = dns->queries;
