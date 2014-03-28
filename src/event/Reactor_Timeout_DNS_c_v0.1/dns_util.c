@@ -16,7 +16,53 @@ void print_packet(uint32_t, uint8_t *, uint32_t, uint32_t, u_int);
 //int dedup(uint32_t, uint8_t *,_info *);
 
 char* read_rr_name(const uint8_t* packet, uint32_t* packet_p, uint32_t id_pos, uint32_t len);
+char* escape_data(const uint8_t* packet, uint32_t start, uint32_t end);
 
+char* escape_data(const uint8_t* packet, uint32_t start, uint32_t end)
+{
+	int i = 0;
+	int o = 0;
+	uint8_t c = 0;
+	uint8_t upper = 0;
+	uint8_t lower = 0;
+	uint32_t length = 1;
+
+	char* outstr;
+
+	for (i = start; i < end; i++) {
+		c = packet[i];
+
+		if (c < 0x20 || c == 0x5c || c >= 0x75) {
+			length += 4;
+		} else {
+			length += 1;
+		}
+	}
+
+	outstr = (char *)malloc(sizeof(char) * length);
+
+	if (outstr == NULL) {
+		return NULL;
+	}
+
+	for (i=start; i<end; i++) {
+		c = packet[i];
+		if (c < 0x20 || c == 0x5c || c >= 0x7f) {
+			outstr[o] = '\\';
+			outstr[o+1] = 'x';
+			outstr[o+2] = c/16 + 0x30;
+			outstr[o+3] = c%16 + 0x30;
+			if (outstr[o+2] > 0x39) outstr[o+2] += 0x27;
+			if (outstr[o+3] > 0x39) outstr[o+3] += 0x27;
+			o += 4;
+		} else {
+			outstr[o] = c;
+			o++;
+		}   
+	}   
+	outstr[o] = 0;
+	return outstr;
+}
 
 char* read_rr_name(const uint8_t* packet, uint32_t* packet_p, uint32_t id_pos, uint32_t len)
 {
@@ -236,7 +282,7 @@ void dns_question_free(dns_question * question) {
 // packet, header - the packet location and header data.
 // count - Number of question records to expect.
 // root - Pointer to where to store the question records.
-uint32_t parse_questions(uint32_t pos, uint32_t id_pos, 
+uint32_t parse_questions(uint32_t pos, uint32_t id_pos, uint32_t len,
                          uint8_t *packet, uint16_t count, 
                          dns_question ** root) {
     uint32_t start_pos = pos; 
@@ -249,11 +295,11 @@ uint32_t parse_questions(uint32_t pos, uint32_t id_pos,
         current = malloc(sizeof(dns_question));
         current->next = NULL; current->name = NULL;
 
-        current->name = read_rr_name(packet, &pos, id_pos, header->len);
-        if (current->name == NULL || (pos + 2) >= header->len) {
+        current->name = read_rr_name(packet, &pos, id_pos, len);
+        if (current->name == NULL || (pos + 2) >= len) {
             // Handle a bad DNS name.
             fprintf(stderr, "DNS question error\n");
-            char * buffer = escape_data(packet, start_pos, header->len);
+            char * buffer = escape_data(packet, start_pos, len);
             const char * msg = "Bad DNS question: ";
             current->name = malloc(sizeof(char) * (strlen(buffer) +
                                                    strlen(msg) + 1));
@@ -458,11 +504,16 @@ int dedup(uint32_t pos, struct pcap_pkthdr *header, uint8_t * packet,
 // Parse the dns protocol in 'packet'. 
 // See RFC1035
 // See dns_parse.h for more info.
-uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns) {
+uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*dns packet len*/) {
     
     int i;
     uint32_t id_pos = pos;
     dns_rr * last = NULL;
+
+		if (len < 12) {
+			fprintf(stderr,"Truncate Packet error! Not a complete dns packet!\n");
+			return -1;
+		}
 
     dns->id = (packet[pos] << 8) + packet[pos+1];
     dns->qr = packet[pos+2] >> 7;
@@ -485,7 +536,7 @@ uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns) {
     dns->ancount = (packet[pos+6] << 8) + packet[pos+7];
     dns->nscount = (packet[pos+8] << 8) + packet[pos+9];
     dns->arcount = (packet[pos+10] << 8) + packet[pos+11];
-
+#if 0
     SHOW_RAW(
         printf("dns\n");
         print_packet(header->len, packet, pos, header->len, 2);
@@ -496,9 +547,9 @@ uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns) {
         printf("DNS qdcount:%d, ancount:%d, nscount:%d, arcount:%d\n",
                dns->qdcount, dns->ancount, dns->nscount, dns->arcount);
     )
-
+#endif
     // Parse each type of records in turn.
-		pos = parse_questions(pos+12, id_pos, packet, 
+		pos = parse_questions(pos+12, id_pos, uint32_t len/*dns packet len*/, packet, 
 				dns->qdcount, &(dns->queries));
 		pos = parse_rr_set(pos, id_pos, packet, 
 				dns->ancount, &(dns->answers), conf);
