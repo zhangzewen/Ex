@@ -1,59 +1,42 @@
+#ifndef _HTTP_DNS_UTIL_H_INCLUDED__
+#define _HTTP_DNS_UTIL_H_INCLUDED__
 
-#include <pcap.h>
-// For standard int type declarations.
-#include <stdint.h>
+#define T_A 1
+#define T_NS 2
+#define T_CNAME 3
+#define T_AAAA 4
+#define T_SOA 6
+#define T_PTR 12
+#define T_MX 15
 
-// Verbosity flags. Switch which function is defined to add or remove
-// various output printfs from the source. These are all for debugging
-// purposes.
-//#define VERBOSE(A) A
-#define VERBOSE(A)
-//#define DBG(A) A fflush(stdout);
-#define DBG(A)
-//#define SHOW_RAW(A) A
-#define SHOW_RAW(A) 
-// There are a lot of DBG statements in the tcp and ip_fragment sections.
-// When debugging those areas, it's really nice to know what's going on
-// exactly at each point.
 
-// Get the value of the BITth bit from byte offset O bytes from base B.
-#define GET_BIT(B,O,BIT) (uint8_t)(((*(B+O)) & (1 << (BIT))) >> BIT )
-// Get a two byte little endian u_int at base B and offset O.
-#define LE_U_SHORT(B,O) (uint16_t)((B[O]<<8)+B[O+1])
-// Get a four byte little endian u_int at base B and offset O.
-#define LE_U_INT(B,O) (uint32_t)((B[O]<<24)+(B[O+1]<<16)+(B[O+2]<<8)+B[O+3])
-// Get the DNS tcp length prepended field.
-#define TCP_DNS_LEN(P,O) ((P[O]<<8) + P[O+1])
+#if 0
+typedef char *rr_data_parse(const uint8_t*, uint32_t, uint32_t, uint16_t, uint32_t);
 
-// Pre-declarations.
-struct tcp_info;
-struct ip_fragment;
+typedef struct{
+	uint16_t cls;
+	uint16_t rtype;
+	rr_data_parse *parse;
+	const char *name;
+	const char *doc;
+	unsigned long long count;
+}rr_parse_container;
 
-#define MAX_EXCLUDES 100
-// Globals passed in via the command line.
-// I don't really want these to be globals, but libpcap doesn't really 
-// have the mechanism I need to pass them to the handler.
-typedef struct {
-    uint16_t EXCLUDED[MAX_EXCLUDES];
-    uint16_t EXCLUDES;
-    char SEP;
-    char * RECORD_SEP;
-    int AD_ENABLED;
-    int NS_ENABLED;
-    int COUNTS;
-    int PRETTY_DATE;
-    int PRINT_RR_NAME;
-    int MISSING_TYPE_WARNINGS;
-    char * TCP_STATE_PATH;
-    uint32_t DEDUPS;
-    struct tcp_info * tcp_sessions_head;
-    struct ip_fragment * ip_fragment_head;
-    unsigned long long * dedup_hashes;
-    uint32_t dedup_pos;
-    
-} config;
+rr_parse_container *find_parse(uint16_t, uint16_t);
 
-// Holds the information for a dns question.
+char *read_dns_name(uint8_t *, uint32_t, uint32_t);
+
+rr_data_parser opts;
+rr_data_parser escape;
+
+extern rr_parse_container rr_parsers[];
+rr_parse_container default_rr_parse;
+
+void print_parsers();
+void print_parse_usage();
+#endif
+
+
 typedef struct dns_question {
     char * name;
     uint16_t type;
@@ -61,7 +44,6 @@ typedef struct dns_question {
     struct dns_question * next;
 } dns_question;
 
-// Holds the information for a dns resource record.
 typedef struct dns_rr {
     char * name;
     uint16_t type;
@@ -74,7 +56,6 @@ typedef struct dns_rr {
     struct dns_rr * next;
 } dns_rr;
 
-// Holds general DNS information.
 typedef struct {
     uint16_t id;
     char qr;
@@ -92,33 +73,28 @@ typedef struct {
     dns_rr * additional;
 } dns_info;
 
-// Including these earlier leads to all sorts of circular dependencies.
-#include "tcp.h"
-#include "network.h"
 
-#define FORCE 1
+struct DNS_HEADER {
+	unsigned short id;
+	
+	unsigned char rd :1;
+	unsigned char tc :1;
+	unsigned char aa :1;
+	unsigned char opcode :4;
+	unsigned char qr :1;
+	
+	unsigned char rcode :4;
+	unsigned char z :3;
+	unsigned char ra :1;
 
-// Parse DNS from from the given 'packet' byte array starting at offset 'pos', 
-// with libpcap header information in 'header'. 
-// The parsed information is put in the 'dns' struct, and the 
-// new pos in the packet is returned. (0 on error).
-// The config struct gives needed configuration options.
-// force - Force fully parsing the dns data, even if 
-//   configuration parameters mean it isn't necessary. If this is false,
-//   the returned position may not correspond with the end of the DNS data. 
-uint32_t dns_parse(uint32_t pos, struct pcap_pkthdr *header, 
-                   uint8_t *packet, dns_info * dns,
-                   config * conf, uint8_t force);
-// Print the information in the given packet information objects according
-// to the settings in the configuration struct.
-void print_summary(ip_info * ip, transport_info * trns, dns_info * dns,
-                   struct pcap_pkthdr * header, config * conf);
-// Print packet bytes in hex.
-// max_len - Maximum packet offset.
-// packet - pointer to the packet data.
-// start - start offset
-// end - end offset (if farther than max_len, printing stops at max_len).
-// wrap - How many bytes to print per line.
-void print_packet(uint32_t max_len, uint8_t *packet,
-                  uint32_t start, uint32_t end, u_int wrap);
+	unsigned short qus_count;
+	unsigned short ans_count;
+	unsigned short auth_count;
+	unsigned add_count;
+};
+
+
+
+uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns);
+
 #endif
