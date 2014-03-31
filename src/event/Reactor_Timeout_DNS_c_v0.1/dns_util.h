@@ -10,27 +10,27 @@
 #define T_MX 15
 
 
-#if 0
-typedef char *rr_data_parse(const uint8_t*, uint32_t, uint32_t, uint16_t, uint32_t);
+#if 1
+typedef char *rr_data_parser(const uint8_t*, uint32_t, uint32_t, uint16_t, uint32_t);
 
 typedef struct{
 	uint16_t cls;
 	uint16_t rtype;
-	rr_data_parse *parse;
+	rr_data_parser *parser;
 	const char *name;
 	const char *doc;
 	unsigned long long count;
-}rr_parse_container;
+}rr_parser_container;
 
-rr_parse_container *find_parse(uint16_t, uint16_t);
+rr_parser_container *find_parse(uint16_t, uint16_t);
 
 char *read_dns_name(uint8_t *, uint32_t, uint32_t);
 
 rr_data_parser opts;
 rr_data_parser escape;
 
-extern rr_parse_container rr_parsers[];
-rr_parse_container default_rr_parse;
+extern rr_parser_container rr_parsers[];
+rr_parser_container default_rr_parse;
 
 void print_parsers();
 void print_parse_usage();
@@ -74,7 +74,7 @@ typedef struct {
 } dns_info;
 
 
-struct DNS_HEADER {
+struct dns_header {
 	unsigned short id;
 	
 	unsigned char rd :1;
@@ -87,14 +87,20 @@ struct DNS_HEADER {
 	unsigned char z :3;
 	unsigned char ra :1;
 
-	unsigned short qus_count;
+	unsigned short q_count;
 	unsigned short ans_count;
 	unsigned short auth_count;
 	unsigned add_count;
 };
 
+struct question
+{
+	unsigned short qtype;
+	unsigned short qclass;
+};
 
 
-uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns);
+
+uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*dns packet len*/);
 
 #endif

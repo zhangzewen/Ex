@@ -7,10 +7,13 @@
 #include "dns_util.h"
 
 
-void handler(uint8_t *, const uint8_t *);
+void handler(uint8_t *, uint32_t len, const uint8_t *);
 void dns_rr_free(dns_rr *);
 void dns_question_free(dns_question *);
-uint32_t parse_rr(uint32_t, uint32_t, uint8_t *, dns_rr *);
+
+uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len, uint8_t *packet, dns_rr * rr);
+
+
 void print_rr_section(dns_rr *, char *);
 void print_packet(uint32_t, uint8_t *, uint32_t, uint32_t, u_int);
 //int dedup(uint32_t, uint8_t *,_info *);
@@ -18,13 +21,265 @@ void print_packet(uint32_t, uint8_t *, uint32_t, uint32_t, u_int);
 char* read_rr_name(const uint8_t* packet, uint32_t* packet_p, uint32_t id_pos, uint32_t len);
 char* escape_data(const uint8_t* packet, uint32_t start, uint32_t end);
 
+rr_parser_container default_rr_parser = {0, 0, escape, NULL, NULL, 0}; 
+
+
+
+
+void handler(uint8_t *args, uint32_t len, const uint8_t *orig_packet)
+{
+	
+}
+
+
+char * mk_error(const char * msg, const uint8_t * packet, uint32_t pos,
+                uint16_t rdlength) {
+    char * tmp = escape_data(packet, pos, pos+rdlength);
+    size_t len = strlen(tmp) + strlen(msg) + 1;
+    char * buffer = malloc(sizeof(char)*len);
+    sprintf(buffer, "%s%s", msg, tmp);
+    free(tmp);
+    return buffer;
+}
+
+#define A_DOC "A (IPv4 address) format\n"\
+"A records are simply an IPv4 address, and are formatted as such."
+char * A(const uint8_t * packet, uint32_t pos, uint32_t i,
+         uint16_t rdlength, uint32_t plen) {
+    char * data = (char *)malloc(sizeof(char)*16);
+
+    if (rdlength != 4) {
+        free(data);
+        return mk_error("Bad A record: ", packet, pos, rdlength);
+    }   
+     
+    sprintf(data, "%d.%d.%d.%d", packet[pos], packet[pos+1],
+                                 packet[pos+2], packet[pos+3]);
+
+    return data;
+}
+
+#define D_DOC "domain name like format\n"\
+"A DNS like name. This format is used for many record types."
+char * domain_name(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                   uint16_t rdlength, uint32_t plen) {
+    char * name = read_rr_name(packet, &pos, id_pos, plen);
+    if (name == NULL) 
+        name = mk_error("Bad DNS name: ", packet, pos, rdlength);
+
+    return name;
+}
+
+#define SOA_DOC "Start of Authority format\n"\
+"Presented as a series of labeled SOA fields."
+char * soa(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                 uint16_t rdlength, uint32_t plen) {
+    char * mname;
+    char * rname;
+    char * buffer;
+    uint32_t serial, refresh, retry, expire, minimum;
+    const char * format = "mname: %s, rname: %s, serial: %d, "
+                          "refresh: %d, retry: %d, expire: %d, min: %d";
+
+    mname = read_rr_name(packet, &pos, id_pos, plen);
+    if (mname == NULL) return mk_error("Bad SOA: ", packet, pos, rdlength);
+    rname = read_rr_name(packet, &pos, id_pos, plen);
+    if (rname == NULL) return mk_error("Bad SOA: ", packet, pos, rdlength);
+
+    serial = (packet[pos] << 8) + packet[pos+1];
+    refresh = (packet[pos+2] << 8) + packet[pos+3];
+    retry = (packet[pos+4] << 8) + packet[pos+5];
+    expire = (packet[pos+6] << 8) + packet[pos+7];
+    minimum = (packet[pos+8] << 8) + packet[pos+9];
+
+    // The 5 tens are for the max of ten digits for the numeric fields.
+    // The format string will lose 14 chrs of format marks.
+    // The +1 is for the terminating null.
+    buffer = malloc(sizeof(char) * (strlen(format) + strlen(mname) +
+                                    strlen(rname) + 10*5 - 14 + 1));
+    sprintf(buffer, format, mname, rname, serial, refresh, retry, expire,
+            minimum);
+    free(mname);
+    free(rname);
+    return buffer;
+}
+
+#define MX_DOC "Mail Exchange record format\n"\
+"A standard dns name preceded by a preference number."
+char * mx(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                uint16_t rdlength, uint32_t plen) {
+
+    uint16_t pref = (packet[pos] << 8) + packet[pos+1];
+    char * name;
+    char * buffer;
+    uint32_t spos = pos;
+
+    pos = pos + 2;
+    name = read_rr_name(packet, &pos, id_pos, plen);
+    if (name == NULL)
+        return mk_error("Bad MX: ", packet, spos, rdlength);
+
+    buffer = malloc(sizeof(char)*(5 + 1 + strlen(name) + 1));
+    sprintf(buffer, "%d,%s", pref, name);
+    free(name);
+    return buffer;
+}
+
+#define OPTS_DOC "EDNS option record format\n"\
+"These records contain a size field for warning about extra large DNS \n"\
+"packets, an extended rcode, and an optional set of dynamic fields.\n"\
+"The size and extended rcode are printed, but the dynamic fields are \n"\
+"simply escaped. Note that the associated format function is non-standard,\n"\
+"as EDNS records modify the basic resourse record protocol (there is no \n"\
+"class field, for instance. RFC 2671"
+char * opts(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                  uint16_t rdlength, uint32_t plen) {
+    uint16_t payload_size = (packet[pos] << 8) + packet[pos+1];
+    char *buffer;
+    const char * base_format = "size:%d,rcode:0x%02x%02x%02x%02x,%s";
+    char *rdata = escape_data(packet, pos+6, pos + 6 + rdlength);
+
+    buffer = malloc(sizeof(char) * (strlen(base_format) - 20 + 5 + 8 +
+                                    strlen(rdata) + 1));
+    sprintf(buffer, base_format, payload_size, packet[2], packet[3],
+                                 packet[4], packet[5], rdata);
+    free(rdata);
+    return buffer;
+}
+
+#define SRV_DOC "Service record format. RFC 2782\n"\
+"Service records are used to identify various network services and ports.\n"\
+"The format is: 'priority,weight,port target'\n"\
+"The target is a somewhat standard DNS name."
+char * srv(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                 uint16_t rdlength, uint32_t plen) {
+    uint16_t priority = (packet[pos] << 8) + packet[pos+1];
+    uint16_t weight = (packet[pos+2] << 8) + packet[pos+3];
+    uint16_t port = (packet[pos+4] << 8) + packet[pos+5];
+    char *target, *buffer;
+    pos = pos + 6;
+    // Don't read beyond the end of the rr.
+    target = read_rr_name(packet, &pos, id_pos, pos+rdlength-6);
+    if (target == NULL)
+        return mk_error("Bad SRV", packet, pos, rdlength);
+
+    buffer = malloc(sizeof(char) * ((3*5+1) + strlen(target)));
+    sprintf(buffer, "%d,%d,%d %s", priority, weight, port, target);
+    free(target);
+    return buffer;
+}
+
+#define AAAA_DOC "IPv6 record format.  RFC 3596\n"\
+"A standard IPv6 address. No attempt is made to abbreviate the address."
+char * AAAA(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
+                  uint16_t rdlength, uint32_t plen) {
+    char *buffer;
+    uint16_t ipv6[8];
+    int i;
+
+    if (rdlength != 16) {
+        return mk_error("Bad AAAA record", packet, pos, rdlength);
+    }
+
+    for (i=0; i < 8; i++)
+        ipv6[i] = (packet[pos+i*2] << 8) + packet[pos+i*2+1];
+    buffer = malloc(sizeof(char) * (4*8 + 7 + 1));
+    sprintf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", ipv6[0], ipv6[1], ipv6[2],
+                                               ipv6[3], ipv6[4], ipv6[5],
+                                               ipv6[6], ipv6[7]);
+    return buffer;
+}
+
+
+
+rr_parser_container rr_parsers[] = { {1, 1, A, "A", A_DOC, 0},
+																		 {0, 2, domain_name, "NS", D_DOC, 0},
+																		 {0, 5, domain_name, "CNAME", D_DOC, 0},
+																		 {0, 6, soa, "SOA", SOA_DOC, 0},
+																		 {0, 12, domain_name, "PTR", D_DOC, 0},
+																		 {0, 33, srv, "SRV", SRV_DOC, 0},
+																		 {1, 28, AAAA, "AAAA", AAAA_DOC, 0},
+																		 {0, 15, mx, "MX", MX_DOC, 0},
+																	};
+
+rr_parser_container* find_parse(uint16_t cls, uint16_t rtype);
+
+inline int count_parsers()
+{
+	return sizeof(rr_parsers) / sizeof(rr_parser_container);
+}
+void sort_parsers()
+{
+	int m = 0;
+	int n = 0;
+	int change = 1;
+	int pcount = count_parsers();
+	rr_parser_container tmp;
+
+	for (m = 0; m < pcount - 1 && change == 1; m++) {
+		change = 0;
+		for (n = 0; n < pcount -1; n++) {
+			if (rr_parsers[n].count < rr_parsers[n + 1].count) {
+				tmp = rr_parsers[n];
+				rr_parsers[n] = rr_parsers[n + 1];
+				rr_parsers[n + 1] = tmp;
+				change = 1;
+			}
+		}
+	}
+	
+	for (m = 0; m < pcount - 1; m++) {
+		rr_parsers[m].count = 0;
+	}
+}
+
+
+
+
+unsigned int PACKETS_SEEN = 0;
+#define REORDER_LIMIT 100000
+rr_parser_container* find_parser(uint16_t cls, uint16_t rtype)
+{
+	unsigned int i = 0;
+	unsigned int pcount = 0;
+	rr_parser_container *found = NULL;
+
+	//Re-arrange the order of the parsers according to how often things are
+	// seen every REORDER_LIMIT packets
+
+	if (PACKETS_SEEN > REORDER_LIMIT) {
+		PACKETS_SEEN = 0;
+		sort_parsers();
+	}
+
+	PACKETS_SEEN++;
+
+	while (i < pcount && found == NULL) {
+		rr_parser_container pc = rr_parsers[i];
+
+		if ((pc.rtype == rtype || pc.rtype == 0) && (pc.cls = cls || pc.cls == 0)) {
+			rr_parsers[i].count++;
+			found = &rr_parsers[i];
+			break;
+		}
+		i++;
+	}
+
+	if (found == NULL) {
+		found = &default_rr_parser;
+	}
+
+	found->count++;
+	return found;
+}
+
 char* escape_data(const uint8_t* packet, uint32_t start, uint32_t end)
 {
 	int i = 0;
 	int o = 0;
 	uint8_t c = 0;
-	uint8_t upper = 0;
-	uint8_t lower = 0;
+	//uint8_t upper = 0;
+	//uint8_t lower = 0;
 	uint32_t length = 1;
 
 	char* outstr;
@@ -166,8 +421,6 @@ char* read_rr_name(const uint8_t* packet, uint32_t* packet_p, uint32_t id_pos, u
 
 	return name;
 
-}
-void handler(uint8_t * args, const uint8_t *orig_packet) {
 }
 
 // Output the DNS data.
@@ -319,8 +572,8 @@ uint32_t parse_questions(uint32_t pos, uint32_t id_pos, uint32_t len,
         last = current;
         pos = pos + 4;
 
-        VERBOSE(printf("question->name: %s\n", current->name);)
-        VERBOSE(printf("type %d, cls %d\n", current->type, current->cls);)
+        //VERBOSE(printf("question->name: %s\n", current->name);)
+        //VERBOSE(printf("type %d, cls %d\n", current->type, current->cls);)
    }
     
     return pos;
@@ -329,20 +582,20 @@ uint32_t parse_questions(uint32_t pos, uint32_t id_pos, uint32_t len,
 // Parse an individual resource record, placing the acquired data in 'rr'.
 // 'packet', 'pos', and 'id_pos' serve the same uses as in parse_rr_set.
 // Return 0 on error, the new 'pos' in the packet otherwise.
-uint32_t parse_rr(uint32_t pos, uint32_t id_pos, struct pcap_pkthdr *header, 
-                  uint8_t *packet, dns_rr * rr, config * conf) {
+uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len, 
+                  uint8_t *packet, dns_rr * rr) {
     int i;
     uint32_t rr_start = pos;
     rr_parser_container * parser;
     rr_parser_container opts_cont = {0,0, opts};
 
-    uint32_t temp_pos; // Only used when parsing SRV records.
-    char * temp_data; // Also used only for SRV records.
+    //uint32_t temp_pos; // Only used when parsing SRV records.
+    //char * temp_data; // Also used only for SRV records.
 
     rr->name = NULL;
     rr->data = NULL;
     
-    rr->name = read_rr_name(packet, &pos, id_pos, header->len);
+    rr->name = read_rr_name(packet, &pos, id_pos, len);
     // Handle a bad rr name.
     // We still want to print the rest of the escaped rr data.
     if (rr->name == NULL) {
@@ -353,11 +606,11 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, struct pcap_pkthdr *header,
         rr->rr_name = NULL;
         rr->cls = 0;
         rr->ttl = 0;
-        rr->data = escape_data(packet, pos, header->len);
+        rr->data = escape_data(packet, pos, len);
         return 0;
     }
     
-    if ((header->len - pos) < 10 ) return 0;
+    if ((len - pos) < 10 ) return 0;
     
     rr->type = (packet[pos] << 8) + packet[pos+1];
     rr->rdlength = (packet[pos+8] << 8) + packet[pos + 9];
@@ -382,18 +635,18 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, struct pcap_pkthdr *header,
         pos = pos + 10;
     }
 
-    VERBOSE(printf("Applying RR parser: %s\n", parser->name);)
-
+    //VERBOSE(printf("Applying RR parser: %s\n", parser->name);)
+#if 0
     if (conf->MISSING_TYPE_WARNINGS && &default_rr_parser == parser) 
         fprintf(stderr, "Missing parser for class %d, type %d\n", 
                         rr->cls, rr->type);
-    
+#endif
     // Make sure the data for the record is actually there.
     // If not, escape and print the raw data.
-    if (header->len < (rr_start + 10 + rr->rdlength)) {
+    if (len < (rr_start + 10 + rr->rdlength)) {
         char * buffer;
         const char * msg = "Truncated rr: ";
-        rr->data = escape_data(packet, rr_start, header->len);
+        rr->data = escape_data(packet, rr_start, len);
         buffer = malloc(sizeof(char) * (strlen(rr->data) + strlen(msg) + 1));
         sprintf(buffer, "%s%s", msg, rr->data);
         free(rr->data);
@@ -402,23 +655,18 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, struct pcap_pkthdr *header,
     }
     // Parse the resource record data.
     rr->data = parser->parser(packet, pos, id_pos, rr->rdlength, 
-                              header->len);
-    VERBOSE(
-    printf("rr->name: %s\n", rr->name);
-    printf("type %d, cls %d, ttl %d, len %d\n", rr->type, rr->cls, rr->ttl,
-           rr->rdlength);
-    printf("rr->data %s\n", rr->data);
-    )
+                              len);
 
     return pos + rr->rdlength;
 }
 
+#if 1
 // Parse a set of resource records in the dns protocol in 'packet', starting
 // at 'pos'. The 'id_pos' offset is necessary for putting together 
 // compressed names. 'count' is the expected number of records of this type.
 // 'root' is where to assign the parsed list of objects.
 // Return 0 on error, the new 'pos' in the packet otherwise.
-uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos, 
+uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos, uint32_t len, 
                          uint8_t *packet, uint16_t count, 
                          dns_rr ** root) {
     dns_rr * last = NULL;
@@ -430,7 +678,7 @@ uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos,
         current = malloc(sizeof(dns_rr));
         current->next = NULL; current->name = NULL; current->data = NULL;
         
-        pos = parse_rr(pos, id_pos, header, packet, current, conf);
+        pos = parse_rr(pos, id_pos, len, packet, current);
         // If a non-recoverable error occurs when parsing an rr, 
         // we can only return what we've got and give up.
         if (pos == 0) {
@@ -444,6 +692,7 @@ uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos,
     }
     return pos;
 }
+#endif
 
 #if 0
 // Generates a hash from the current packet. 
@@ -506,9 +755,9 @@ int dedup(uint32_t pos, struct pcap_pkthdr *header, uint8_t * packet,
 // See dns_parse.h for more info.
 uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*dns packet len*/) {
     
-    int i;
+    //int i;
     uint32_t id_pos = pos;
-    dns_rr * last = NULL;
+   // dns_rr * last = NULL;
 
 		if (len < 12) {
 			fprintf(stderr,"Truncate Packet error! Not a complete dns packet!\n");
@@ -536,30 +785,17 @@ uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*
     dns->ancount = (packet[pos+6] << 8) + packet[pos+7];
     dns->nscount = (packet[pos+8] << 8) + packet[pos+9];
     dns->arcount = (packet[pos+10] << 8) + packet[pos+11];
-#if 0
-    SHOW_RAW(
-        printf("dns\n");
-        print_packet(header->len, packet, pos, header->len, 2);
-    )
-    VERBOSE(
-        printf("DNS id:%d, qr:%d, AA:%d, TC:%d, rcode:%d\n", 
-               dns->id, dns->qr, dns->AA, dns->TC, dns->rcode);
-        printf("DNS qdcount:%d, ancount:%d, nscount:%d, arcount:%d\n",
-               dns->qdcount, dns->ancount, dns->nscount, dns->arcount);
-    )
-#endif
     // Parse each type of records in turn.
-		pos = parse_questions(pos+12, id_pos, uint32_t len/*dns packet len*/, packet, 
+		pos = parse_questions(pos+12, id_pos, len/*dns packet len*/, packet, 
 				dns->qdcount, &(dns->queries));
-		pos = parse_rr_set(pos, id_pos, packet, 
-				dns->ancount, &(dns->answers), conf);
-		pos = parse_rr_set(pos, id_pos, packet, 
-				dns->nscount, &(dns->name_servers), conf);
-		pos = parse_rr_set(pos, id_pos, packet, 
-				dns->arcount, &(dns->additional), conf);
+		pos = parse_rr_set(pos, id_pos, len, packet, 
+				dns->ancount, &(dns->answers));
+		pos = parse_rr_set(pos, id_pos, len, packet, 
+				dns->nscount, &(dns->name_servers));
+		pos = parse_rr_set(pos, id_pos, len, packet, 
+				dns->arcount, &(dns->additional));
 		return pos;
 }
-
 
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
@@ -581,8 +817,6 @@ void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, i
 	dns->rd = 1;
 	dns->ra = 0;
 	dns->z = 0;
-	dns->ad = 0;
-	dns->cd = 0;
 	dns->rcode = 0;
 	dns->q_count = htons(1);
 	dns->ans_count = 0;
@@ -641,7 +875,7 @@ void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host)
 	dns[i-1]='\0'; //remove the last dot
 }
 
-
+#if 0
 static int do_parse_dns(struct resolver_result *result, unsigned char *buf)
 {
 #if 0
@@ -749,6 +983,7 @@ static int do_parse_dns(struct resolver_result *result, unsigned char *buf)
 #endif
 	return 0;
 }
+#endif
 
 void parse_dns(int fd, short events, void *arg)
 {
@@ -766,7 +1001,7 @@ void parse_dns(int fd, short events, void *arg)
 	}
 	
 #endif
-	do_parse_dns(result, buf);
+//	do_parse_dns(result, buf);
 }
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count)
