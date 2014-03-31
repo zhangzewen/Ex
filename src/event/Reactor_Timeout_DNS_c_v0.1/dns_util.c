@@ -753,7 +753,7 @@ int dedup(uint32_t pos, struct pcap_pkthdr *header, uint8_t * packet,
 // Parse the dns protocol in 'packet'. 
 // See RFC1035
 // See dns_parse.h for more info.
-uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*dns packet len*/) {
+uint32_t dns_parse(uint32_t pos, uint8_t *buf, dns_info * dns, uint32_t len/*dns packet len*/) {
     
     //int i;
     uint32_t id_pos = pos;
@@ -764,11 +764,11 @@ uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*
 			return -1;
 		}
 
-    dns->id = (packet[pos] << 8) + packet[pos+1];
-    dns->qr = packet[pos+2] >> 7;
-    dns->AA = (packet[pos+2] & 0x04) >> 2;
-    dns->TC = (packet[pos+2] & 0x02) >> 1;
-    dns->rcode = packet[pos + 3] & 0x0f;
+    dns->id = (buf[pos] << 8) + buf[pos+1];
+    dns->qr = buf[pos+2] >> 7;
+    dns->AA = (buf[pos+2] & 0x04) >> 2;
+    dns->TC = (buf[pos+2] & 0x02) >> 1;
+    dns->rcode = buf[pos + 3] & 0x0f;
     // rcodes > 5 indicate various protocol errors and redefine most of the 
     // remaining fields. Parsing this would hurt more than help. 
     if (dns->rcode > 5) {
@@ -785,15 +785,34 @@ uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*
     dns->ancount = (packet[pos+6] << 8) + packet[pos+7];
     dns->nscount = (packet[pos+8] << 8) + packet[pos+9];
     dns->arcount = (packet[pos+10] << 8) + packet[pos+11];
+
+
+		fprintf(stderr, "========================================\n");
+		fprintf(stderr, "DNS query: id = %d, q_count = %d, ancount = %d, nscount = %d, arcount = %d",
+						dns->id, dns->qdcount, dns->ancount, dns->nscount, dns->arcount);
+		fprintf(stderr, "========================================\n");
+		
+	
+		
+	
     // Parse each type of records in turn.
-		pos = parse_questions(pos+12, id_pos, len/*dns packet len*/, packet, 
+		
+		pos = parse_questions(pos+12, id_pos, len/*dns packet len*/, buf, 
 				dns->qdcount, &(dns->queries));
-		pos = parse_rr_set(pos, id_pos, len, packet, 
-				dns->ancount, &(dns->answers));
-		pos = parse_rr_set(pos, id_pos, len, packet, 
-				dns->nscount, &(dns->name_servers));
-		pos = parse_rr_set(pos, id_pos, len, packet, 
-				dns->arcount, &(dns->additional));
+		if (pos != 0) {
+			pos = parse_rr_set(pos, id_pos, len, buf, 
+					dns->ancount, &(dns->answers));
+		}
+
+		if (pos != 0) {	
+			pos = parse_rr_set(pos, id_pos, len, buf, 
+					dns->nscount, &(dns->name_servers));
+		}
+
+		if (pos != 0) {
+			pos = parse_rr_set(pos, id_pos, len, buf, 
+					dns->arcount, &(dns->additional));
+		}
 		return pos;
 }
 
@@ -987,9 +1006,9 @@ static int do_parse_dns(struct resolver_result *result, unsigned char *buf)
 
 void parse_dns(int fd, short events, void *arg)
 {
-#if 0
 	struct resolver_result* result = (struct resolver_result *)arg;
 	unsigned char buf[65536] = {0};
+	dns_info dns;
 	ssize_t nread = 0;
 
 	//read data
@@ -999,9 +1018,7 @@ void parse_dns(int fd, short events, void *arg)
 		fprintf(stderr, "Wrong Dns response!\n");
 		return ;
 	}
-	
-#endif
-//	do_parse_dns(result, buf);
+	dns_parse(0, &dns, buf, nread);
 }
 
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count)
