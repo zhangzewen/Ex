@@ -140,17 +140,17 @@ typedef void (*ADD_STAT)(const char *key, const uint16_t klen,
  * Possible states of a connection.
  */
 enum conn_states {
-    conn_listening,  /**< the socket which listens for connections */
-    conn_new_cmd,    /**< Prepare connection for next command */
-    conn_waiting,    /**< waiting for a readable socket */
-    conn_read,       /**< reading in a command line */
-    conn_parse_cmd,  /**< try to parse a command from the input buffer */
-    conn_write,      /**< writing out a simple response */
-    conn_nread,      /**< reading in a fixed number of bytes */
-    conn_swallow,    /**< swallowing unnecessary bytes w/o storing */
-    conn_closing,    /**< closing this connection */
-    conn_mwrite,     /**< writing out many items sequentially */
-    conn_max_state   /**< Max state value (used for assertion) */
+    conn_listening,  /**< the socket which listens for connections */ /*套接字监听端口，等待新的连接*/
+    conn_new_cmd,    /**< Prepare connection for next command *//*准备下一次命令的连接*/
+    conn_waiting,    /**< waiting for a readable socket *//*等待可读套接字*/
+    conn_read,       /**< reading in a command line *//*读入命令行*/
+    conn_parse_cmd,  /**< try to parse a command from the input buffer *//*从输入缓冲区中分析命令*/
+    conn_write,      /**< writing out a simple response *//*响应写出*/
+    conn_nread,      /**< reading in a fixed number of bytes *//*读入固定大小的字节*/
+    conn_swallow,    /**< swallowing unnecessary bytes w/o storing *//*去除不必要的存储字节*/
+    conn_closing,    /**< closing this connection *//*关闭连接*/
+    conn_mwrite,     /**< writing out many items sequentially *//*循序写item*/
+    conn_max_state   /**< Max state value (used for assertion) *//*最大的状态值，用于状态断言*/
 };
 
 enum bin_substates {

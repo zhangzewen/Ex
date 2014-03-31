@@ -94,11 +94,15 @@ unsigned int slabs_clsid(const size_t size) {
  */
 void slabs_init(const size_t limit, const double factor, const bool prealloc) {
     int i = POWER_SMALLEST - 1;
-    unsigned int size = sizeof(item) + settings.chunk_size;
+    unsigned int size = sizeof(item) + settings.chunk_size; //这里的item，开始以为是个变量，其实是struct _stritem 每个chunk的大小就是信息+数据块
 
-    mem_limit = limit;
+		mem_limit = limit;
 
-    if (prealloc) {
+		if (settings.verbose > 1) {
+			fprintf(stderr, "prealloc = %d\n", prealloc);
+		}
+
+		if (prealloc) { //是否预先分配内存
         /* Allocate everything in a big chunk with malloc */
         mem_base = malloc(mem_limit);
         if (mem_base != NULL) {

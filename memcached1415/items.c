@@ -13,6 +13,33 @@
 #include <time.h>
 #include <assert.h>
 
+
+/*
+*1,首先,计算该item占用的空间大小.一个item的大小包括它的item结构体大小部分、名字长度部分、状态标识部分、内容大小部分等的总和.看item_make_header 函数
+*
+*2.然后寻找合适的slab用于存储，主要比较item和slab桶的大小，寻找最合适slab, 查看slabs_clsid
+*
+*3.然后从对应的slab的tail队列中寻找是否存在过期的item， 如果有，清除掉
+*
+*4.如果第3步操作失败,并且在对应slab中分配空间失败,那么从slab对应的tail队列中删除没有被引用的item,且最多也是尝试50次
+*
+*5. 尝试从slab中分配空间
+*
+*6.如果第5步失败,会从slab对应的tail队列中删除3个小时(默认)之前的正在引用的item
+*
+*7. 然后尝试从slab中分配空间。如果失败,返回NULL,成功则会设置item对应的一些信息,返回成功标识
+*
+* item 的删除的过程
+*
+*1.设置已被删除状态。并从hash表中删除,次部分代码调用的是  memcache源码分析之assoc   中介绍到的函数assoc_delete
+*
+*2. 从LRU链中删除。函数item_unlink_q
+*
+*3. 如果要清除item占用的资源,则调用函数do_item_remove和item_free,释放占用内存空间
+*
+*http://www.cnblogs.com/xianbei/archive/2011/01/18/1924893.html
+*/
+
 /* Forward Declarations */
 static void item_link_q(item *it);
 static void item_unlink_q(item *it);
@@ -77,6 +104,7 @@ uint64_t get_cas_id(void) {
  *
  * Returns the total size of the header.
  */
+//计算item占用空间的大小
 static size_t item_make_header(const uint8_t nkey, const int flags, const int nbytes,
                      char *suffix, uint8_t *nsuffix) {
     /* suffix is defined at 40 chars elsewhere.. */
@@ -85,6 +113,7 @@ static size_t item_make_header(const uint8_t nkey, const int flags, const int nb
 }
 
 /*@null@*/
+//分配一个item空间
 item *do_item_alloc(char *key, const size_t nkey, const int flags,
                     const rel_time_t exptime, const int nbytes,
                     const uint32_t cur_hv) {
@@ -215,10 +244,11 @@ item *do_item_alloc(char *key, const size_t nkey, const int flags,
     return it;
 }
 
+//释放item
 void item_free(item *it) {
     size_t ntotal = ITEM_ntotal(it);
     unsigned int clsid;
-    assert((it->it_flags & ITEM_LINKED) == 0);
+    assert((it->it_flags & ITEM_LINKED) == 0);//没有在hash表和LUR链中
     assert(it != heads[it->slabs_clsid]);
     assert(it != tails[it->slabs_clsid]);
     assert(it->refcount == 0);
@@ -234,6 +264,7 @@ void item_free(item *it) {
  * Returns true if an item will fit in the cache (its size does not exceed
  * the maximum for a cache entry.)
  */
+//检验item是否有合适的slab来存储
 bool item_size_ok(const size_t nkey, const int flags, const int nbytes) {
     char prefix[40];
     uint8_t nsuffix;
@@ -247,10 +278,11 @@ bool item_size_ok(const size_t nkey, const int flags, const int nbytes) {
     return slabs_clsid(ntotal) != 0;
 }
 
+//键入LRU队列，形成新的head
 static void item_link_q(item *it) { /* item is the new head */
     item **head, **tail;
-    assert(it->slabs_clsid < LARGEST_ID);
-    assert((it->it_flags & ITEM_SLABBED) == 0);
+    assert(it->slabs_clsid < LARGEST_ID); //判断所设置的slab是否有效
+    assert((it->it_flags & ITEM_SLABBED) == 0); //判断状态
 
     head = &heads[it->slabs_clsid];
     tail = &tails[it->slabs_clsid];
@@ -260,7 +292,7 @@ static void item_link_q(item *it) { /* item is the new head */
     it->next = *head;
     if (it->next) it->next->prev = it;
     *head = it;
-    if (*tail == 0) *tail = it;
+    if (*tail == 0) *tail = it; //只有tail为空时才加入
     sizes[it->slabs_clsid]++;
     return;
 }
@@ -288,23 +320,24 @@ static void item_unlink_q(item *it) {
     return;
 }
 
+//将item加入到hashtable和LRU链中
 int do_item_link(item *it, const uint32_t hv) {
     MEMCACHED_ITEM_LINK(ITEM_key(it), it->nkey, it->nbytes);
-    assert((it->it_flags & (ITEM_LINKED|ITEM_SLABBED)) == 0);
+    assert((it->it_flags & (ITEM_LINKED|ITEM_SLABBED)) == 0); //判断状态，即没有在hash表LRU链中或被释放
     mutex_lock(&cache_lock);
-    it->it_flags |= ITEM_LINKED;
-    it->time = current_time;
+    it->it_flags |= ITEM_LINKED; //设置linked状态
+    it->time = current_time;//设置最近访问的时间
 
     STATS_LOCK();
-    stats.curr_bytes += ITEM_ntotal(it);
+    stats.curr_bytes += ITEM_ntotal(it); //增加每个item所需要的字节大小，包括item结构体和item内容大小
     stats.curr_items += 1;
     stats.total_items += 1;
     STATS_UNLOCK();
 
     /* Allocate a new CAS ID on link. */
-    ITEM_set_cas(it, (settings.use_cas) ? get_cas_id() : 0);
-    assoc_insert(it, hv);
-    item_link_q(it);
+    ITEM_set_cas(it, (settings.use_cas) ? get_cas_id() : 0); //设置新CAS，CAS是memcache用来处理并发请求的一种机制
+    assoc_insert(it, hv);//插入hashtable
+    item_link_q(it); //加入LRU链
     refcount_incr(&it->refcount);
     mutex_unlock(&cache_lock);
 
@@ -315,13 +348,13 @@ void do_item_unlink(item *it, const uint32_t hv) {
     MEMCACHED_ITEM_UNLINK(ITEM_key(it), it->nkey, it->nbytes);
     mutex_lock(&cache_lock);
     if ((it->it_flags & ITEM_LINKED) != 0) {
-        it->it_flags &= ~ITEM_LINKED;
+        it->it_flags &= ~ITEM_LINKED;//设置为非linked
         STATS_LOCK();
         stats.curr_bytes -= ITEM_ntotal(it);
         stats.curr_items -= 1;
         STATS_UNLOCK();
-        assoc_delete(ITEM_key(it), it->nkey, hv);
-        item_unlink_q(it);
+        assoc_delete(ITEM_key(it), it->nkey, hv); //从hash表中删除
+        item_unlink_q(it); //从LRU链中删除
         do_item_remove(it);
     }
     mutex_unlock(&cache_lock);
@@ -518,6 +551,7 @@ void do_item_stats_sizes(ADD_STAT add_stats, void *c) {
 }
 
 /** wrapper around assoc_find which does the lazy expiration logic */
+//获取item
 item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
     //mutex_lock(&cache_lock);
     item *it = assoc_find(key, nkey, hv);
@@ -544,7 +578,7 @@ item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
             was_found++;
         }
     }
-
+//忽略比设置日期早的item
     if (it != NULL) {
         if (settings.oldest_live != 0 && settings.oldest_live <= current_time &&
             it->time <= settings.oldest_live) {
@@ -554,7 +588,7 @@ item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
             if (was_found) {
                 fprintf(stderr, " -nuked by flush");
             }
-        } else if (it->exptime != 0 && it->exptime <= current_time) {
+        } else if (it->exptime != 0 && it->exptime <= current_time) { // 过期
             do_item_unlink(it, hv);
             do_item_remove(it);
             it = NULL;
