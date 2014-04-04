@@ -222,6 +222,8 @@ char * A(const uint8_t * packet, uint32_t pos, uint32_t i,
      
     sprintf(data, "%d.%d.%d.%d", packet[pos], packet[pos+1],
                                  packet[pos+2], packet[pos+3]);
+		
+		fprintf(stderr, "\n[%s:%d] data = %s\n", __func__, __LINE__, data);
 
     return data;
 }
@@ -234,6 +236,7 @@ char * domain_name(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
     if (name == NULL) 
         name = mk_error("Bad DNS name: ", packet, pos, rdlength);
 
+		fprintf(stderr, "\n[%s:%d] name = %s\n", __func__, __LINE__, name);
     return name;
 }
 
@@ -354,6 +357,7 @@ char * AAAA(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
     sprintf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", ipv6[0], ipv6[1], ipv6[2],
                                                ipv6[3], ipv6[4], ipv6[5],
                                                ipv6[6], ipv6[7]);
+		fprintf(stderr, "\n[%s:%d] buffer = %s\n", __func__, __LINE__, buffer);
     return buffer;
 }
 
@@ -408,7 +412,7 @@ unsigned int PACKETS_SEEN = 0;
 rr_parser_container* find_parser(uint16_t cls, uint16_t rtype)
 {
 	unsigned int i = 0;
-	unsigned int pcount = 0;
+	unsigned int pcount = count_parsers();
 	rr_parser_container *found = NULL;
 
 	//Re-arrange the order of the parsers according to how often things are
@@ -457,12 +461,13 @@ uint32_t parse_questions(uint32_t pos, uint32_t id_pos, uint32_t len,
     dns_question * current;
     uint16_t i;
     *root = NULL;
-
+		//fprintf(stderr, "[%s:%d] pos = %d, id_pos = %d\n", __func__, __LINE__, pos, id_pos);
     for (i=0; i < count; i++) {
         current = malloc(sizeof(dns_question));
         current->next = NULL; current->name = NULL;
 
         current->name = read_rr_name(packet, &pos, id_pos, len);
+				//fprintf(stderr, "[%s:%d] pos = %d, id_pos = %d, name = %s\n", __func__, __LINE__, pos, id_pos, current->name);
         if (current->name == NULL || (pos + 2) >= len) {
             // Handle a bad DNS name.
             fprintf(stderr, "DNS question error\n");
@@ -486,6 +491,7 @@ uint32_t parse_questions(uint32_t pos, uint32_t id_pos, uint32_t len,
         last = current;
         pos = pos + 4;
 
+				//fprintf(stderr, "question->name : %s, question->type = %d, question->cls = %d\n", current->name, current->type, current->cls);
         //VERBOSE(printf("question->name: %s\n", current->name);)
         //VERBOSE(printf("type %d, cls %d\n", current->type, current->cls);)
    }
@@ -510,6 +516,7 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
     rr->data = NULL;
     
     rr->name = read_rr_name(packet, &pos, id_pos, len);
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     // Handle a bad rr name.
     // We still want to print the rest of the escaped rr data.
     if (rr->name == NULL) {
@@ -524,11 +531,14 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
         return 0;
     }
     
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     if ((len - pos) < 10 ) return 0;
     
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     rr->type = (packet[pos] << 8) + packet[pos+1];
     rr->rdlength = (packet[pos+8] << 8) + packet[pos + 9];
     // Handle edns opt RR's differently.
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     if (rr->type == 41) {
         rr->cls = 0;
         rr->ttl = 0;
@@ -549,9 +559,11 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
         pos = pos + 10;
     }
 
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     // Make sure the data for the record is actually there.
     // If not, escape and print the raw data.
     if (len < (rr_start + 10 + rr->rdlength)) {
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
         char * buffer;
         const char * msg = "Truncated rr: ";
         rr->data = escape_data(packet, rr_start, len);
@@ -562,9 +574,11 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
         return 0;
     }
     // Parse the resource record data.
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     rr->data = parser->parser(packet, pos, id_pos, rr->rdlength, 
                               len);
 
+		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     return pos + rr->rdlength;
 }
 
@@ -577,6 +591,7 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
 uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos, uint32_t len, 
                          uint8_t *packet, uint16_t count, 
                          dns_rr ** root) {
+		//fprintf(stderr, "[%s:%d] pos = %d, id_pos = %d\n", __func__, __LINE__, pos, id_pos);
     dns_rr * last = NULL;
     dns_rr * current;
     uint16_t i;
@@ -640,7 +655,7 @@ uint32_t dns_parse(uint32_t pos, uint8_t *buf, dns_info * dns, uint32_t len/*dns
 
 
 		fprintf(stderr, "========================================\n");
-		fprintf(stderr, "DNS query: id = %d, q_count = %d, ancount = %d, nscount = %d, arcount = %d",
+		fprintf(stderr, "DNS query: id = %d, q_count = %d, ancount = %d, nscount = %d, arcount = %d\n",
 						dns->id, dns->qdcount, dns->ancount, dns->nscount, dns->arcount);
 		fprintf(stderr, "========================================\n");
 		
@@ -651,20 +666,26 @@ uint32_t dns_parse(uint32_t pos, uint8_t *buf, dns_info * dns, uint32_t len/*dns
 		
 		pos = parse_questions(pos+12, id_pos, len/*dns packet len*/, buf, 
 				dns->qdcount, &(dns->queries));
+		fprintf(stderr, "pos = %d\n", pos);
+fprintf(stderr, "\n#######################################################################\n");
 		if (pos != 0) {
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->ancount, &(dns->answers));
 		}
-
+fprintf(stderr, "\n#######################################################################\n");
+#if 1
 		if (pos != 0) {	
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->nscount, &(dns->name_servers));
 		}
 
+fprintf(stderr, "\n#######################################################################\n");
 		if (pos != 0) {
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->arcount, &(dns->additional));
 		}
+fprintf(stderr, "\n#######################################################################\n");
+#endif
 		return pos;
 }
 
