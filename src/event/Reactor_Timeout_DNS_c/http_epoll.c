@@ -192,7 +192,7 @@ int epoll_add(struct epoll_loop *loop, struct event *ev)
 		op = EPOLL_CTL_MOD;
 	}
 
-	if (event_epoll->read != NULL) { //是不是已经注册的写事件
+	if (event_epoll->write != NULL) { //是不是已经注册的写事件
 		events |= EPOLLOUT;
 		op = EPOLL_CTL_MOD;
 	}

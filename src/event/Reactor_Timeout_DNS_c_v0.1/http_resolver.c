@@ -197,8 +197,8 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	create_dns_query(host, T_A, buf, &result->question_len);
 
 	result->key  =	NULL; 
-	
 	nwrite = write(fd, buf, (sizeof(struct dns_header) + (result->question_len + 1) + sizeof(struct question)));
+	//fprintf(stderr, "buff(len = %d):%s", (int)nwrite, buf );	
 	//nwrite = send(resolver->fd, buf, 65536, 0);
 	
 	if (nwrite < 0) {

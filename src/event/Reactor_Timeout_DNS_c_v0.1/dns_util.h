@@ -84,13 +84,15 @@ struct dns_header {
 	unsigned char qr :1;
 	
 	unsigned char rcode :4;
-	unsigned char z :3;
+	unsigned char cd :1;
+	unsigned char ad :1;
+	unsigned char z  :1;
 	unsigned char ra :1;
 
 	unsigned short q_count;
 	unsigned short ans_count;
 	unsigned short auth_count;
-	unsigned add_count;
+	unsigned short add_count;
 };
 
 struct question
@@ -99,8 +101,9 @@ struct question
 	unsigned short qclass;
 };
 
+void parse_dns(int fd, short events, void *arg);
+void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, int *question_len);
 
 
-uint32_t dns_parse(uint32_t pos, uint8_t *packet, dns_info * dns, uint32_t len/*dns packet len*/);
 
 #endif
