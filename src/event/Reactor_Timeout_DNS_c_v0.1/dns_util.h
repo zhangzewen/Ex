@@ -10,7 +10,6 @@
 #define T_MX 15
 
 
-#if 1
 typedef char *rr_data_parser(const uint8_t*, uint32_t, uint32_t, uint16_t, uint32_t);
 
 typedef struct{
@@ -31,10 +30,6 @@ rr_data_parser escape;
 
 extern rr_parser_container rr_parsers[];
 rr_parser_container default_rr_parse;
-
-void print_parsers();
-void print_parse_usage();
-#endif
 
 
 typedef struct dns_question {

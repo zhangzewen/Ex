@@ -582,7 +582,6 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
     return pos + rr->rdlength;
 }
 
-#if 1
 // Parse a set of resource records in the dns protocol in 'packet', starting
 // at 'pos'. The 'id_pos' offset is necessary for putting together 
 // compressed names. 'count' is the expected number of records of this type.
@@ -615,7 +614,6 @@ uint32_t parse_rr_set(uint32_t pos, uint32_t id_pos, uint32_t len,
     }
     return pos;
 }
-#endif
 
 // Parse the dns protocol in 'packet'. 
 // See RFC1035
@@ -667,25 +665,19 @@ uint32_t dns_parse(uint32_t pos, uint8_t *buf, dns_info * dns, uint32_t len/*dns
 		pos = parse_questions(pos+12, id_pos, len/*dns packet len*/, buf, 
 				dns->qdcount, &(dns->queries));
 		fprintf(stderr, "pos = %d\n", pos);
-fprintf(stderr, "\n#######################################################################\n");
 		if (pos != 0) {
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->ancount, &(dns->answers));
 		}
-fprintf(stderr, "\n#######################################################################\n");
-#if 1
 		if (pos != 0) {	
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->nscount, &(dns->name_servers));
 		}
 
-fprintf(stderr, "\n#######################################################################\n");
 		if (pos != 0) {
 			pos = parse_rr_set(pos, id_pos, len, buf, 
 					dns->arcount, &(dns->additional));
 		}
-fprintf(stderr, "\n#######################################################################\n");
-#endif
 		return pos;
 }
 
