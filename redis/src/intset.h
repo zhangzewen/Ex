@@ -33,8 +33,11 @@
 #include <stdint.h>
 
 typedef struct intset {
+		//保存元素所使用的类型的长度
     uint32_t encoding;
+		//元素个数
     uint32_t length;
+		//保存元素的数组
     int8_t contents[];
 } intset;
 
@@ -46,5 +49,6 @@ int64_t intsetRandom(intset *is);
 uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);
 uint32_t intsetLen(intset *is);
 size_t intsetBlobLen(intset *is);
+uint8_t intsetSearch(intset *is, int64_t value, uint32_t *pos);
 
 #endif // __INTSET_H

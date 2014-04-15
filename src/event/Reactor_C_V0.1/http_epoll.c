@@ -9,6 +9,7 @@
 #include <string.h>
 #include "event_base.h"
 #include "http_epoll.h"
+#include "event.h"
 struct epoll_loop  *epoll_init(struct event_base *base)
 {
 	int epfd;

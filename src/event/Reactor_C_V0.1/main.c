@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 
 #include "http_epoll.h"
-#include "http_buffer.h"
+#include "evbuf.h"
 #include "http_parse.h"
 #include "http_request.h"
 #include "event.h"
@@ -48,9 +48,9 @@ void ServerRead(int fd, short events, void *arg)
 	
 	int nread = 0;
 	
-	nread = buffer_read(r->buffer, fd, 12);
+	nread = evbuffer_read(r->buffer, fd, 12);
 	if (nread  == -1) {
-		event_del(&ev);
+		event_del(ev);
 	}
 	//printf("\n----------------------------------------\n");
 	//printf("ev->buffer->off: %d", r->buffer->off);
@@ -72,7 +72,7 @@ void ServerRead(int fd, short events, void *arg)
 	write(fd ,return_ok, sizeof(return_ok));
 	close(fd);
 
-//	event_del(&ev);
+	event_del(ev);
 }
 
 void ServerAccept(int fd, short events, void *arg)
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 	flags |= O_NONBLOCK;
 	fcntl(listen_fd, F_SETFL, flags);
 
-	event_set(&ev, listen_fd ,EV_READ | EV_PERSIST, ServerAccept, (void *)&ev);
+	event_set(&ev, listen_fd ,EV_READ | EV_PERSIST, ServerAccept, (void *)&ev, NULL);
 
 	event_add(&ev, NULL);
 

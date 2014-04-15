@@ -31,6 +31,7 @@
 #include "slowlog.h"
 #include "bio.h"
 
+#include <syslog.h>
 #include <time.h>
 #include <signal.h>
 #include <sys/wait.h>
@@ -258,6 +259,7 @@ struct redisCommand redisCommandTable[] = {
 /* Low level logging. To use only for very big messages, otherwise
  * redisLog() is to prefer. */
 void redisLogRaw(int level, const char *msg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const int syslogLevelMap[] = { LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING };
     const char *c = ".-*#";
     FILE *fp;
@@ -292,6 +294,7 @@ void redisLogRaw(int level, const char *msg) {
  * is used across the code. The raw version is only used in order to dump
  * the INFO output on crash. */
 void redisLog(int level, const char *fmt, ...) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     va_list ap;
     char msg[REDIS_MAX_LOGMSG_LEN];
 
@@ -311,6 +314,7 @@ void redisLog(int level, const char *fmt, ...) {
  * of view of Redis. Signals that are going to kill the server anyway and
  * where we need printf-alike features are served by redisLog(). */
 void redisLogFromHandler(int level, const char *msg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int fd;
     char buf[64];
 
@@ -335,6 +339,7 @@ err:
 
 /* Return the UNIX time in microseconds */
 long long ustime(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval tv;
     long long ust;
 
@@ -346,6 +351,7 @@ long long ustime(void) {
 
 /* Return the UNIX time in milliseconds */
 long long mstime(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return ustime()/1000;
 }
 
@@ -354,6 +360,7 @@ long long mstime(void) {
  * the parent process. However if we are testing the coverage normal exit() is
  * used in order to obtain the right coverage information. */
 void exitFromChild(int retcode) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #ifdef COVERAGE_TEST
     exit(retcode);
 #else
@@ -369,12 +376,14 @@ void exitFromChild(int retcode) {
 
 void dictVanillaFree(void *privdata, void *val)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     DICT_NOTUSED(privdata);
     zfree(val);
 }
 
 void dictListDestructor(void *privdata, void *val)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     DICT_NOTUSED(privdata);
     listRelease((list*)val);
 }
@@ -382,6 +391,7 @@ void dictListDestructor(void *privdata, void *val)
 int dictSdsKeyCompare(void *privdata, const void *key1,
         const void *key2)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int l1,l2;
     DICT_NOTUSED(privdata);
 
@@ -396,6 +406,7 @@ int dictSdsKeyCompare(void *privdata, const void *key1,
 int dictSdsKeyCaseCompare(void *privdata, const void *key1,
         const void *key2)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     DICT_NOTUSED(privdata);
 
     return strcasecmp(key1, key2) == 0;
@@ -403,6 +414,7 @@ int dictSdsKeyCaseCompare(void *privdata, const void *key1,
 
 void dictRedisObjectDestructor(void *privdata, void *val)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     DICT_NOTUSED(privdata);
 
     if (val == NULL) return; /* Values of swapped out keys as set to NULL */
@@ -411,6 +423,7 @@ void dictRedisObjectDestructor(void *privdata, void *val)
 
 void dictSdsDestructor(void *privdata, void *val)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     DICT_NOTUSED(privdata);
 
     sdsfree(val);
@@ -419,26 +432,31 @@ void dictSdsDestructor(void *privdata, void *val)
 int dictObjKeyCompare(void *privdata, const void *key1,
         const void *key2)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const robj *o1 = key1, *o2 = key2;
     return dictSdsKeyCompare(privdata,o1->ptr,o2->ptr);
 }
 
 unsigned int dictObjHash(const void *key) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const robj *o = key;
     return dictGenHashFunction(o->ptr, sdslen((sds)o->ptr));
 }
 
 unsigned int dictSdsHash(const void *key) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return dictGenHashFunction((unsigned char*)key, sdslen((char*)key));
 }
 
 unsigned int dictSdsCaseHash(const void *key) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return dictGenCaseHashFunction((unsigned char*)key, sdslen((char*)key));
 }
 
 int dictEncObjKeyCompare(void *privdata, const void *key1,
         const void *key2)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     robj *o1 = (robj*) key1, *o2 = (robj*) key2;
     int cmp;
 
@@ -455,6 +473,7 @@ int dictEncObjKeyCompare(void *privdata, const void *key1,
 }
 
 unsigned int dictEncObjHash(const void *key) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     robj *o = (robj*) key;
 
     if (o->encoding == REDIS_ENCODING_RAW) {
@@ -560,6 +579,7 @@ dictType keylistDictType = {
 };
 
 int htNeedsResize(dict *dict) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     long long size, used;
 
     size = dictSlots(dict);
@@ -571,6 +591,7 @@ int htNeedsResize(dict *dict) {
 /* If the percentage of used slots in the HT reaches REDIS_HT_MINFILL
  * we resize the hash table to save memory */
 void tryResizeHashTables(int dbid) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (htNeedsResize(server.db[dbid].dict))
         dictResize(server.db[dbid].dict);
     if (htNeedsResize(server.db[dbid].expires))
@@ -585,6 +606,7 @@ void tryResizeHashTables(int dbid) {
  * The function returns 1 if some rehashing was performed, otherwise 0
  * is returned. */
 int incrementallyRehash(int dbid) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* Keys dictionary */
     if (dictIsRehashing(server.db[dbid].dict)) {
         dictRehashMilliseconds(server.db[dbid].dict,1);
@@ -605,6 +627,7 @@ int incrementallyRehash(int dbid) {
  * for dict.c to resize the hash tables accordingly to the fact we have o not
  * running childs. */
 void updateDictResizePolicy(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (server.rdb_child_pid == -1 && server.aof_child_pid == -1)
         dictEnableResize();
     else
@@ -625,6 +648,7 @@ void updateDictResizePolicy(void) {
  * The parameter 'now' is the current time in milliseconds as is passed
  * to the function to avoid too many gettimeofday() syscalls. */
 int activeExpireCycleTryExpire(redisDb *db, struct dictEntry *de, long long now) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     long long t = dictGetSignedIntegerVal(de);
     if (now > t) {
         sds key = dictGetKey(de);
@@ -663,6 +687,7 @@ int activeExpireCycleTryExpire(redisDb *db, struct dictEntry *de, long long now)
  * as specified by the REDIS_EXPIRELOOKUPS_TIME_PERC define. */
 
 void activeExpireCycle(int type) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* This function has some global state in order to continue the work
      * incrementally across calls. */
     static unsigned int current_db = 0; /* Last DB tested. */
@@ -780,6 +805,7 @@ void activeExpireCycle(int type) {
 }
 
 void updateLRUClock(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     server.lruclock = (server.unixtime/REDIS_LRU_CLOCK_RESOLUTION) &
                                                 REDIS_LRU_CLOCK_MAX;
 }
@@ -787,6 +813,7 @@ void updateLRUClock(void) {
 
 /* Add a sample to the operations per second array of samples. */
 void trackOperationsPerSecond(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     long long t = mstime() - server.ops_sec_last_sample_time;
     long long ops = server.stat_numcommands - server.ops_sec_last_sample_ops;
     long long ops_sec;
@@ -801,6 +828,7 @@ void trackOperationsPerSecond(void) {
 
 /* Return the mean of all the samples. */
 long long getOperationsPerSecond(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
     long long sum = 0;
 
@@ -811,6 +839,7 @@ long long getOperationsPerSecond(void) {
 
 /* Check for timeouts. Returns non-zero if the client was terminated */
 int clientsCronHandleTimeout(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t now = server.unixtime;
 
     if (server.maxidletime &&
@@ -838,6 +867,7 @@ int clientsCronHandleTimeout(redisClient *c) {
  *
  * The function always returns 0 as it never terminates the client. */
 int clientsCronResizeQueryBuffer(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t querybuf_size = sdsAllocSize(c->querybuf);
     time_t idletime = server.unixtime - c->lastinteraction;
 
@@ -860,6 +890,7 @@ int clientsCronResizeQueryBuffer(redisClient *c) {
 }
 
 void clientsCron(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* Make sure to process at least 1/(server.hz*10) of clients per call.
      * Since this function is called server.hz times per second we are sure that
      * in the worst case we process all the clients in 10 seconds.
@@ -892,6 +923,7 @@ void clientsCron(void) {
  * incrementally in Redis databases, such as active key expiring, resizing,
  * rehashing. */
 void databasesCron(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* Expire keys by random sampling. Not required for slaves
      * as master will synthesize DELs for us. */
     if (server.active_expire_enabled && server.masterhost == NULL)
@@ -953,6 +985,7 @@ void databasesCron(void) {
  */
 
 int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
     REDIS_NOTUSED(eventLoop);
     REDIS_NOTUSED(id);
@@ -1123,6 +1156,7 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
  * main loop of the event driven library, that is, before to sleep
  * for ready file descriptors. */
 void beforeSleep(struct aeEventLoop *eventLoop) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     REDIS_NOTUSED(eventLoop);
     listNode *ln;
     redisClient *c;
@@ -1153,6 +1187,7 @@ void beforeSleep(struct aeEventLoop *eventLoop) {
 /* =========================== Server initialization ======================== */
 
 void createSharedObjects(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
 
     shared.crlf = createObject(REDIS_STRING,sdsnew("\r\n"));
@@ -1224,6 +1259,7 @@ void createSharedObjects(void) {
 }
 
 void initServerConfig() {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     getRandomHexChars(server.runid,REDIS_RUN_ID_SIZE);
     server.hz = REDIS_DEFAULT_HZ;
     server.runid[REDIS_RUN_ID_SIZE] = '\0';
@@ -1360,6 +1396,7 @@ void initServerConfig() {
  * max number of clients, the function will do the reverse setting
  * server.maxclients to the value that we can actually handle. */
 void adjustOpenFilesLimit(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     rlim_t maxfiles = server.maxclients+32;
     struct rlimit limit;
 
@@ -1396,9 +1433,10 @@ void adjustOpenFilesLimit(void) {
 }
 
 void initServer() {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
 
-    signal(SIGHUP, SIG_IGN);
+    signal(SIGHUP, SIG_IGN); // in nginx  for reload ,wonder if redis can do this?
     signal(SIGPIPE, SIG_IGN);
     setupSignalHandlers();
 
@@ -1517,6 +1555,7 @@ void initServer() {
 /* Populates the Redis Command Table starting from the hard coded list
  * we have on top of redis.c file. */
 void populateCommandTable(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
     int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
 
@@ -1553,6 +1592,7 @@ void populateCommandTable(void) {
 }
 
 void resetCommandTableStats(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
     int j;
 
@@ -1567,6 +1607,7 @@ void resetCommandTableStats(void) {
 /* ========================== Redis OP Array API ============================ */
 
 void redisOpArrayInit(redisOpArray *oa) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     oa->ops = NULL;
     oa->numops = 0;
 }
@@ -1574,6 +1615,7 @@ void redisOpArrayInit(redisOpArray *oa) {
 int redisOpArrayAppend(redisOpArray *oa, struct redisCommand *cmd, int dbid,
                        robj **argv, int argc, int target)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     redisOp *op;
 
     oa->ops = zrealloc(oa->ops,sizeof(redisOp)*(oa->numops+1));
@@ -1588,6 +1630,7 @@ int redisOpArrayAppend(redisOpArray *oa, struct redisCommand *cmd, int dbid,
 }
 
 void redisOpArrayFree(redisOpArray *oa) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     while(oa->numops) {
         int j;
         redisOp *op;
@@ -1604,10 +1647,12 @@ void redisOpArrayFree(redisOpArray *oa) {
 /* ====================== Commands lookup and execution ===================== */
 
 struct redisCommand *lookupCommand(sds name) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return dictFetchValue(server.commands, name);
 }
 
 struct redisCommand *lookupCommandByCString(char *s) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct redisCommand *cmd;
     sds name = sdsnew(s);
 
@@ -1624,6 +1669,7 @@ struct redisCommand *lookupCommandByCString(char *s) {
  * rewriteClientCommandVector() in order to set client->cmd pointer
  * correctly even if the command was renamed. */
 struct redisCommand *lookupCommandOrOriginal(sds name) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct redisCommand *cmd = dictFetchValue(server.commands, name);
 
     if (!cmd) cmd = dictFetchValue(server.orig_commands,name);
@@ -1641,6 +1687,7 @@ struct redisCommand *lookupCommandOrOriginal(sds name) {
 void propagate(struct redisCommand *cmd, int dbid, robj **argv, int argc,
                int flags)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (server.aof_state != REDIS_AOF_OFF && flags & REDIS_PROPAGATE_AOF)
         feedAppendOnlyFile(cmd,dbid,argv,argc);
     if (flags & REDIS_PROPAGATE_REPL && listLength(server.slaves))
@@ -1652,11 +1699,13 @@ void propagate(struct redisCommand *cmd, int dbid, robj **argv, int argc,
 void alsoPropagate(struct redisCommand *cmd, int dbid, robj **argv, int argc,
                    int target)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     redisOpArrayAppend(&server.also_propagate,cmd,dbid,argv,argc,target);
 }
 
 /* Call() is the core of Redis execution of a command */
 void call(redisClient *c, int flags) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     long long dirty, start = ustime(), duration;
 
     /* Sent the command to clients in MONITOR mode, only if the commands are
@@ -1725,6 +1774,7 @@ void call(redisClient *c, int flags) {
  * other operations can be performed by the caller. Otherwise
  * if 0 is returned the client was destroyed (i.e. after QUIT). */
 int processCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* The QUIT command is handled separately. Normal command procs will
      * go through checking for replication and QUIT will cause trouble
      * when FORCE_REPLICATION is enabled and would be implemented in
@@ -1856,6 +1906,7 @@ int processCommand(redisClient *c) {
 /*================================== Shutdown =============================== */
 
 int prepareForShutdown(int flags) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int save = flags & REDIS_SHUTDOWN_SAVE;
     int nosave = flags & REDIS_SHUTDOWN_NOSAVE;
 
@@ -1921,6 +1972,7 @@ int prepareForShutdown(int flags) {
  * possible branch misprediction related leak.
  */
 int time_independent_strcmp(char *a, char *b) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char bufa[REDIS_AUTHPASS_MAX_LEN], bufb[REDIS_AUTHPASS_MAX_LEN];
     /* The above two strlen perform len(a) + len(b) operations where either
      * a or b are fixed (our password) length, and the difference is only
@@ -1954,6 +2006,7 @@ int time_independent_strcmp(char *a, char *b) {
 }
 
 void authCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (!server.requirepass) {
         addReplyError(c,"Client sent AUTH, but no password is set");
     } else if (!time_independent_strcmp(c->argv[1]->ptr, server.requirepass)) {
@@ -1966,14 +2019,17 @@ void authCommand(redisClient *c) {
 }
 
 void pingCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     addReply(c,shared.pong);
 }
 
 void echoCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     addReplyBulk(c,c->argv[1]);
 }
 
 void timeCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval tv;
 
     /* gettimeofday() can only fail if &tv is a bad address so we
@@ -1987,6 +2043,7 @@ void timeCommand(redisClient *c) {
 /* Convert an amount of bytes into a human readable string in the form
  * of 100B, 2G, 100M, 4K, and so forth. */
 void bytesToHuman(char *s, unsigned long long n) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     double d;
 
     if (n < 1024) {
@@ -2009,6 +2066,7 @@ void bytesToHuman(char *s, unsigned long long n) {
  * by the INFO command itself as we need to report the same information
  * on memory corruption problems. */
 sds genRedisInfoString(char *section) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     sds info = sdsempty();
     time_t uptime = server.unixtime-server.stat_starttime;
     int j, numcommands;
@@ -2361,6 +2419,7 @@ sds genRedisInfoString(char *section) {
 }
 
 void infoCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *section = c->argc == 2 ? c->argv[1]->ptr : "default";
 
     if (c->argc > 2) {
@@ -2375,6 +2434,7 @@ void infoCommand(redisClient *c) {
 }
 
 void monitorCommand(redisClient *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* ignore MONITOR if already slave or in monitor mode */
     if (c->flags & REDIS_SLAVE) return;
 
@@ -2402,6 +2462,7 @@ void monitorCommand(redisClient *c) {
  * used by the server.
  */
 int freeMemoryIfNeeded(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t mem_used, mem_tofree, mem_freed;
     int slaves = listLength(server.slaves);
 
@@ -2546,6 +2607,7 @@ int freeMemoryIfNeeded(void) {
 
 #ifdef __linux__
 int linuxOvercommitMemoryValue(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     FILE *fp = fopen("/proc/sys/vm/overcommit_memory","r");
     char buf[64];
 
@@ -2560,6 +2622,7 @@ int linuxOvercommitMemoryValue(void) {
 }
 
 void linuxOvercommitMemoryWarning(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (linuxOvercommitMemoryValue() == 0) {
         redisLog(REDIS_WARNING,"WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.");
     }
@@ -2567,6 +2630,7 @@ void linuxOvercommitMemoryWarning(void) {
 #endif /* __linux__ */
 
 void createPidFile(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* Try to write the pid file in a best-effort way. */
     FILE *fp = fopen(server.pidfile,"w");
     if (fp) {
@@ -2576,6 +2640,7 @@ void createPidFile(void) {
 }
 
 void daemonize(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int fd;
 
     if (fork() != 0) exit(0); /* parent exits */
@@ -2646,6 +2711,7 @@ static void sigtermHandler(int sig) {
 }
 
 void setupSignalHandlers(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct sigaction act;
 
     /* When the SA_SIGINFO flag is set in sa_flags then sa_sigaction is used.
@@ -2672,6 +2738,7 @@ void memtest(size_t megabytes, int passes);
 /* Returns 1 if there is --sentinel among the arguments or if
  * argv[0] is exactly "redis-sentinel". */
 int checkForSentinelMode(int argc, char **argv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int j;
 
     if (strstr(argv[0],"redis-sentinel") != NULL) return 1;
@@ -2682,6 +2749,7 @@ int checkForSentinelMode(int argc, char **argv) {
 
 /* Function called at startup to load RDB or AOF file in memory. */
 void loadDataFromDisk(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     long long start = ustime();
     if (server.aof_state == REDIS_AOF_ON) {
         if (loadAppendOnlyFile(server.aof_filename) == REDIS_OK)
@@ -2698,12 +2766,14 @@ void loadDataFromDisk(void) {
 }
 
 void redisOutOfMemoryHandler(size_t allocation_size) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     redisLog(REDIS_WARNING,"Out Of Memory allocating %zu bytes!",
         allocation_size);
     redisPanic("Redis aborting for OUT OF MEMORY");
 }
 
 int main(int argc, char **argv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval tv;
 
     /* We need to initialize our libraries, and the server configuration. */
