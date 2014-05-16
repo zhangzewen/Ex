@@ -1,7 +1,7 @@
 #ifndef _HTTP_REQUEST_H_INCLUDED_
 #define _HTTP_REQUEST_H_INCLUDED_
 
-#include "evbuf.h"
+#include "http_buffer.h"
 
 typedef struct http_request_st http_request_t;
 typedef struct http_connection_st http_connection_t;
@@ -9,10 +9,9 @@ typedef struct http_connection_st http_connection_t;
 struct http_connection_st{
 	struct event *read; //accept后读事件
 	struct event *write;//这个暂时做NULL处理
-	struct evbuffer *buffer;
+	struct http_buffer *buffer;
 	int fd;
-	
-	http_request_t *r;
+	struct http_request_st *r;
 };
 
 struct http_request_st{
@@ -33,6 +32,8 @@ struct http_request_st{
 	char *value_start;
 	char *value_end;
 	char *tmp;
+	int http_major;
+	int http_minor;
 	
 	int parse_state;
 

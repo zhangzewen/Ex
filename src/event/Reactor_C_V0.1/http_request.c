@@ -1,5 +1,6 @@
 #include "http_request.h"
 #include "Define_Macro.h"
+#include "event_base.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -45,10 +46,8 @@ http_connection_t *init_connection()
 		return NULL;
 	}
 
-	c->read = NULL;
-	c->write = NULL;
-	c->r = NULL;
-
+	c->read = calloc(1, sizeof(struct event));
+	c->write = calloc(1, sizeof(struct event));
 	c->fd = -1;
 	
 	return c;

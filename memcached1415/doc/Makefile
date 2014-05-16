@@ -74,17 +74,17 @@ am__installdirs = "$(DESTDIR)$(man1dir)"
 NROFF = nroff
 MANS = $(man_MANS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run aclocal-1.11
-AMTAR = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run tar
-AUTOCONF = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run autoconf
-AUTOHEADER = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run autoheader
-AUTOMAKE = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run automake-1.11
+ACLOCAL = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run aclocal-1.11
+AMTAR = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run tar
+AUTOCONF = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run automake-1.11
 AWK = gawk
 CC = gcc -std=gnu99
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 -pthread -pthread -Wall -Werror -pedantic -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
 CPP = gcc -E
-CPPFLAGS = -I/usr/local/libevent//include 
+CPPFLAGS = -I/usr/local/libevent144/include 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -93,21 +93,21 @@ DTRACEFLAGS =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 ENABLE_SASL = 
 EXEEXT = 
-GREP = /bin/grep
+GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -L/usr/local/libevent//lib  -Wl,-rpath,/usr/local/libevent//lib
+LDFLAGS = -L/usr/local/libevent144/lib  -Wl,-rpath,/usr/local/libevent144/lib
 LIBOBJS = 
-LIBS = -levent -lrt 
+LIBS = -levent 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /root/GitHub/Http/trunk/memcached1415/missing --run makeinfo
-MKDIR_P = /bin/mkdir -p
+MAKEINFO = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/missing --run makeinfo
+MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = memcached
 PACKAGE_BUGREPORT = memcached@googlegroups.com
@@ -125,11 +125,11 @@ SHELL = /bin/sh
 STRIP = 
 VERSION = 1.4.15
 XML2RFC = no
-XSLTPROC = no
-abs_builddir = /root/GitHub/Http/trunk/memcached1415/doc
-abs_srcdir = /root/GitHub/Http/trunk/memcached1415/doc
-abs_top_builddir = /root/GitHub/Http/trunk/memcached1415
-abs_top_srcdir = /root/GitHub/Http/trunk/memcached1415
+XSLTPROC = /usr/bin/xsltproc
+abs_builddir = /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/doc
+abs_srcdir = /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/doc
+abs_top_builddir = /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415
+abs_top_srcdir = /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -156,13 +156,13 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /root/GitHub/Http/trunk/memcached1415/install-sh
+install_sh = ${SHELL} /home/zhangjie/Documents/GitHub/zewen/Ex/memcached1415/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
 mandir = ${datarootdir}/man
-mkdir_p = /bin/mkdir -p
+mkdir_p = /usr/bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr/local/memcached
@@ -428,10 +428,10 @@ uninstall-man: uninstall-man1
 	no $< $@
 
 %.chk: %.xml xml2rfc/rfc2629-refchk.xsl
-	no xml2rfc/rfc2629-refchk.xsl $< >$@
+	/usr/bin/xsltproc xml2rfc/rfc2629-refchk.xsl $< >$@
 
 %.full: %.xml xml2rfc/rfc2629-noinc.xsl
-	no xml2rfc/rfc2629-noinc.xsl $< >$@
+	/usr/bin/xsltproc xml2rfc/rfc2629-noinc.xsl $< >$@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

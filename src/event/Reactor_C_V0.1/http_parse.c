@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 #include "http_parse.h"
 #include "Define_Macro.h"
 #include <string.h>
@@ -59,6 +60,14 @@ int parse_http_request_line(http_request_t *r)
 				sw_spaces_after_uri,
 				sw_spaces_before_version,
 				sw_version,
+				sw_version_H,
+				sw_version_HT,
+				sw_version_HTT,
+				sw_version_HTTP,
+				sw_version_first_http_major,
+				sw_version_http_major,
+				sw_version_first_http_minor,
+				sw_version_http_minor,
 				sw_request_line_parse_almost_done,
 				sw_request_line_parse_done,
 				sw_key,
@@ -77,7 +86,7 @@ int parse_http_request_line(http_request_t *r)
 
     state = (r->parse_state == -1)? sw_start: r->parse_state;
 
-		for (p = r->buffer->pos; p != r->buffer->last; p++) {
+		for (p = r->c->buffer->pos; p != r->c->buffer->last; p++) {
 			ch = *p;
 
 			switch (state) {
@@ -137,18 +146,89 @@ int parse_http_request_line(http_request_t *r)
 
 				case sw_spaces_before_version:
 					if (ch == 'H') {
-						state = sw_version;
+						state = sw_version_H;
 						r->version_start = p;
 						break;
 					}
+				
+				case sw_version_H:
+					if (ch == 'T') {
+						state = sw_version_HT;
+						break;
+					} else {
+						fprintf(stderr ,"version parse error!\n");
+						return -1;
+					}
+				case sw_version_HT:
+					if (ch == 'T') {
+						state = sw_version_HTT;
+						break;
+					}else {
+						fprintf(stderr, "version parse error!\n");
+						return -1;
+					}
+				case sw_version_HTT:
+					if (ch == 'P') {
+						state = sw_version_HTTP;
+						break;
+					} else {
+						fprintf(stderr, "version parse error!\n");
+						return -1;
+					}
+				case sw_version_HTTP:
+					if (ch == '/') {
+						state = sw_version_first_http_major;	
+					}else {
+						fprintf(stderr, "version parse error!\n");
+					}
+					break;
+				case sw_version_first_http_major:
+					if (ch < '1' || ch > '9') {
+						fprintf(stderr, "version parse error!\n");
+						return -1;
+					}
+					r->http_major = ch - '0';
+					state = sw_version_http_major;
+					break;
 
-				case sw_version:
+				case sw_version_http_major:
+					if (ch == '.') {
+						state = sw_version_first_http_minor;
+						break;
+					}
+					
+					if (!isdigit(ch)) {
+						fprintf(stderr, "Invalid version!\n");
+						return -1;
+					}
+
+					r->http_major *= 10;
+					r->http_major += ch - '0';	
+					break;
+				case sw_version_first_http_minor:
+					if (ch < '0' || ch > '9') {
+						fprintf(stderr, "Invalid version!\n");
+						return -1;
+					}
+
+					r->http_minor = ch - '0';
+					state = sw_version_http_minor;
+					break;
+
+				case sw_version_http_minor:
 					if (ch == '\r') {
 						state = sw_request_line_parse_almost_done;
 						r->version_end = p;
 						do_version(r->version_start, r->version_end);
+						break;
 					}	
 
+					if (ch < '0' || ch > '9') {
+						fprintf(stderr, "Invalid version!\n");
+						return -1;
+					}
+
+					r->http_minor = r->http_minor * 10 + ch - '0';
 					break;
 				case sw_request_line_parse_almost_done:
 					if (ch == '\n') {
@@ -245,7 +325,7 @@ int parse_http_request_line(http_request_t *r)
 		}
 
 		r->parse_state = state;
-		r->buffer->pos = p;
+		r->c->buffer->pos = p;
 		
 		if (r->parse_state != sw_done) {
 			return EAGAIN;	

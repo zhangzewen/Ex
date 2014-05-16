@@ -1938,7 +1938,7 @@ ngx_http_run_posted_requests(ngx_connection_t *c)
         }
 
         r = c->data;
-        pr = r->main->posted_requests;
+        pr = r->main->posted_requests; //子请求
 
         if (pr == NULL) {
             return;

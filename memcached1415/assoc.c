@@ -24,6 +24,7 @@
 #include <string.h>
 #include <assert.h>
 #include <pthread.h>
+#include <syslog.h>
 
 static pthread_cond_t maintenance_cond = PTHREAD_COND_INITIALIZER;
 
@@ -60,6 +61,7 @@ static bool started_expanding = false;
 static unsigned int expand_bucket = 0;
 
 void assoc_init(const int hashtable_init) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (hashtable_init) {
         hashpower = hashtable_init;
     }
@@ -75,6 +77,7 @@ void assoc_init(const int hashtable_init) {
 }
 
 item *assoc_find(const char *key, const size_t nkey, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
     unsigned int oldbucket;
 
@@ -104,6 +107,7 @@ item *assoc_find(const char *key, const size_t nkey, const uint32_t hv) {
    the item wasn't found */
 
 static item** _hashitem_before (const char *key, const size_t nkey, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item **pos;
     unsigned int oldbucket;
 
@@ -123,6 +127,7 @@ static item** _hashitem_before (const char *key, const size_t nkey, const uint32
 
 /* grows the hashtable to the next power of 2. */
 static void assoc_expand(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     old_hashtable = primary_hashtable;
 
     primary_hashtable = calloc(hashsize(hashpower + 1), sizeof(void *));
@@ -144,6 +149,7 @@ static void assoc_expand(void) {
 }
 
 static void assoc_start_expand(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (started_expanding)
         return;
     started_expanding = true;
@@ -152,6 +158,7 @@ static void assoc_start_expand(void) {
 
 /* Note: this isn't an assoc_update.  The key must not already exist to call this */
 int assoc_insert(item *it, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     unsigned int oldbucket;
 
 //    assert(assoc_find(ITEM_key(it), it->nkey) == 0);  /* shouldn't have duplicately named things defined */
@@ -176,6 +183,7 @@ int assoc_insert(item *it, const uint32_t hv) {
 }
 
 void assoc_delete(const char *key, const size_t nkey, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item **before = _hashitem_before(key, nkey, hv);
 
     if (*before) {
@@ -202,6 +210,7 @@ static volatile int do_run_maintenance_thread = 1;
 int hash_bulk_move = DEFAULT_HASH_BULK_MOVE;
 
 static void *assoc_maintenance_thread(void *arg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 
     while (do_run_maintenance_thread) {
         int ii = 0;
@@ -264,6 +273,7 @@ static void *assoc_maintenance_thread(void *arg) {
 static pthread_t maintenance_tid;
 
 int start_assoc_maintenance_thread() {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int ret;
     char *env = getenv("MEMCACHED_HASH_BULK_MOVE");
     if (env != NULL) {
@@ -281,6 +291,7 @@ int start_assoc_maintenance_thread() {
 }
 
 void stop_assoc_maintenance_thread() {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     mutex_lock(&cache_lock);
     do_run_maintenance_thread = 0;
     pthread_cond_signal(&maintenance_cond);

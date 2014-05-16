@@ -270,7 +270,7 @@ struct ngx_http_upstream_s {
     ngx_peer_connection_t            peer;
 
     ngx_event_pipe_t                *pipe;
-
+		/*request_bufs决定发送什么样的请求给上游服务器，在实现creat_request方法时需要设置它*/
     ngx_chain_t                     *request_bufs;
 		//定义了向下游发送响应的方式
     ngx_output_chain_ctx_t           output;

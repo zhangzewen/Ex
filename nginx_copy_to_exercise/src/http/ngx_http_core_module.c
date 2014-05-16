@@ -3055,16 +3055,16 @@ ngx_http_core_location(ngx_conf_t *cf, ngx_command_t *cmd, void *dummy)
     ngx_http_module_t         *module;
     ngx_http_conf_ctx_t       *ctx, *pctx;
     ngx_http_core_loc_conf_t  *clcf, *pclcf;
-
+// 创建 location 的ctx
     ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_conf_ctx_t));
     if (ctx == NULL) {
         return NGX_CONF_ERROR;
     }
-
+//保存下父ctx，可能是server的ctx，也可能是父location的ctx
     pctx = cf->ctx;
     ctx->main_conf = pctx->main_conf;
     ctx->srv_conf = pctx->srv_conf;
-
+//创建loc_conf
     ctx->loc_conf = ngx_pcalloc(cf->pool, sizeof(void *) * ngx_http_max_module);
     if (ctx->loc_conf == NULL) {
         return NGX_CONF_ERROR;

@@ -20,8 +20,7 @@ make clean;
   --without-http_upstream_ip_hash_module  \
   --without-http_upstream_least_conn_module  \
   --without-http_upstream_keepalive_module \
-	--with-pcre=/root/tar/pcre \
+	--with-pcre=/home/zhangjie/Documents/tar/pcre-8.33 \
 	--with-debug \
-	--without-http-cache \
 
 exit 0;

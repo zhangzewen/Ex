@@ -679,7 +679,7 @@ ngx_event_process_init(ngx_cycle_t *cycle)
 			itv.it_value.tv_sec = ngx_timer_resolution / 1000;
 			itv.it_value.tv_usec = (ngx_timer_resolution % 1000) * 1000;
 
-
+//main setitimer
 			if (setitimer(ITIMER_REAL, &itv, NULL) == -1) {
 				ngx_log_error(NGX_LOG_ALERT, cycle->log, ngx_errno,
 											"[%s:%d]setitimer() failed", __func__, __LINE__);

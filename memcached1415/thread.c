@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <string.h>
 #include <pthread.h>
+#include <syslog.h>
 
 #ifdef __sun
 #include <atomic.h>
@@ -83,6 +84,7 @@ static pthread_cond_t init_cond;
 static void thread_libevent_process(int fd, short which, void *arg);
 
 unsigned short refcount_incr(unsigned short *refcount) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #ifdef HAVE_GCC_ATOMICS
     return __sync_add_and_fetch(refcount, 1);
 #elif defined(__sun)
@@ -98,6 +100,7 @@ unsigned short refcount_incr(unsigned short *refcount) {
 }
 
 unsigned short refcount_decr(unsigned short *refcount) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #ifdef HAVE_GCC_ATOMICS
     return __sync_sub_and_fetch(refcount, 1);
 #elif defined(__sun)
@@ -204,6 +207,7 @@ void switch_item_lock_type(enum item_lock_types type) {
  * Initializes a connection queue.
  */
 static void cq_init(CQ *cq) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     pthread_mutex_init(&cq->lock, NULL);
     pthread_cond_init(&cq->cond, NULL);
     cq->head = NULL;
@@ -216,6 +220,7 @@ static void cq_init(CQ *cq) {
  * Returns the item, or NULL if no item is available
  */
 static CQ_ITEM *cq_pop(CQ *cq) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     CQ_ITEM *item;
 
     pthread_mutex_lock(&cq->lock);
@@ -234,6 +239,7 @@ static CQ_ITEM *cq_pop(CQ *cq) {
  * Adds an item to a connection queue.
  */
 static void cq_push(CQ *cq, CQ_ITEM *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item->next = NULL;
 
     pthread_mutex_lock(&cq->lock);
@@ -250,6 +256,7 @@ static void cq_push(CQ *cq, CQ_ITEM *item) {
  * Returns a fresh connection queue item.
  */
 static CQ_ITEM *cqi_new(void) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     CQ_ITEM *item = NULL;
     pthread_mutex_lock(&cqi_freelist_lock);
     if (cqi_freelist) {
@@ -288,6 +295,7 @@ static CQ_ITEM *cqi_new(void) {
  * Frees a connection queue item (adds it to the freelist.)
  */
 static void cqi_free(CQ_ITEM *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     pthread_mutex_lock(&cqi_freelist_lock);
     item->next = cqi_freelist;
     cqi_freelist = item;
@@ -299,6 +307,7 @@ static void cqi_free(CQ_ITEM *item) {
  * Creates a worker thread.
  */
 static void create_worker(void *(*func)(void *), void *arg) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     pthread_t       thread;
     pthread_attr_t  attr;
     int             ret;
@@ -316,6 +325,7 @@ static void create_worker(void *(*func)(void *), void *arg) {
  * Sets whether or not we accept new connections.
  */
 void accept_new_conns(const bool do_accept) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     pthread_mutex_lock(&conn_lock);
     do_accept_new_conns(do_accept);
     pthread_mutex_unlock(&conn_lock);
@@ -326,6 +336,7 @@ void accept_new_conns(const bool do_accept) {
  * Set up a thread's information.
  */
 static void setup_thread(LIBEVENT_THREAD *me) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     me->base = event_init();
     if (! me->base) {
         fprintf(stderr, "Can't allocate event base\n");
@@ -366,6 +377,7 @@ static void setup_thread(LIBEVENT_THREAD *me) {
  * Worker thread: main event loop
  */
 static void *worker_libevent(void *arg) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     LIBEVENT_THREAD *me = arg;
 
     /* Any per-thread setup can happen here; thread_init() will block until
@@ -391,6 +403,7 @@ static void *worker_libevent(void *arg) {
  * input arrives on the libevent wakeup pipe.
  */
 static void thread_libevent_process(int fd, short which, void *arg) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     LIBEVENT_THREAD *me = arg;
     CQ_ITEM *item;
     char buf[1];
@@ -445,6 +458,7 @@ static int last_thread = -1;
  */
 void dispatch_conn_new(int sfd, enum conn_states init_state, int event_flags,
                        int read_buffer_size, enum network_transport transport) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     CQ_ITEM *item = cqi_new();
     char buf[1];
     int tid = (last_thread + 1) % settings.num_threads;
@@ -472,6 +486,7 @@ void dispatch_conn_new(int sfd, enum conn_states init_state, int event_flags,
  * Returns true if this is the thread that listens for new TCP connections.
  */
 int is_listen_thread() {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return pthread_self() == dispatcher_thread.thread_id;
 }
 
@@ -481,6 +496,7 @@ int is_listen_thread() {
  * Allocates a new item.
  */
 item *item_alloc(char *key, size_t nkey, int flags, rel_time_t exptime, int nbytes) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
     /* do_item_alloc handles its own locks */
     it = do_item_alloc(key, nkey, flags, exptime, nbytes, 0);
@@ -492,6 +508,7 @@ item *item_alloc(char *key, size_t nkey, int flags, rel_time_t exptime, int nbyt
  * lazy-expiring as needed.
  */
 item *item_get(const char *key, const size_t nkey) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
     uint32_t hv;
     hv = hash(key, nkey, 0);
@@ -502,6 +519,7 @@ item *item_get(const char *key, const size_t nkey) {
 }
 
 item *item_touch(const char *key, size_t nkey, uint32_t exptime) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
     uint32_t hv;
     hv = hash(key, nkey, 0);
@@ -515,6 +533,7 @@ item *item_touch(const char *key, size_t nkey, uint32_t exptime) {
  * Links an item into the LRU and hashtable.
  */
 int item_link(item *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int ret;
     uint32_t hv;
 
@@ -530,6 +549,7 @@ int item_link(item *item) {
  * needed.
  */
 void item_remove(item *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uint32_t hv;
     hv = hash(ITEM_key(item), item->nkey, 0);
 
@@ -544,6 +564,7 @@ void item_remove(item *item) {
  * it to be thread-safe.
  */
 int item_replace(item *old_it, item *new_it, const uint32_t hv) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return do_item_replace(old_it, new_it, hv);
 }
 
@@ -551,6 +572,7 @@ int item_replace(item *old_it, item *new_it, const uint32_t hv) {
  * Unlinks an item from the LRU and hashtable.
  */
 void item_unlink(item *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uint32_t hv;
     hv = hash(ITEM_key(item), item->nkey, 0);
     item_lock(hv);
@@ -562,6 +584,7 @@ void item_unlink(item *item) {
  * Moves an item to the back of the LRU queue.
  */
 void item_update(item *item) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     uint32_t hv;
     hv = hash(ITEM_key(item), item->nkey, 0);
 
@@ -577,6 +600,7 @@ enum delta_result_type add_delta(conn *c, const char *key,
                                  const size_t nkey, int incr,
                                  const int64_t delta, char *buf,
                                  uint64_t *cas) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     enum delta_result_type ret;
     uint32_t hv;
 
@@ -591,6 +615,7 @@ enum delta_result_type add_delta(conn *c, const char *key,
  * Stores an item in the cache (high level, obeys set/add/replace semantics)
  */
 enum store_item_type store_item(item *item, int comm, conn* c) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     enum store_item_type ret;
     uint32_t hv;
 
@@ -605,6 +630,7 @@ enum store_item_type store_item(item *item, int comm, conn* c) {
  * Flushes expired items after a flush_all call
  */
 void item_flush_expired() {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     mutex_lock(&cache_lock);
     do_item_flush_expired();
     mutex_unlock(&cache_lock);
@@ -614,6 +640,7 @@ void item_flush_expired() {
  * Dumps part of the cache
  */
 char *item_cachedump(unsigned int slabs_clsid, unsigned int limit, unsigned int *bytes) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *ret;
 
     mutex_lock(&cache_lock);
@@ -626,12 +653,14 @@ char *item_cachedump(unsigned int slabs_clsid, unsigned int limit, unsigned int 
  * Dumps statistics about slab classes
  */
 void  item_stats(ADD_STAT add_stats, void *c) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     mutex_lock(&cache_lock);
     do_item_stats(add_stats, c);
     mutex_unlock(&cache_lock);
 }
 
 void  item_stats_totals(ADD_STAT add_stats, void *c) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     mutex_lock(&cache_lock);
     do_item_stats_totals(add_stats, c);
     mutex_unlock(&cache_lock);
@@ -641,6 +670,7 @@ void  item_stats_totals(ADD_STAT add_stats, void *c) {
  * Dumps a list of objects of each size in 32-byte increments
  */
 void  item_stats_sizes(ADD_STAT add_stats, void *c) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     mutex_lock(&cache_lock);
     do_item_stats_sizes(add_stats, c);
     mutex_unlock(&cache_lock);
@@ -657,6 +687,7 @@ void STATS_UNLOCK() {
 }
 
 void threadlocal_stats_reset(void) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int ii, sid;
     for (ii = 0; ii < settings.num_threads; ++ii) {
         pthread_mutex_lock(&threads[ii].stats.mutex);
@@ -692,6 +723,7 @@ void threadlocal_stats_reset(void) {
 }
 
 void threadlocal_stats_aggregate(struct thread_stats *stats) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int ii, sid;
 
     /* The struct has a mutex, but we can safely set the whole thing
@@ -740,6 +772,7 @@ void threadlocal_stats_aggregate(struct thread_stats *stats) {
 }
 
 void slab_stats_aggregate(struct thread_stats *stats, struct slab_stats *out) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int sid;
 
     out->set_cmds = 0;
@@ -770,6 +803,7 @@ void slab_stats_aggregate(struct thread_stats *stats, struct slab_stats *out) {
  * main_base Event base for main thread
  */
 void thread_init(int nthreads, struct event_base *main_base) {
+	syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int         i;
     int         power;
 

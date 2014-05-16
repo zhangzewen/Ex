@@ -123,6 +123,7 @@ typedef struct {
     ngx_atomic_t                     cold;
 //那个进程正在load这个cache
     ngx_atomic_t                     loading;
+//文件的大小
     off_t                            size;
 } ngx_http_file_cache_sh_t;
 

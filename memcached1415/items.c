@@ -12,6 +12,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <syslog.h>
 
 
 /*
@@ -77,6 +78,7 @@ void item_stats_reset(void) {
 
 /* Get the next CAS id for a new item. */
 uint64_t get_cas_id(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     static uint64_t cas_id = 0;
     return ++cas_id;
 }
@@ -246,6 +248,7 @@ item *do_item_alloc(char *key, const size_t nkey, const int flags,
 
 //释放item
 void item_free(item *it) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t ntotal = ITEM_ntotal(it);
     unsigned int clsid;
     assert((it->it_flags & ITEM_LINKED) == 0);//没有在hash表和LUR链中
@@ -266,6 +269,7 @@ void item_free(item *it) {
  */
 //检验item是否有合适的slab来存储
 bool item_size_ok(const size_t nkey, const int flags, const int nbytes) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char prefix[40];
     uint8_t nsuffix;
 
@@ -280,6 +284,7 @@ bool item_size_ok(const size_t nkey, const int flags, const int nbytes) {
 
 //键入LRU队列，形成新的head
 static void item_link_q(item *it) { /* item is the new head */
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item **head, **tail;
     assert(it->slabs_clsid < LARGEST_ID); //判断所设置的slab是否有效
     assert((it->it_flags & ITEM_SLABBED) == 0); //判断状态
@@ -298,6 +303,7 @@ static void item_link_q(item *it) { /* item is the new head */
 }
 
 static void item_unlink_q(item *it) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item **head, **tail;
     assert(it->slabs_clsid < LARGEST_ID);
     head = &heads[it->slabs_clsid];
@@ -322,6 +328,7 @@ static void item_unlink_q(item *it) {
 
 //将item加入到hashtable和LRU链中
 int do_item_link(item *it, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_LINK(ITEM_key(it), it->nkey, it->nbytes);
     assert((it->it_flags & (ITEM_LINKED|ITEM_SLABBED)) == 0); //判断状态，即没有在hash表LRU链中或被释放
     mutex_lock(&cache_lock);
@@ -345,6 +352,7 @@ int do_item_link(item *it, const uint32_t hv) {
 }
 
 void do_item_unlink(item *it, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_UNLINK(ITEM_key(it), it->nkey, it->nbytes);
     mutex_lock(&cache_lock);
     if ((it->it_flags & ITEM_LINKED) != 0) {
@@ -362,6 +370,7 @@ void do_item_unlink(item *it, const uint32_t hv) {
 
 /* FIXME: Is it necessary to keep this copy/pasted code? */
 void do_item_unlink_nolock(item *it, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_UNLINK(ITEM_key(it), it->nkey, it->nbytes);
     if ((it->it_flags & ITEM_LINKED) != 0) {
         it->it_flags &= ~ITEM_LINKED;
@@ -376,6 +385,7 @@ void do_item_unlink_nolock(item *it, const uint32_t hv) {
 }
 
 void do_item_remove(item *it) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_REMOVE(ITEM_key(it), it->nkey, it->nbytes);
     assert((it->it_flags & ITEM_SLABBED) == 0);
 
@@ -385,6 +395,7 @@ void do_item_remove(item *it) {
 }
 
 void do_item_update(item *it) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_UPDATE(ITEM_key(it), it->nkey, it->nbytes);
     if (it->time < current_time - ITEM_UPDATE_INTERVAL) {
         assert((it->it_flags & ITEM_SLABBED) == 0);
@@ -400,6 +411,7 @@ void do_item_update(item *it) {
 }
 
 int do_item_replace(item *it, item *new_it, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     MEMCACHED_ITEM_REPLACE(ITEM_key(it), it->nkey, it->nbytes,
                            ITEM_key(new_it), new_it->nkey, new_it->nbytes);
     assert((it->it_flags & ITEM_SLABBED) == 0);
@@ -410,6 +422,7 @@ int do_item_replace(item *it, item *new_it, const uint32_t hv) {
 
 /*@null@*/
 char *do_item_cachedump(const unsigned int slabs_clsid, const unsigned int limit, unsigned int *bytes) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     unsigned int memlimit = 2 * 1024 * 1024;   /* 2MB max response size */
     char *buffer;
     unsigned int bufcurr;
@@ -449,6 +462,7 @@ char *do_item_cachedump(const unsigned int slabs_clsid, const unsigned int limit
 }
 
 void item_stats_evictions(uint64_t *evicted) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int i;
     mutex_lock(&cache_lock);
     for (i = 0; i < LARGEST_ID; i++) {
@@ -458,6 +472,7 @@ void item_stats_evictions(uint64_t *evicted) {
 }
 
 void do_item_stats_totals(ADD_STAT add_stats, void *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     itemstats_t totals;
     memset(&totals, 0, sizeof(itemstats_t));
     int i;
@@ -478,6 +493,7 @@ void do_item_stats_totals(ADD_STAT add_stats, void *c) {
 }
 
 void do_item_stats(ADD_STAT add_stats, void *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int i;
     for (i = 0; i < LARGEST_ID; i++) {
         if (tails[i] != NULL) {
@@ -517,6 +533,7 @@ void do_item_stats(ADD_STAT add_stats, void *c) {
 /** dumps out a list of objects of each size, with granularity of 32 bytes */
 /*@null@*/
 void do_item_stats_sizes(ADD_STAT add_stats, void *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 
     /* max 1MB object, divided into 32 bytes size buckets */
     const int num_buckets = 32768;
@@ -553,6 +570,7 @@ void do_item_stats_sizes(ADD_STAT add_stats, void *c) {
 /** wrapper around assoc_find which does the lazy expiration logic */
 //获取item
 item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     //mutex_lock(&cache_lock);
     item *it = assoc_find(key, nkey, hv);
     if (it != NULL) {
@@ -609,6 +627,7 @@ item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
 
 item *do_item_touch(const char *key, size_t nkey, uint32_t exptime,
                     const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it = do_item_get(key, nkey, hv);
     if (it != NULL) {
         it->exptime = exptime;
@@ -618,6 +637,7 @@ item *do_item_touch(const char *key, size_t nkey, uint32_t exptime,
 
 /* expires items that are more recent than the oldest_live setting. */
 void do_item_flush_expired(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int i;
     item *iter, *next;
     if (settings.oldest_live == 0)

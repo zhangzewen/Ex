@@ -40,10 +40,11 @@ typedef void (*ngx_path_loader_pt) (void *data);
 
 
 typedef struct {
+//cache名字
     ngx_str_t                  name;
     size_t                     len;
     size_t                     level[3];
-
+//对应的回调，以及回调数据
     ngx_path_manager_pt        manager;
     ngx_path_loader_pt         loader;
     void                      *data;

@@ -22,6 +22,7 @@
 #include <sys/uio.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <syslog.h>
 
 /* some POSIX systems need the following definition
  * to get mlockall flags out of sys/mman.h.  */
@@ -126,6 +127,7 @@ static enum transmit_result transmit(conn *c);
 static volatile bool allow_new_conns = true;
 static struct event maxconnsevent;
 static void maxconns_handler(const int fd, const short which, void *arg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval t = {.tv_sec = 0, .tv_usec = 10000};
 
     if (fd == -42 || allow_new_conns == false) {
@@ -147,6 +149,7 @@ static void maxconns_handler(const int fd, const short which, void *arg) {
  * be that low).
  */
 static rel_time_t realtime(const time_t exptime) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* no. of seconds in 30 days - largest possible delta exptime */
 
     if (exptime == 0) return 0; /* 0 means never expire */
@@ -167,6 +170,7 @@ static rel_time_t realtime(const time_t exptime) {
 }
 
 static void stats_init(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     stats.curr_items = stats.total_items = stats.curr_conns = stats.total_conns = stats.conn_structs = 0;
     stats.get_cmds = stats.set_cmds = stats.get_hits = stats.get_misses = stats.evictions = stats.reclaimed = 0;
     stats.touch_cmds = stats.touch_misses = stats.touch_hits = stats.rejected_conns = 0;
@@ -186,6 +190,7 @@ static void stats_init(void) {
 }
 
 static void stats_reset(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     STATS_LOCK();
     stats.total_items = stats.total_conns = 0;
     stats.rejected_conns = 0;
@@ -199,6 +204,7 @@ static void stats_reset(void) {
 }
 
 static void settings_init(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     settings.use_cas = true;
     settings.access = 0700;
     settings.port = 11211;
@@ -234,6 +240,7 @@ static void settings_init(void) {
  */
 static int add_msghdr(conn *c)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct msghdr *msg;
 
     assert(c != NULL);
@@ -283,6 +290,7 @@ static pthread_mutex_t conn_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 static void conn_init(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     freetotal = 200;
     freecurr = 0;
     if ((freeconns = calloc(freetotal, sizeof(conn *))) == NULL) {
@@ -295,6 +303,7 @@ static void conn_init(void) {
  * Returns a connection from the freelist, if any.
  */
 conn *conn_from_freelist() {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     conn *c;
 
     pthread_mutex_lock(&conn_lock);
@@ -312,6 +321,7 @@ conn *conn_from_freelist() {
  * Adds a connection to the freelist. 0 = success.
  */
 bool conn_add_to_freelist(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     bool ret = true;
     pthread_mutex_lock(&conn_lock);
     if (freecurr < freetotal) {
@@ -333,6 +343,7 @@ bool conn_add_to_freelist(conn *c) {
 }
 
 static const char *prot_text(enum protocol prot) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *rv = "unknown";
     switch(prot) {
         case ascii_prot:
@@ -352,6 +363,7 @@ conn *conn_new(const int sfd, enum conn_states init_state,
                 const int event_flags,
                 const int read_buffer_size, enum network_transport transport,
                 struct event_base *base) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     conn *c = conn_from_freelist();
 
     if (NULL == c) {
@@ -472,6 +484,7 @@ conn *conn_new(const int sfd, enum conn_states init_state,
 }
 
 static void conn_cleanup(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     if (c->item) {
@@ -511,6 +524,7 @@ static void conn_cleanup(conn *c) {
  * Frees a connection.
  */
 void conn_free(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (c) {
         MEMCACHED_CONN_DESTROY(c);
         if (c->hdrbuf)
@@ -532,6 +546,7 @@ void conn_free(conn *c) {
 }
 
 static void conn_close(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     /* delete the event, the socket and the conn */
@@ -568,6 +583,7 @@ static void conn_close(conn *c) {
  * buffers!
  */
 static void conn_shrink(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     if (IS_UDP(c->transport))
@@ -621,6 +637,7 @@ static void conn_shrink(conn *c) {
  * Convert a state name to a human readable form.
  */
 static const char *state_text(enum conn_states state) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const char* const statenames[] = { "conn_listening",
                                        "conn_new_cmd",
                                        "conn_waiting",
@@ -640,6 +657,7 @@ static const char *state_text(enum conn_states state) {
  * happen here.
  */
 static void conn_set_state(conn *c, enum conn_states state) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
     assert(state >= conn_listening && state < conn_max_state);
 
@@ -664,6 +682,7 @@ static void conn_set_state(conn *c, enum conn_states state) {
  * Returns 0 on success, -1 on out-of-memory.
  */
 static int ensure_iov_space(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     if (c->iovused >= c->iovsize) {
@@ -694,6 +713,7 @@ static int ensure_iov_space(conn *c) {
  */
 
 static int add_iov(conn *c, const void *buf, int len) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct msghdr *m;
     int leftover;
     bool limit_to_mtu;
@@ -747,6 +767,7 @@ static int add_iov(conn *c, const void *buf, int len) {
  * Constructs a set of UDP headers and attaches them to the outgoing messages.
  */
 static int build_udp_headers(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int i;
     unsigned char *hdr;
 
@@ -784,6 +805,7 @@ static int build_udp_headers(conn *c) {
 
 
 static void out_string(conn *c, const char *str) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t len;
 
     assert(c != NULL);
@@ -827,6 +849,7 @@ static void out_string(conn *c, const char *str) {
  * has been stored in c->cmd, and the item is ready in c->item.
  */
 static void complete_nread_ascii(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     item *it = c->item;
@@ -899,6 +922,7 @@ static void complete_nread_ascii(conn *c) {
  * get a pointer to the start of the request struct for the current command
  */
 static void* binary_get_request(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *ret = c->rcurr;
     ret -= (sizeof(c->binary_header) + c->binary_header.request.keylen +
             c->binary_header.request.extlen);
@@ -911,10 +935,12 @@ static void* binary_get_request(conn *c) {
  * get a pointer to the key in this request
  */
 static char* binary_get_key(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     return c->rcurr - (c->binary_header.request.keylen);
 }
 
 static void add_bin_header(conn *c, uint16_t err, uint8_t hdr_len, uint16_t key_len, uint32_t body_len) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     protocol_binary_response_header* header;
 
     assert(c);
@@ -958,6 +984,7 @@ static void add_bin_header(conn *c, uint16_t err, uint8_t hdr_len, uint16_t key_
 }
 
 static void write_bin_error(conn *c, protocol_binary_response_status err, int swallow) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const char *errstr = "Unknown error";
     size_t len;
 
@@ -1015,6 +1042,7 @@ static void write_bin_error(conn *c, protocol_binary_response_status err, int sw
 
 /* Form and send a response to a command over the binary protocol */
 static void write_bin_response(conn *c, void *d, int hlen, int keylen, int dlen) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (!c->noreply || c->cmd == PROTOCOL_BINARY_CMD_GET ||
         c->cmd == PROTOCOL_BINARY_CMD_GETK) {
         add_bin_header(c, 0, hlen, keylen, dlen);
@@ -1029,6 +1057,7 @@ static void write_bin_response(conn *c, void *d, int hlen, int keylen, int dlen)
 }
 
 static void complete_incr_bin(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
     char *key;
     size_t nkey;
@@ -1122,6 +1151,7 @@ static void complete_incr_bin(conn *c) {
 }
 
 static void complete_update_bin(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     protocol_binary_response_status eno = PROTOCOL_BINARY_RESPONSE_EINVAL;
     enum store_item_type ret = NOT_STORED;
     assert(c != NULL);
@@ -1192,6 +1222,7 @@ static void complete_update_bin(conn *c) {
 }
 
 static void process_bin_touch(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
 
     protocol_binary_response_get* rsp = (protocol_binary_response_get*)c->wbuf;
@@ -1284,6 +1315,7 @@ static void process_bin_touch(conn *c) {
 }
 
 static void process_bin_get(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
 
     protocol_binary_response_get* rsp = (protocol_binary_response_get*)c->wbuf;
@@ -1368,6 +1400,7 @@ static void process_bin_get(conn *c) {
 static void append_bin_stats(const char *key, const uint16_t klen,
                              const char *val, const uint32_t vlen,
                              conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *buf = c->stats.buffer + c->stats.offset;
     uint32_t bodylen = klen + vlen;
     protocol_binary_response_header header = {
@@ -1397,6 +1430,7 @@ static void append_bin_stats(const char *key, const uint16_t klen,
 static void append_ascii_stats(const char *key, const uint16_t klen,
                                const char *val, const uint32_t vlen,
                                conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *pos = c->stats.buffer + c->stats.offset;
     uint32_t nbytes = 0;
     int remaining = c->stats.size - c->stats.offset;
@@ -1414,6 +1448,7 @@ static void append_ascii_stats(const char *key, const uint16_t klen,
 }
 
 static bool grow_stats_buf(conn *c, size_t needed) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     size_t nsize = c->stats.size;
     size_t available = nsize - c->stats.offset;
     bool rv = true;
@@ -1447,6 +1482,7 @@ static void append_stats(const char *key, const uint16_t klen,
                   const char *val, const uint32_t vlen,
                   const void *cookie)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* value without a key is invalid */
     if (klen == 0 && vlen > 0) {
         return ;
@@ -1472,6 +1508,7 @@ static void append_stats(const char *key, const uint16_t klen,
 }
 
 static void process_bin_stat(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *subcommand = binary_get_key(c);
     size_t nkey = c->binary_header.request.keylen;
 
@@ -1538,6 +1575,7 @@ static void process_bin_stat(conn *c) {
 }
 
 static void bin_read_key(conn *c, enum bin_substates next_substate, int extra) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c);
     c->substate = next_substate;
     c->rlbytes = c->keylen + extra;
@@ -1588,6 +1626,7 @@ static void bin_read_key(conn *c, enum bin_substates next_substate, int extra) {
 
 /* Just write an error message and disconnect the client */
 static void handle_binary_protocol_error(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     write_bin_error(c, PROTOCOL_BINARY_RESPONSE_EINVAL, 0);
     if (settings.verbose) {
         fprintf(stderr, "Protocol error (opcode %02x), close connection %d\n",
@@ -1597,6 +1636,7 @@ static void handle_binary_protocol_error(conn *c) {
 }
 
 static void init_sasl_conn(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c);
     /* should something else be returned? */
     if (!settings.sasl)
@@ -1618,6 +1658,7 @@ static void init_sasl_conn(conn *c) {
 }
 
 static void bin_list_sasl_mechs(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     // Guard against a disabled SASL.
     if (!settings.sasl) {
         write_bin_error(c, PROTOCOL_BINARY_RESPONSE_UNKNOWN_COMMAND,
@@ -1647,6 +1688,7 @@ static void bin_list_sasl_mechs(conn *c) {
 }
 
 static void process_bin_sasl_auth(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     // Guard for handling disabled SASL on the server.
     if (!settings.sasl) {
         write_bin_error(c, PROTOCOL_BINARY_RESPONSE_UNKNOWN_COMMAND,
@@ -1685,6 +1727,7 @@ static void process_bin_sasl_auth(conn *c) {
 }
 
 static void process_bin_complete_sasl_auth(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(settings.sasl);
     const char *out = NULL;
     unsigned int outlen = 0;
@@ -1761,6 +1804,7 @@ static void process_bin_complete_sasl_auth(conn *c) {
 }
 
 static bool authenticated(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(settings.sasl);
     bool rv = false;
 
@@ -1788,6 +1832,7 @@ static bool authenticated(conn *c) {
 }
 
 static void dispatch_bin_command(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int protocol_error = 0;
 
     int extlen = c->binary_header.request.extlen;
@@ -1973,6 +2018,7 @@ static void dispatch_bin_command(conn *c) {
 }
 
 static void process_bin_update(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     int nkey;
     int vlen;
@@ -2064,6 +2110,7 @@ static void process_bin_update(conn *c) {
 }
 
 static void process_bin_append_prepend(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     int nkey;
     int vlen;
@@ -2117,6 +2164,7 @@ static void process_bin_append_prepend(conn *c) {
 }
 
 static void process_bin_flush(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     time_t exptime = 0;
     protocol_binary_request_flush* req = binary_get_request(c);
 
@@ -2139,6 +2187,7 @@ static void process_bin_flush(conn *c) {
 }
 
 static void process_bin_delete(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     item *it;
 
     protocol_binary_request_delete* req = binary_get_request(c);
@@ -2179,6 +2228,7 @@ static void process_bin_delete(conn *c) {
 }
 
 static void complete_nread_binary(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
     assert(c->cmd >= 0);
 
@@ -2225,6 +2275,7 @@ static void complete_nread_binary(conn *c) {
 }
 
 static void reset_cmd_handler(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     c->cmd = -1;
     c->substate = bin_no_state;
     if(c->item != NULL) {
@@ -2240,6 +2291,7 @@ static void reset_cmd_handler(conn *c) {
 }
 
 static void complete_nread(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
     assert(c->protocol == ascii_prot
            || c->protocol == binary_prot);
@@ -2258,6 +2310,7 @@ static void complete_nread(conn *c) {
  * Returns the state of storage.
  */
 enum store_item_type do_store_item(item *it, int comm, conn *c, const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key = ITEM_key(it);
     item *old_it = do_item_get(key, it->nkey, hv);
     enum store_item_type stored = NOT_STORED;
@@ -2403,6 +2456,7 @@ typedef struct token_s {
  *   }
  */
 static size_t tokenize_command(char *command, token_t *tokens, const size_t max_tokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *s, *e;
     size_t ntokens = 0;
     size_t len = strlen(command);
@@ -2448,6 +2502,7 @@ static size_t tokenize_command(char *command, token_t *tokens, const size_t max_
 
 /* set up a connection to write a buffer then free it, used for stats */
 static void write_and_free(conn *c, char *buf, int bytes) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (buf) {
         c->write_and_free = buf;
         c->wcurr = buf;
@@ -2461,6 +2516,7 @@ static void write_and_free(conn *c, char *buf, int bytes) {
 
 static inline bool set_noreply_maybe(conn *c, token_t *tokens, size_t ntokens)
 {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int noreply_index = ntokens - 2;
 
     /*
@@ -2518,6 +2574,7 @@ inline static void process_stats_detail(conn *c, const char *command) {
 
 /* return server specific stats only */
 static void server_stats(ADD_STAT add_stats, conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     pid_t pid = getpid();
     rel_time_t now = current_time;
 
@@ -2593,6 +2650,7 @@ static void server_stats(ADD_STAT add_stats, conn *c) {
 }
 
 static void process_stat_settings(ADD_STAT add_stats, void *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(add_stats);
     APPEND_STAT("maxbytes", "%u", (unsigned int)settings.maxbytes);
     APPEND_STAT("maxconns", "%d", settings.maxconns);
@@ -2626,6 +2684,7 @@ static void process_stat_settings(ADD_STAT add_stats, void *c) {
 }
 
 static void process_stat(conn *c, token_t *tokens, const size_t ntokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     const char *subcommand = tokens[SUBCOMMAND_TOKEN].value;
     assert(c != NULL);
 
@@ -2703,6 +2762,7 @@ static void process_stat(conn *c, token_t *tokens, const size_t ntokens) {
 
 /* ntokens is overwritten here... shrug.. */
 static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens, bool return_cas) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     size_t nkey;
     int i = 0;
@@ -2859,6 +2919,7 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
 }
 
 static void process_update_command(conn *c, token_t *tokens, const size_t ntokens, int comm, bool handle_cas) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     size_t nkey;
     unsigned int flags;
@@ -2947,6 +3008,7 @@ static void process_update_command(conn *c, token_t *tokens, const size_t ntoken
 }
 
 static void process_touch_command(conn *c, token_t *tokens, const size_t ntokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     size_t nkey;
     int32_t exptime_int = 0;
@@ -2990,6 +3052,7 @@ static void process_touch_command(conn *c, token_t *tokens, const size_t ntokens
 }
 
 static void process_arithmetic_command(conn *c, token_t *tokens, const size_t ntokens, const bool incr) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char temp[INCR_MAX_STORAGE_LEN];
     uint64_t delta;
     char *key;
@@ -3053,6 +3116,7 @@ enum delta_result_type do_add_delta(conn *c, const char *key, const size_t nkey,
                                     const bool incr, const int64_t delta,
                                     char *buf, uint64_t *cas,
                                     const uint32_t hv) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *ptr;
     uint64_t value;
     int res;
@@ -3131,6 +3195,7 @@ enum delta_result_type do_add_delta(conn *c, const char *key, const size_t nkey,
 }
 
 static void process_delete_command(conn *c, token_t *tokens, const size_t ntokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key;
     size_t nkey;
     item *it;
@@ -3183,6 +3248,7 @@ static void process_delete_command(conn *c, token_t *tokens, const size_t ntoken
 }
 
 static void process_verbosity_command(conn *c, token_t *tokens, const size_t ntokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     unsigned int level;
 
     assert(c != NULL);
@@ -3196,6 +3262,7 @@ static void process_verbosity_command(conn *c, token_t *tokens, const size_t nto
 }
 
 static void process_slabs_automove_command(conn *c, token_t *tokens, const size_t ntokens) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     unsigned int level;
 
     assert(c != NULL);
@@ -3216,6 +3283,7 @@ static void process_slabs_automove_command(conn *c, token_t *tokens, const size_
 }
 
 static void process_command(conn *c, char *command) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 
     token_t tokens[MAX_TOKENS];
     size_t ntokens;
@@ -3383,6 +3451,7 @@ static void process_command(conn *c, char *command) {
  * if we have a complete line in the buffer, process it.
  */
 static int try_read_command(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
     assert(c->rcurr <= (c->rbuf + c->rsize));
     assert(c->rbytes > 0);
@@ -3516,6 +3585,7 @@ static int try_read_command(conn *c) {
  * read a UDP request.
  */
 static enum try_read_result try_read_udp(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int res;
 
     assert(c != NULL);
@@ -3562,6 +3632,7 @@ static enum try_read_result try_read_udp(conn *c) {
  * @return enum try_read_result
  */
 static enum try_read_result try_read_network(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     enum try_read_result gotdata = READ_NO_DATA_RECEIVED;
     int res;
     int num_allocs = 0;
@@ -3620,6 +3691,7 @@ static enum try_read_result try_read_network(conn *c) {
 }
 
 static bool update_event(conn *c, const int new_flags) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     struct event_base *base = c->event.ev_base;
@@ -3637,6 +3709,7 @@ static bool update_event(conn *c, const int new_flags) {
  * Sets whether we are listening for new connections or not.
  */
 void do_accept_new_conns(const bool do_accept) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     conn *next;
 
     for (next = listen_conn; next; next = next->next) {
@@ -3678,6 +3751,7 @@ void do_accept_new_conns(const bool do_accept) {
  *   TRANSMIT_HARD_ERROR Can't write (c->state is set to conn_closing)
  */
 static enum transmit_result transmit(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     assert(c != NULL);
 
     if (c->msgcurr < c->msgused &&
@@ -3736,6 +3810,7 @@ static enum transmit_result transmit(conn *c) {
 }
 
 static void drive_machine(conn *c) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     bool stop = false;
     int sfd, flags = 1;
     socklen_t addrlen;
@@ -4047,6 +4122,7 @@ static void drive_machine(conn *c) {
 }
 
 void event_handler(const int fd, const short which, void *arg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     conn *c;
 
     c = (conn *)arg;
@@ -4069,6 +4145,7 @@ void event_handler(const int fd, const short which, void *arg) {
 }
 
 static int new_socket(struct addrinfo *ai) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int sfd;
     int flags;
 
@@ -4090,6 +4167,7 @@ static int new_socket(struct addrinfo *ai) {
  * Sets a socket's send buffer size to the maximum allowed by the system.
  */
 static void maximize_sndbuf(const int sfd) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     socklen_t intsize = sizeof(int);
     int last_good = 0;
     int min, max, avg;
@@ -4133,6 +4211,7 @@ static int server_socket(const char *interface,
                          int port,
                          enum network_transport transport,
                          FILE *portnumber_file) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int sfd;
     struct linger ling = {0, 0};
     struct addrinfo *ai;
@@ -4268,6 +4347,7 @@ static int server_socket(const char *interface,
 
 static int server_sockets(int port, enum network_transport transport,
                           FILE *portnumber_file) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (settings.inter == NULL) {
         return server_socket(settings.inter, port, transport, portnumber_file);
     } else {
@@ -4304,6 +4384,7 @@ static int server_sockets(int port, enum network_transport transport,
 }
 
 static int new_socket_unix(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int sfd;
     int flags;
 
@@ -4322,6 +4403,7 @@ static int new_socket_unix(void) {
 }
 
 static int server_socket_unix(const char *path, int access_mask) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     int sfd;
     struct linger ling = {0, 0};
     struct sockaddr_un addr;
@@ -4397,6 +4479,7 @@ static struct event clockevent;
  * Note that users who are setting explicit dates for expiration times *must*
  * ensure their clocks are correct before starting memcached. */
 static void clock_handler(const int fd, const short which, void *arg) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval t = {.tv_sec = 1, .tv_usec = 0};
     static bool initialized = false;
 #if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_MONOTONIC)
@@ -4577,6 +4660,7 @@ static void usage_license(void) {
 }
 
 static void save_pid(const char *pid_file) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     FILE *fp;
     if (access(pid_file, F_OK) == 0) {
         if ((fp = fopen(pid_file, "r")) != NULL) {
@@ -4603,6 +4687,7 @@ static void save_pid(const char *pid_file) {
 }
 
 static void remove_pidfile(const char *pid_file) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
   if (pid_file == NULL)
       return;
 
@@ -4613,12 +4698,14 @@ static void remove_pidfile(const char *pid_file) {
 }
 
 static void sig_handler(const int sig) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     printf("SIGINT handled.\n");
     exit(EXIT_SUCCESS);
 }
 
 #ifndef HAVE_SIGIGNORE
 static int sigignore(int sig) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct sigaction sa = { .sa_handler = SIG_IGN, .sa_flags = 0 };
 
     if (sigemptyset(&sa.sa_mask) == -1 || sigaction(sig, &sa, 0) == -1) {
@@ -4634,6 +4721,7 @@ static int sigignore(int sig) {
  * number of TLB-misses by using the biggest available page size
  */
 static int enable_large_pages(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
 #if defined(HAVE_GETPAGESIZES) && defined(HAVE_MEMCNTL)
     int ret = -1;
     size_t sizes[32];
@@ -4677,6 +4765,7 @@ static int enable_large_pages(void) {
  * @return true if no errors found, false if we can't use this env
  */
 static bool sanitycheck(void) {
+		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     /* One of our biggest problems is old and bogus libevents */
     const char *ever = event_get_version();
     if (ever != NULL) {

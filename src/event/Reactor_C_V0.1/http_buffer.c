@@ -2,17 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <assert.h>
 
-http_buffer_t *buffer_new(void)
+struct http_buffer *buffer_new(void)
 {
-	http_buffer_t *buffer;
-	buffer = (http_buffer_t *)malloc(sizeof(http_buffer_t));
+	struct http_buffer *buffer;
+	buffer = (struct http_buffer *)malloc(sizeof(struct http_buffer));
 	return buffer;
 }
 
 
-void buffer_free(http_buffer_t *buffer)
+void buffer_free(struct http_buffer *buffer)
 {
 	if (buffer->start != NULL) {
 		free(buffer->start);
@@ -21,7 +22,7 @@ void buffer_free(http_buffer_t *buffer)
 }
 
 
-static void buffer_align(http_buffer_t *buf)
+static void buffer_align(struct http_buffer *buf)
 {
 	memmove(buf->start, buf->pos, buf->off);
 	buf->pos = buf->start;
@@ -31,7 +32,7 @@ static void buffer_align(http_buffer_t *buf)
 }
 
 
-int buffer_expand(http_buffer_t *buf, size_t datlen)
+int buffer_expand(struct http_buffer *buf, size_t datlen)
 {
 	size_t need = buf->misalign + buf->off + datlen;
 	
@@ -52,25 +53,38 @@ int buffer_expand(http_buffer_t *buf, size_t datlen)
 			length <<= 1;
 		}
 
-		if (buf->start != buf->pos) {
+		if (buf->start != buf->pos && buf->misalign != 0) {
 			buffer_align(buf);
 		}
-		if ((newbuf = realloc(buf->pos, length)) == NULL) {
+		int pos_off = buf->pos - buf->start;
+		if ((newbuf = realloc(buf->start, length)) == NULL) {
 			return -1;
 		}
-
+#if 0
 		buf->start = buf->pos = newbuf;
 		buf->last = buf->start;
 		buf->totallen = length;
 		buf->end = buf->start + length;
+#endif
+		
+		if (buf->misalign == 0) {
+			buf->start = newbuf;
+			buf->pos = buf->start +pos_off; 
+		} else {
+			buf->start = newbuf;
+			buf->pos = buf->start;
+		}
+		buf->last = buf->start + buf->off;
+		buf->end = buf->start + length;
+		buf->totallen = length;
+		
 	}
 
 	return 0;
 }
 
-void buffer_drain(http_buffer_t *buf, size_t len)
+void buffer_drain(struct http_buffer *buf, size_t len)
 {
-	size_t oldoff = buf->off;
 	
 	if(len >= buf->off) {
 		buf->pos = buf->last = buf->start;
@@ -86,13 +100,12 @@ void buffer_drain(http_buffer_t *buf, size_t len)
 }
 
 
-#define EVBUFFER_MAX_READ 4096
+#define BUFFER_MAX_READ 4096
 
-int buffer_read(http_buffer_t *buf, int fd, int howmuch)
+int buffer_read(struct http_buffer *buf, int fd, int howmuch)
 {
-	unsigned char *p;
-	size_t oldoff = buf->off;
-	int n = EVBUFFER_MAX_READ;
+	char *p;
+	int n = BUFFER_MAX_READ;
 
 	if (howmuch < 0 || howmuch > n) {
 		howmuch = n;
@@ -123,7 +136,7 @@ int buffer_read(http_buffer_t *buf, int fd, int howmuch)
 }
 
 
-int buffer_write(http_buffer_t *buffer, int fd)
+int buffer_write(struct http_buffer *buffer, int fd)
 {
 	int n;
 	
