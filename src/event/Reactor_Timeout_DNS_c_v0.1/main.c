@@ -8,21 +8,24 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <assert.h>
 
 
-#include "evbuf.h"
 #include "event.h"
 #include "event_base.h"
 #include "http_resolver.h"
 
 int main(int argc, char *argv[])
 {
+	assert(argc == 1);
+	assert(argv[0] != NULL);
 	struct resolver_st* resolve = NULL;
 	resolve = resolver_create();
 	
 	resolver_init(resolve);
 	
 	unsigned char name_1[60] = "www.google.com";
+#if 1
 	unsigned char name_2[60] = "www.baidu.com";
 	unsigned char name_3[60] = "www.csdn.com";
 	unsigned char name_4[60] = "www.kuwo.com";
@@ -33,7 +36,9 @@ int main(int argc, char *argv[])
 	unsigned char name_9[60] = "www.openrice.com";
 	unsigned char name_10[60] = "www.beecrazy.com";
 	unsigned char name_11[60] = "www.zhangzewen.sinaapp.com";
+#endif
 	resolve_name(resolve, name_1);
+#if 1
 	resolve_name(resolve, name_2);
 	resolve_name(resolve, name_3);
 	resolve_name(resolve, name_4);
@@ -44,6 +49,7 @@ int main(int argc, char *argv[])
 	resolve_name(resolve, name_9);
 	resolve_name(resolve, name_10);
 	resolve_name(resolve, name_11);
+#endif
  //event_dispatch();
 	event_base_loop(resolve->base, 0);
 

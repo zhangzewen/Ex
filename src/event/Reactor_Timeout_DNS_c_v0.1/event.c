@@ -4,10 +4,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <sys/time.h>
+#include <assert.h>
 
 #include "http_epoll.h"
 #include "event.h"
-#include "evbuf.h"
 #include "list.h"
 #include "RBTree.h"
 #include "timer.h"
@@ -38,31 +38,6 @@ static int gettime(struct event_base *base, struct timeval *tp);
 
 static int timeout_next(struct event_base *base, struct timeval **tv_p)
 {
-#if 0
-	struct timeval now;
-	struct event *ev;
-	struct timeval *tv = *tv_p;
-
-	if ((ev = min_heap_top(&base->timeheap)) == NULL) {
-		*tv_p = NULL;
-		return 0;
-	}
-
-
-	if (gettime(base, &now) == -1)
-		return -1;
-
-	if (evutil_timercmp(&ev->ev_timeout, &now, <=)) {
-		evutil_timerclear(tv);
-		return 0;
-	}
-
-	evutil_timersub(&ev->ev_timeout, &now, tv);
-
-	assert(tv->tv_sec >= 0);
-	
-	assert(tv->tv_usec >= 0);
-#endif
 
 	struct timeval now;
 	struct event *ev;
@@ -146,7 +121,7 @@ struct event_base *event_base_new(void)
 
 	base->evbase = NULL;
 	base->evsel = &epollops;
-	base->evbase = base->evsel->init(base);
+	base->evbase = base->evsel->init();
 
 	if(base->evbase == NULL) {
 		fprintf(stderr, "%s: no event mechanism available\n", __func__);
@@ -340,11 +315,10 @@ int event_base_loop(struct event_base *base, int flags)
 	struct eventop *evsel = base->evsel;
 	struct epoll_loop *evbase = base->evbase;
 	int res;
-	int done;
 	struct timeval tv;
 	struct timeval *tv_p;
 
-	
+	assert(flags == 0);	
 	/*clear time cache*/
 	//清空时间缓存
 	base->tv_cache.tv_sec = 0;
@@ -357,19 +331,8 @@ int event_base_loop(struct event_base *base, int flags)
 					base->event_tv.tv_sec,
 					base->event_tv.tv_usec);
 #endif
-	done = 0;
 	
-	while(!done) {
-		if (base->event_gotterm) {
-			base->event_gotterm = 0;
-			break;
-		}
-		
-		if (base->event_break) {
-			base->event_break = 0;
-			break;
-		}
-
+	while(1) {
 		timeout_correct(base, &tv);//时间矫正
 #if 0
 	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
@@ -387,7 +350,7 @@ int event_base_loop(struct event_base *base, int flags)
 #endif
 		tv_p = &tv;
 
-		if (!base->event_count_active && !(flags & EVLOOP_NONBLOCK)) {
+		if (!base->event_count_active ) {
 			timeout_next(base, &tv_p);
 #if 0
 	fprintf(stderr, "[%s:%d]:base->tv_cache.tv_sec = %lld,base->tv_cache.tv_usec = %lld, base->event_tv.tv_sec = %lld, base->event_tv.tv_usec = %lld\n",
@@ -434,7 +397,7 @@ int event_base_loop(struct event_base *base, int flags)
 		base->tv_cache.tv_sec = 0;
 		
 		//等待I/O事件就绪
-		res = evsel->dispatch(base, evbase, tv_p);
+		res = evsel->dispatch(evbase, tv_p);
 
 		if (res == -1) {
 			return -1;
@@ -457,11 +420,6 @@ int event_base_loop(struct event_base *base, int flags)
 
 		if (base->event_count_active) {
 			event_process_active(base);
-			if (!base->event_count_active && flags) {
-				done = 1;
-			}else if(flags & EVLOOP_NONBLOCK) {
-				done = 1;
-			}
 		}
 	}
 	//退出时也要清空时间缓存
@@ -594,7 +552,6 @@ void event_set(struct event *ev, int fd, short events, void (*callback)(int, sho
 	ev->ev_ncalls = 0;
 	ev->ev_pncalls = NULL;
 	ev->name = name;
-	ev->buffer = evbuffer_new();
 	
 	
 	INIT_LIST_HEAD(&ev->event_list);
@@ -652,39 +609,6 @@ void event_active(struct event *ev, int res, short ncalls)
 	ev->ev_pncalls = NULL;
 	event_queue_insert(ev->ev_base, ev, EVLIST_ACTIVE);
 }
-
-
-/*
-	TAILQ_INSERT_TAIL(&base->eventqueue, ev, ev_next) ===>
-	
-	do{
-		(ev)->ev_next.tqe_next = ((void *)0);
-		(ev)->ev_next.tqe_prev = (&base->eventqueue)->tqh_last;
-		*(&base->eventqueue)->tqh_last = (ev);
-		(&base->eventqueue)->tqh_last = &(ev)->ev_next.tqe_next;
-	}while(0)
-	
-	ptype base->eventqueue
-	type = struct event_list {
-		struct event *tqh_first;
-		struct event **tqh_last;
-	}
-
-	 TAILQ_ENTRY (event) ev_next ==> struct {
-																				struct event *tqe_next;
-																				struct event **tqe_prev;
-																		} ev_next;
-
-	 TAILQ_ENTRY (event) ev_active_next ==> struct {
-																							struct event *tqe_next;
-																							struct event **tqe_prev;
-																					} ev_active_next;
-	
-*/
-
-
-
-
 
 
 void event_queue_insert(struct event_base *base, struct event *ev, int queue)

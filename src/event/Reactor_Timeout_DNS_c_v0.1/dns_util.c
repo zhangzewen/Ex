@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <assert.h>
 #include "dns_util.h"
 
 
@@ -29,7 +30,7 @@ void dns_question_free(dns_question * question) {
 
 char* escape_data(const uint8_t* packet, uint32_t start, uint32_t end)
 {
-	int i = 0;
+	uint32_t i = 0;
 	int o = 0;
 	uint8_t c = 0;
 	//uint8_t upper = 0;
@@ -201,6 +202,8 @@ char * mk_error(const char * msg, const uint8_t * packet, uint32_t pos,
 
 char *escape(const uint8_t *packet, uint32_t pos, uint32_t i,
 							uint16_t rdlength, uint32_t plen) {
+	assert(0 != plen);
+	assert( 0 != i);
 	return escape_data(packet, pos, pos + rdlength);
 }
 
@@ -213,6 +216,8 @@ char *escape(const uint8_t *packet, uint32_t pos, uint32_t i,
 "A records are simply an IPv4 address, and are formatted as such."
 char * A(const uint8_t * packet, uint32_t pos, uint32_t i,
          uint16_t rdlength, uint32_t plen) {
+		assert(0 != plen);
+		assert(0 == i);
     char * data = (char *)malloc(sizeof(char)*16);
 
     if (rdlength != 4) {
@@ -295,34 +300,13 @@ char * mx(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
     return buffer;
 }
 
-#define OPTS_DOC "EDNS option record format\n"\
-"These records contain a size field for warning about extra large DNS \n"\
-"packets, an extended rcode, and an optional set of dynamic fields.\n"\
-"The size and extended rcode are printed, but the dynamic fields are \n"\
-"simply escaped. Note that the associated format function is non-standard,\n"\
-"as EDNS records modify the basic resourse record protocol (there is no \n"\
-"class field, for instance. RFC 2671"
-char * opts(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
-                  uint16_t rdlength, uint32_t plen) {
-    uint16_t payload_size = (packet[pos] << 8) + packet[pos+1];
-    char *buffer;
-    const char * base_format = "size:%d,rcode:0x%02x%02x%02x%02x,%s";
-    char *rdata = escape_data(packet, pos+6, pos + 6 + rdlength);
-
-    buffer = malloc(sizeof(char) * (strlen(base_format) - 20 + 5 + 8 +
-                                    strlen(rdata) + 1));
-    sprintf(buffer, base_format, payload_size, packet[2], packet[3],
-                                 packet[4], packet[5], rdata);
-    free(rdata);
-    return buffer;
-}
-
 #define SRV_DOC "Service record format. RFC 2782\n"\
 "Service records are used to identify various network services and ports.\n"\
 "The format is: 'priority,weight,port target'\n"\
 "The target is a somewhat standard DNS name."
 char * srv(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
                  uint16_t rdlength, uint32_t plen) {
+		assert(0 != plen);
     uint16_t priority = (packet[pos] << 8) + packet[pos+1];
     uint16_t weight = (packet[pos+2] << 8) + packet[pos+3];
     uint16_t port = (packet[pos+4] << 8) + packet[pos+5];
@@ -343,6 +327,8 @@ char * srv(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
 "A standard IPv6 address. No attempt is made to abbreviate the address."
 char * AAAA(const uint8_t * packet, uint32_t pos, uint32_t id_pos,
                   uint16_t rdlength, uint32_t plen) {
+		assert(0 != plen);
+		assert(0 != id_pos);
     char *buffer;
     uint16_t ipv6[8];
     int i;
@@ -437,7 +423,7 @@ rr_parser_container* find_parser(uint16_t cls, uint16_t rtype)
 	}
 
 	if (found == NULL) {
-		found = &default_rr_parser;
+		return NULL;
 	}
 
 	found->count++;
@@ -507,7 +493,6 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
     int i;
     uint32_t rr_start = pos;
     rr_parser_container * parser;
-    rr_parser_container opts_cont = {0,0, opts};
 
     //uint32_t temp_pos; // Only used when parsing SRV records.
     //char * temp_data; // Also used only for SRV records.
@@ -538,12 +523,8 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
     rr->type = (packet[pos] << 8) + packet[pos+1];
     rr->rdlength = (packet[pos+8] << 8) + packet[pos + 9];
     // Handle edns opt RR's differently.
-		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     if (rr->type == 41) {
-        rr->cls = 0;
-        rr->ttl = 0;
-        rr->rr_name = "OPTS";
-        parser = &opts_cont;
+        parser = NULL;
         // We'll leave the parsing of the special EDNS opt fields to
         // our opt rdata parser.  
         pos = pos + 2;
@@ -563,7 +544,6 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
     // Make sure the data for the record is actually there.
     // If not, escape and print the raw data.
     if (len < (rr_start + 10 + rr->rdlength)) {
-		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
         char * buffer;
         const char * msg = "Truncated rr: ";
         rr->data = escape_data(packet, rr_start, len);
@@ -574,11 +554,11 @@ uint32_t parse_rr(uint32_t pos, uint32_t id_pos, uint32_t len,
         return 0;
     }
     // Parse the resource record data.
-		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
-    rr->data = parser->parser(packet, pos, id_pos, rr->rdlength, 
-                              len);
+		if (parser) {
+			rr->data = parser->parser(packet, pos, id_pos, rr->rdlength, 
+					len);
+		}
 
-		//fprintf(stderr, "[%s:%d]\n", __func__, __LINE__);
     return pos + rr->rdlength;
 }
 
@@ -687,7 +667,8 @@ uint32_t dns_parse(uint32_t pos, uint8_t *buf, dns_info * dns, uint32_t len/*dns
 //void ChangeDnsNameFormatoString(unsigned char *dns, unsigned char *host);
 void ChangetoDnsNameFormat(unsigned char* dns, unsigned char* host) 
 {
-	int lock = 0 , i;
+	size_t lock = 0;
+	size_t i = 0;
 	strcat((char*)host,".");
 
 	for(i = 0 ; i < strlen((char*)host) ; i++) 
@@ -744,6 +725,8 @@ void create_dns_query(unsigned char *host, int query_type, unsigned char *buf, i
 void parse_dns(int fd, short events, void *arg)
 {
 	//struct resolver_result* result = (struct resolver_result *)arg;
+	assert(NULL != arg);
+	assert( 0 != events);
 	unsigned char buf[65536] = {0};
 	dns_info dns;
 	ssize_t nread = 0;

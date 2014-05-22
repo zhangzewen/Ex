@@ -12,7 +12,7 @@
 #include "event.h"
 
 
-struct epoll_loop  *epoll_init(struct event_base *base)
+struct epoll_loop  *epoll_init(void)
 {
 	int epfd;
 	struct epoll_loop *loop;
@@ -57,7 +57,7 @@ struct epoll_loop  *epoll_init(struct event_base *base)
 }
 
 
-int epoll_recalc(struct event_base *base, struct epoll_loop *loop, int max)
+int epoll_recalc(struct epoll_loop *loop, int max)
 {
 	
 	if(max >= loop->nfds) {
@@ -83,7 +83,7 @@ int epoll_recalc(struct event_base *base, struct epoll_loop *loop, int max)
 }
 
 
-int epoll_dispatch(struct event_base *base, struct epoll_loop *loop, struct timeval *tv)
+int epoll_dispatch(struct epoll_loop *loop, struct timeval *tv)
 {
 	struct epoll_event *events = loop->events;
 	struct event_epoll *event_epoll;
@@ -176,7 +176,7 @@ int epoll_add(struct epoll_loop *loop, struct event *ev)
 	fd = ev->ev_fd;
 	
 	if (fd >= loop->nfds) {
-		if (epoll_recalc(ev->ev_base, loop, fd) == -1) {
+		if (epoll_recalc(loop, fd) == -1) {
 			return (-1);
 		}
 	}
@@ -192,7 +192,7 @@ int epoll_add(struct epoll_loop *loop, struct event *ev)
 		op = EPOLL_CTL_MOD;
 	}
 
-	if (event_epoll->read != NULL) { //是不是已经注册的写事件
+	if (event_epoll->write != NULL) { //是不是已经注册的写事件
 		events |= EPOLLOUT;
 		op = EPOLL_CTL_MOD;
 	}
@@ -287,7 +287,7 @@ int epoll_del(struct epoll_loop *loop, struct event *ev)
 }
 
 
-void epoll_dealloc(struct event_base *base, struct epoll_loop *loop)
+void epoll_dealloc(struct epoll_loop *loop)
 {
 
 	if (loop->fds) {

@@ -2772,6 +2772,7 @@ void redisOutOfMemoryHandler(size_t allocation_size) {
     redisPanic("Redis aborting for OUT OF MEMORY");
 }
 
+#if 0
 int main(int argc, char **argv) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     struct timeval tv;
@@ -2868,5 +2869,6 @@ int main(int argc, char **argv) {
     aeDeleteEventLoop(server.el);
     return 0;
 }
+#endif
 
 /* The End */

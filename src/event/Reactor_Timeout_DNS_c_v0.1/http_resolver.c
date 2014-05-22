@@ -213,10 +213,12 @@ void resolve_name(struct resolver_st *resolver, unsigned char *host)
 	return ;
 }
 
+#if 0
 void resolver_distory(struct resolver_st *resolver)
 {
-
+	
 }
+#endif
 
 #if 0
 static name_find_cache(strcut rbtree_st *root, const char *host)//先在rbtree中查找，若有且没有过期立即返回，否则通过dns查询，并把查询的结果插入到rbtree中去！
