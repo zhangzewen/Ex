@@ -64,7 +64,7 @@ typedef struct {
     uint64_t evicted_unfetched;
 } itemstats_t;
 
-static item *heads[LARGEST_ID];
+static item *heads[LARGEST_ID]; 
 static item *tails[LARGEST_ID];
 static itemstats_t itemstats[LARGEST_ID];
 static unsigned int sizes[LARGEST_ID];

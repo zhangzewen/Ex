@@ -21,6 +21,7 @@ make clean;
   --without-http_upstream_least_conn_module  \
   --without-http_upstream_keepalive_module \
 	--with-pcre=/home/zhangjie/Documents/tar/pcre-8.33 \
+	--add-module=/home/zhangjie/Documents/GitHub/zewen/Ex/nginx_copy_to_exercise/ngx_modules/ngx_http_echo_module/ \
 	--with-debug \
 
 exit 0;

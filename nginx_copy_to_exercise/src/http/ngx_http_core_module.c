@@ -1684,7 +1684,7 @@ ngx_http_core_find_static_location(ngx_http_request_t *r,
     len = r->uri.len;
     uri = r->uri.data;
 
-    rv = NGX_DECLINED;
+    rv = NGX_DECLINED; //默认精准匹配和前缀匹配 匹配不到，需要匹配后面的正则
 
     for ( ;; ) {
 
@@ -1698,22 +1698,24 @@ ngx_http_core_find_static_location(ngx_http_request_t *r,
 											 node->len, node->name);
 
         n = (len <= (size_t) node->len) ? len : node->len;
-
+				//n 是uri的长度和node name长度的最小值，好比较他们的交集
+				//比较uri和node的name的交集
         rc = ngx_filename_cmp(uri, node->name, n);
-
+				//不得0 表示uri和node的那么不相等，这时候三叉树就能加速查找的效率，选择node的左节点或者右节点
         if (rc != 0) {
             node = (rc < 0) ? node->left : node->right;
 
-            continue;
+            continue; //更新节点后重新开始比较匹配 
         }
-
+				//如果交集相等，如果rui的长度比node的长度还要长
         if (len > (size_t) node->len) {
 
-            if (node->inclusive) {
+            if (node->inclusive) {// 如果这个节点是前缀匹配的那种需要递归tree节点因为tree节点后面的子节点拥有相同的前缀
+						//因为前缀已经匹配到了，所以这里先暂且吧loc_cof作为target，但是不保证后面的tree节点的子节点时候有和uri完全匹配或者更多前缀匹配的。例如如果uri是/abc, 单前的node节点是/a, 虽然匹配到了 location /a， 先把/a的location配置作为target，但是有肯能在/a的tree节点有/abc的location，所以需要递归tree节点看一下
 
                 r->loc_conf = node->inclusive->loc_conf;
                 rv = NGX_AGAIN;
-
+//设置为again表示需要递归嵌套location，为什么要嵌套递归呢，因为location的嵌套配置虽然官网不推荐，导师配置的话，父子location需要有相同的前缀，所以需要递归嵌套location
                 node = node->tree;
                 uri += n;
                 len -= n;
@@ -1722,25 +1724,26 @@ ngx_http_core_find_static_location(ngx_http_request_t *r,
             }
 
             /* exact only */
-
+						//对于精确匹配的location不会放在公共前缀节点的tree节点中，会单拉出来一个node和前缀节点平行，也即使说对于精确匹配 =/abcd和前缀匹配的/abc两个location配置，=/abcd不会是/abc节点的tree节点。 =/abcd只能是/abc的right节点
             node = node->right;
 
             continue;
         }
 
-        if (len == (size_t) node->len) {
+        if (len == (size_t) node->len) { //如果是uri和node的那么是完全相等的
 
-            if (node->exact) {
+            if (node->exact) {         //如果是精确匹配，那么就直接返回ok了
                 r->loc_conf = node->exact->loc_conf;
                 return NGX_OK;
 
-            } else {
+            } else { //如果还是前缀模式的location，那么需要递归嵌套location了，需要提前设置loc_conf，如果嵌套有匹配的再覆盖
                 r->loc_conf = node->inclusive->loc_conf;
                 return NGX_AGAIN;
             }
         }
 
         /* len < node->len */
+			//如果前缀相等，uri的长度binode的长度还要小，比如node的name是/abc，uri是/ab，这种情况是/abc一定是精确匹配，因为如果是前缀匹配那么/abc肯定会在/ab的tree指针里面
 
         if (len + 1 == (size_t) node->len && node->auto_redirect) {
 

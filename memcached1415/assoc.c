@@ -35,7 +35,7 @@ typedef  unsigned       char ub1;   /* unsigned 1-byte quantities */
 /* how many powers of 2's worth of buckets we use */
 unsigned int hashpower = HASHPOWER_DEFAULT;
 
-#define hashsize(n) ((ub4)1<<(n))
+#define hashsize(n) ((ub4)1<<(n))  // 1 << n <===> 2^n
 #define hashmask(n) (hashsize(n)-1)
 
 /* Main hash table. This is where we look except during expansion. */
@@ -45,6 +45,7 @@ static item** primary_hashtable = 0;
  * Previous hash table. During expansion, we look here for keys that haven't
  * been moved over to the primary yet.
  */
+//以下的变量为扩展hash表用到
 static item** old_hashtable = 0;
 
 /* Number of items in the hash table. */
@@ -59,7 +60,7 @@ static bool started_expanding = false;
  * far we've gotten so far. Ranges from 0 .. hashsize(hashpower - 1) - 1.
  */
 static unsigned int expand_bucket = 0;
-
+//创建hashtable
 void assoc_init(const int hashtable_init) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     if (hashtable_init) {
@@ -130,12 +131,12 @@ static void assoc_expand(void) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     old_hashtable = primary_hashtable;
 
-    primary_hashtable = calloc(hashsize(hashpower + 1), sizeof(void *));
+    primary_hashtable = calloc(hashsize(hashpower + 1), sizeof(void *)); //扩展hash表，为原来的hash表的两倍
     if (primary_hashtable) {
         if (settings.verbose > 1)
             fprintf(stderr, "Hash table expansion starting\n");
-        hashpower++;
-        expanding = true;
+        hashpower++; //hashpower刚开始默认的值是16，每次扩展hash表，都自加，
+        expanding = true; //标量，表示正在进行expand
         expand_bucket = 0;
         STATS_LOCK();
         stats.hash_power_level = hashpower;
@@ -150,9 +151,9 @@ static void assoc_expand(void) {
 
 static void assoc_start_expand(void) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
-    if (started_expanding)
+    if (started_expanding) //标量，如果expand已经开始，立即返回
         return;
-    started_expanding = true;
+    started_expanding = true; //标量
     pthread_cond_signal(&maintenance_cond);
 }
 

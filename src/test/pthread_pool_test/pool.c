@@ -19,15 +19,16 @@ int main(int argc, char *argv[])
 
 	//create tasks first
 
-	for (j = 0; j < 20; j++) {
-		task = thread_task_create(task_fun, j);
-		add_task(queue, task);	
-	}	
 
 	for (i = 0; i < 3; i++) {
 		thread = thread_create(NULL, start_routine, queue, i);
 		add_thread(pool, thread);
 	}
+
+	for (j = 0; j < 20; j++) {
+		task = thread_task_create(task_fun, j);
+		add_task(queue, task);	
+	}	
 
 	while(1){
 	};

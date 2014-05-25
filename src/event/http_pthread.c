@@ -45,8 +45,10 @@ task_queue_t task_queue_create(void)
 	
 	queue = (task_queue_t )malloc(sizeof(struct task_queue_st));
 
-	if (NULL == queue)
-		error_quit("can not create task queue!");
+	if (NULL == queue) {
+		fprintf(stderr, "can not create task queue!");
+		return NULL;
+	}
 	pthread_mutex_init(&queue->task_queue_mutex, NULL);
 	pthread_cond_init(&queue->task_queue_ready, NULL);
 	queue->current_tasks = 0;
@@ -60,12 +62,12 @@ task_queue_t task_queue_create(void)
 int add_task(task_queue_t queue, thread_task_t task)
 {
 	if (NULL == queue) {
-		error_quit("the task_queue is empty!\n");
+		fprintf(stderr, "the task_queue is empty!\n");
 		return -1;
 	}
 
 	if (NULL == queue) {	
-		error_quit("the task to be added is empty!\n");
+		fprintf(stderr, "the task to be added is empty!\n");
 		return -1;
 	}
 	pthread_mutex_lock(&queue->task_queue_mutex);
@@ -82,7 +84,7 @@ int add_task(task_queue_t queue, thread_task_t task)
 int destory_task(thread_task_t task)
 {
 	if (NULL == task){
-		error_quit("the task to be deleted is empty!\n");
+		fprintf(stderr, "the task to be deleted is empty!\n");
 		return -1;
 	}
 
@@ -140,20 +142,20 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 	thread = (thread_t)malloc(sizeof(struct thread_st));
 	
 	if (NULL == thread) {
-		error_quit("malloc thread error!\n");
+		fprintf(stderr,"malloc thread error!\n");
 		return NULL;
 	}
 
 	data = (private_data_t)malloc(sizeof(struct private_data_st));
 	
 	if(NULL == data) {
-		error_quit("malloc private_data_st error");
+		fprintf(stderr,"malloc private_data_st error");
 		return NULL;
 	}
 
 	thread->pid = (pthread_t *)malloc(sizeof(pthread_t));
 	if (NULL == thread->pid) {
-		error_quit("malloc error!\n");
+		fprintf(stderr,"malloc error!\n");
 	}
 	INIT_LIST_HEAD(&thread->list);	
 	thread->num = i;
@@ -165,7 +167,7 @@ thread_t thread_create(const pthread_attr_t *attr, void *(*start_routine)(void *
 	if (ret != 0){
 		free(thread->pid);
 		thread->pid = NULL;
-		error_quit("create pthreat error1\n");
+		fprintf(stderr,"create pthreat error1\n");
 	}	
 	return thread;	
 }
@@ -176,7 +178,7 @@ thread_pool_t thread_pool_create(void)
 	pool = (thread_pool_t)malloc(sizeof(struct thread_pool_st));
 	
 	if (NULL == pool) {
-		error_quit("malloc pool error1\n");
+		fprintf(stderr,"malloc pool error1\n");
 		return NULL;
 	}
 	
@@ -192,12 +194,12 @@ thread_pool_t thread_pool_create(void)
 int add_thread(thread_pool_t pool, thread_t thread)
 {
 	if (NULL == pool) {
-		error_quit("the pool is empty!\n");
+		fprintf(stderr,"the pool is empty!\n");
 		return -1;
 	}
 
 	if (NULL == thread) {
-		error_quit("the thread is illegal!\n");
+		fprintf(stderr,"the thread is illegal!\n");
 		return -1;
 	}
 	pthread_mutex_lock(&pool->thread_pool_mutex);
@@ -213,7 +215,7 @@ int add_thread(thread_pool_t pool, thread_t thread)
 int destory_thead(thread_t thread)
 {
 	if (NULL == thread) {
-		error_quit("the thead to be deleted is empty!\n");
+		fprintf(stderr,"the thead to be deleted is empty!\n");
 		return -1;
 	}
 	list_del(&thread->list);

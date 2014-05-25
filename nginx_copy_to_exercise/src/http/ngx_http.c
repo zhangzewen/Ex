@@ -736,7 +736,7 @@ ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
         lq = (ngx_http_location_queue_t *) q;
 
         clcf = lq->exact ? lq->exact : lq->inclusive;
-
+				//由于可能存在嵌套location，这里需要递归的处理一下当前咯擦题哦年下面的嵌套location
         if (ngx_http_init_locations(cf, NULL, clcf) != NGX_OK) {
             return NGX_ERROR;
         }
@@ -773,7 +773,7 @@ ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
     if (q != ngx_queue_sentinel(locations)) {
         ngx_queue_split(locations, q, &tail);
     }
-
+		//如果有named location，奖他们保存在所属server的named_location数组中
     if (named) {
         clcfp = ngx_palloc(cf->pool,
                            (n + 1) * sizeof(ngx_http_core_loc_conf_t **));
@@ -798,7 +798,8 @@ ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
     }
 
 #if (NGX_PCRE)
-
+//如果有正则匹配location，蒋他们保存在所属server的http core模块的loc配置的regex_locations数组中，这里和named location保存位置不同的原因是named location只能存在server
+//里面，而regx location可以作为嵌套location
     if (regex) {
 
         clcfp = ngx_palloc(cf->pool,
@@ -859,11 +860,12 @@ ngx_http_init_static_location_trees(ngx_conf_t *cf,
             return NGX_ERROR;
         }
     }
-
+//join 队列中名字相同的inclusive和exact类型的location，也就是如果某个exact_match的location名字和普通字符串匹配的location名字相同的话
+//就将它们合道一个节点中，分别保存在节点的exact和inclusive下，这一步的目的实际上是去重，为后面的建立排序树做准备
     if (ngx_http_join_exact_locations(cf, locations) != NGX_OK) {
         return NGX_ERROR;
     }
-
+//递归每一个location节点，得到当前节点的名字为其前缀的location的列表，保存在当前节点的list字段下
     ngx_http_create_locations_list(locations, ngx_queue_head(locations));
 
     pclcf->static_locations = ngx_http_create_locations_tree(cf, locations, 0);
@@ -1042,7 +1044,7 @@ ngx_http_create_locations_list(ngx_queue_t *locations, ngx_queue_t *q)
     ngx_queue_t                *x, tail;
     ngx_http_location_queue_t  *lq, *lx;
 
-    if (q == ngx_queue_last(locations)) {
+    if (q == ngx_queue_last(locations)) { //如果location为空就没有必要继续走下面的流程了，尤其是递归到嵌套location
         return;
     }
 
@@ -1050,6 +1052,7 @@ ngx_http_create_locations_list(ngx_queue_t *locations, ngx_queue_t *q)
 
     if (lq->inclusive == NULL) {
         ngx_http_create_locations_list(locations, ngx_queue_next(q));
+				//如果这个节点是精确匹配那么这个节点就不会作为某些节点的前缀，不用拥有tree节点
         return;
     }
 

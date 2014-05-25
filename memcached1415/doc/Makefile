@@ -84,7 +84,7 @@ CC = gcc -std=gnu99
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 -pthread -pthread -Wall -Werror -pedantic -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
 CPP = gcc -E
-CPPFLAGS = -I/usr/local/libevent144/include 
+CPPFLAGS = -I/usr/local/libevent144//include 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -102,7 +102,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -L/usr/local/libevent144/lib  -Wl,-rpath,/usr/local/libevent144/lib
+LDFLAGS = -L/usr/local/libevent144//lib  -Wl,-rpath,/usr/local/libevent144//lib
 LIBOBJS = 
 LIBS = -levent 
 LTLIBOBJS = 
