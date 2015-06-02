@@ -522,21 +522,22 @@ static int slab_rebalance_move(void) {
     pthread_mutex_lock(&cache_lock);
     pthread_mutex_lock(&slabs_lock);
 
-    s_cls = &slabclass[slab_rebal.s_clsid];
+    s_cls = &slabclass[slab_rebal.s_clsid]; //获得那个src的slab-class
 
     for (x = 0; x < slab_bulk_check; x++) {
+        //获取当前那个slab的item，每次网后推一个，直到到了slab_end
         item *it = slab_rebal.slab_pos;
         status = MOVE_PASS;
         if (it->slabs_clsid != 255) {
             void *hold_lock = NULL;
             uint32_t hv = hash(ITEM_key(it), it->nkey, 0);
-            if ((hold_lock = item_trylock(hv)) == NULL) {
+            if ((hold_lock = item_trylock(hv)) == NULL) {//获取当前item的hash桶的锁
                 status = MOVE_LOCKED;
             } else {
                 refcount = refcount_incr(&it->refcount);
-                if (refcount == 1) { /* item is unlinked, unused */
+                if (refcount == 1) { /* item is unlinked, unused */ //判断当前item是否是新的item
                     if (it->it_flags & ITEM_SLABBED) {
-                        /* remove from slab freelist */
+                        /* remove from slab freelist */ //删除item
                         if (s_cls->slots == it) {
                             s_cls->slots = it->next;
                         }
