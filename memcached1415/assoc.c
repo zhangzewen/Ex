@@ -253,18 +253,19 @@ static void *assoc_maintenance_thread(void *arg) {
 
         if (!expanding) {
             /* finished expanding. tell all threads to use fine-grained locks */
-            switch_item_lock_type(ITEM_LOCK_GRANULAR);
-            slabs_rebalancer_resume();
+            switch_item_lock_type(ITEM_LOCK_GRANULAR); //使用分段锁
+            slabs_rebalancer_resume(); //打开slab_move
             /* We are done expanding.. just wait for next invocation */
             mutex_lock(&cache_lock);
             started_expanding = false;
+            //在不扩容时，线程会停留在这里
             pthread_cond_wait(&maintenance_cond, &cache_lock);
             /* Before doing anything, tell threads to use a global lock */
             mutex_unlock(&cache_lock);
-            slabs_rebalancer_pause();
-            switch_item_lock_type(ITEM_LOCK_GLOBAL);
+            slabs_rebalancer_pause(); //停止slab_move
+            switch_item_lock_type(ITEM_LOCK_GLOBAL);//转换为全局锁
             mutex_lock(&cache_lock);
-            assoc_expand();
+            assoc_expand();//开始扩容
             mutex_unlock(&cache_lock);
         }
     }

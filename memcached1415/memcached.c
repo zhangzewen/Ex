@@ -2309,6 +2309,7 @@ static void complete_nread(conn *c) {
  *
  * Returns the state of storage.
  */
+// 把item关联到hash dict上
 enum store_item_type do_store_item(item *it, int comm, conn *c, const uint32_t hv) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     char *key = ITEM_key(it);
@@ -2965,7 +2966,7 @@ static void process_update_command(conn *c, token_t *tokens, const size_t ntoken
         }
     }
 
-    vlen += 2;
+    vlen += 2; //需要读取的value包括\r\n
     if (vlen < 0 || vlen - 2 < 0) {
         out_string(c, "CLIENT_ERROR bad command line format");
         return;

@@ -126,7 +126,8 @@ void item_unlock_global(void) {
 
 void item_lock(uint32_t hv) {
     uint8_t *lock_type = pthread_getspecific(item_lock_type_key);
-    if (likely(*lock_type == ITEM_LOCK_GRANULAR)) {
+    if (likely(*lock_type == ITEM_LOCK_GRANULAR)) {//细粒度的锁
+        //取得hash值在去取相应的锁
         mutex_lock(&item_locks[(hv & hashmask(hashpower)) % item_lock_count]);
     } else {
         mutex_lock(&item_global_lock);
@@ -174,16 +175,21 @@ static void register_thread_initialized(void) {
     pthread_mutex_unlock(&init_lock);
 }
 
+
+//如果在hash空间不够的时候，需要对hash表进行扩容，这个时候需要转换item的锁从
+//分段锁转化为全局锁，由于hash扩容操作是一个单独的线程在做，改变锁的类型
+//需要改变所有work对item的锁的类型，这个时候memcache是通过循环每个worker对
+//他们的pipe的一端写入锁的转换命令
 void switch_item_lock_type(enum item_lock_types type) {
     char buf[1];
     int i;
 
     switch (type) {
         case ITEM_LOCK_GRANULAR:
-            buf[0] = 'l';
+            buf[0] = 'l'; //转换为分段锁
             break;
         case ITEM_LOCK_GLOBAL:
-            buf[0] = 'g';
+            buf[0] = 'g'; //转换为全局锁
             break;
         default:
             fprintf(stderr, "Unknown lock type: %d\n", type);
@@ -199,7 +205,7 @@ void switch_item_lock_type(enum item_lock_types type) {
             /* TODO: This is a fatal problem. Can it ever happen temporarily? */
         }
     }
-    wait_for_thread_registration(settings.num_threads);
+    wait_for_thread_registration(settings.num_threads); //等待每个线程序处理完设置锁的类型
     pthread_mutex_unlock(&init_lock);
 }
 
@@ -413,7 +419,7 @@ static void thread_libevent_process(int fd, short which, void *arg) {
             fprintf(stderr, "Can't read from libevent pipe\n");
 
     switch (buf[0]) {
-    case 'c':
+    case 'c': //有新的连接
     item = cq_pop(me->new_conn_queue);
 
     if (NULL != item) {
@@ -437,11 +443,11 @@ static void thread_libevent_process(int fd, short which, void *arg) {
     }
         break;
     /* we were told to flip the lock type and report in */
-    case 'l':
+    case 'l': //转换为分段锁
     me->item_lock_type = ITEM_LOCK_GRANULAR;
     register_thread_initialized();
         break;
-    case 'g':
+    case 'g': //转换为全局锁
     me->item_lock_type = ITEM_LOCK_GLOBAL;
     register_thread_initialized();
         break;
@@ -817,6 +823,10 @@ void thread_init(int nthreads, struct event_base *main_base) {
     cqi_freelist = NULL;
 
     /* Want a wide lock table, but don't waste memory */
+    //在assoc.h/c中hashtable 初始化的过程中，默认的hashtable_init的值是空值
+    //所以hashpower = HASHPOWER__DEFAULT 即 16，共有2^16个桶
+    //所以可以看的出来，当小于3个work的时候，相隔2^16/2^10 = 2^6 = 64个桶
+    //一个锁，以此类推
     if (nthreads < 3) {
         power = 10;
     } else if (nthreads < 4) {

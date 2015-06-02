@@ -64,7 +64,7 @@ typedef struct {
     uint64_t evicted_unfetched;
 } itemstats_t;
 
-static item *heads[LARGEST_ID]; 
+static item *heads[LARGEST_ID];
 static item *tails[LARGEST_ID];
 static itemstats_t itemstats[LARGEST_ID];
 static unsigned int sizes[LARGEST_ID];
@@ -116,15 +116,15 @@ static size_t item_make_header(const uint8_t nkey, const int flags, const int nb
 
 /*@null@*/
 //分配一个item空间
-item *do_item_alloc(char *key, const size_t nkey, const int flags,
-                    const rel_time_t exptime, const int nbytes,
-                    const uint32_t cur_hv) {
+item *do_item_alloc(char *key/*k/v中的k*/, const size_t nkey/*k的长度*/, const int flags,
+                    const rel_time_t exptime/*超时时间*/, const int nbytes/*k/v中v的长度包括\r\n*/,
+                    const uint32_t cur_hv/*目前这个值为0*/) {
     uint8_t nsuffix;
     item *it = NULL;
     char suffix[40];
     size_t ntotal = item_make_header(nkey + 1, flags, nbytes, suffix, &nsuffix);
     if (settings.use_cas) {
-        ntotal += sizeof(uint64_t);
+        ntotal += sizeof(uint64_t);//若有cas值
     }
 
     unsigned int id = slabs_clsid(ntotal);
@@ -143,7 +143,7 @@ item *do_item_alloc(char *key, const size_t nkey, const int flags,
     /* We walk up *only* for locked items. Never searching for expired.
      * Waste of CPU for almost all deployments */
     for (; tries > 0 && search != NULL; tries--, search=search->prev) {
-        uint32_t hv = hash(ITEM_key(search), search->nkey, 0);
+        uint32_t hv = hash(ITEM_key(search), search->nkey, 0); //获取hash值
         /* Attempt to hash item lock the "search" item. If locked, no
          * other callers can incr the refcount
          */
@@ -151,7 +151,7 @@ item *do_item_alloc(char *key, const size_t nkey, const int flags,
         if (hv != cur_hv && (hold_lock = item_trylock(hv)) == NULL)
             continue;
         /* Now see if the item is refcount locked */
-        if (refcount_incr(&search->refcount) != 2) {
+        if (refcount_incr(&search->refcount) != 2) { //判断此是否被引用
             refcount_decr(&search->refcount);
             /* Old rare bug could cause a refcount leak. We haven't seen
              * it in years, but we leave this code in to prevent failures
@@ -215,8 +215,8 @@ item *do_item_alloc(char *key, const size_t nkey, const int flags,
         break;
     }
 
-    if (!tried_alloc && (tries == 0 || search == NULL))
-        it = slabs_alloc(ntotal, id);
+    if (!tried_alloc && (tries == 0 || search == NULL))//没实过分配并且lru中没有取到item
+        it = slabs_alloc(ntotal, id);//从slab中重新分配
 
     if (it == NULL) {
         itemstats[id].outofmemory++;
@@ -389,7 +389,7 @@ void do_item_remove(item *it) {
     MEMCACHED_ITEM_REMOVE(ITEM_key(it), it->nkey, it->nbytes);
     assert((it->it_flags & ITEM_SLABBED) == 0);
 
-    if (refcount_decr(&it->refcount) == 0) {
+    if (refcount_decr(&it->refcount) == 0) {//如果只有一个引用item，就释放这块内存空间个slab
         item_free(it);
     }
 }
@@ -568,7 +568,7 @@ void do_item_stats_sizes(ADD_STAT add_stats, void *c) {
 }
 
 /** wrapper around assoc_find which does the lazy expiration logic */
-//获取item
+//获取item ,如果取到，引用加1
 item *do_item_get(const char *key, const size_t nkey, const uint32_t hv) {
 		syslog(LOG_INFO, "[%s:%s:%d]", __FILE__, __func__, __LINE__);
     //mutex_lock(&cache_lock);

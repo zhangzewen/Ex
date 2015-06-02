@@ -177,6 +177,7 @@ static void slabs_preallocate (const unsigned int maxslabs) {
 
 static int grow_slab_list (const unsigned int id) {
     slabclass_t *p = &slabclass[id];
+    //这个其实和redis的dict差不多主要是为了解决，就是为了达到reblance
     if (p->slabs == p->list_size) {
         size_t new_size =  (p->list_size != 0) ? p->list_size * 2 : 16;
         void *new_list = realloc(p->slab_list, new_size * sizeof(void *));
@@ -198,10 +199,14 @@ static void split_slab_page_into_freelist(char *ptr, const unsigned int id) {
 
 static int do_slabs_newslab(const unsigned int id) {
     slabclass_t *p = &slabclass[id];
+    //是否要重新分配，是因为1M可能大于p->size*p->perslab,因为size进行了字节对齐，可能大于实际的sizeof(item) + settings.chunck_size
     int len = settings.slab_reassign ? settings.item_size_max
         : p->size * p->perslab;
     char *ptr;
 
+    //条件1： 做了mem_limit内存限制并且当前已经分配的内存加上将要分配的内存大于mem_limit，
+    //并且p->slabs大于0，分配新的slab将失败
+    //条件2 ： 当条件1不满足的时候，执行条件2
     if ((mem_limit && mem_malloced + len > mem_limit && p->slabs > 0) ||
         (grow_slab_list(id) == 0) ||
         ((ptr = memory_allocate((size_t)len)) == 0)) {
@@ -650,13 +655,15 @@ static void slab_rebalance_finish(void) {
  */
 static int slab_automove_decision(int *src, int *dst) {
     static uint64_t evicted_old[POWER_LARGEST];
+    //static 的成员变量，记录上次的分配失败统计信息，一个slab-class一个元素
     static unsigned int slab_zeroes[POWER_LARGEST];
-    static unsigned int slab_winner = 0;
-    static unsigned int slab_wins   = 0;
-    uint64_t evicted_new[POWER_LARGEST];
-    uint64_t evicted_diff = 0;
-    uint64_t evicted_max  = 0;
-    unsigned int highest_slab = 0;
+    //记录每个slab-class，分配失败次数不变化的次数
+    static unsigned int slab_winner = 0;//表示哪个slab-class应该是那个dest
+    static unsigned int slab_wins   = 0;//选举成功的次数
+    uint64_t evicted_new[POWER_LARGEST]; //新的slab分配失败的统计信息
+    uint64_t evicted_diff = 0;//记录每个slab新的统计信息和旧的统计信息的差
+    uint64_t evicted_max  = 0;//记录分配失败次数的最大值
+    unsigned int highest_slab = 0; //记录分配次数最多的那个slab-class id
     unsigned int total_pages[POWER_LARGEST];
     int i;
     int source = 0;
@@ -664,7 +671,7 @@ static int slab_automove_decision(int *src, int *dst) {
     static rel_time_t next_run;
 
     /* Run less frequently than the slabmove tester. */
-    if (current_time >= next_run) {
+    if (current_time >= next_run) { //控制执行的频率
         next_run = current_time + 10;
     } else {
         return 0;
@@ -721,7 +728,9 @@ static void *slab_maintenance_thread(void *arg) {
 
     while (do_run_slab_thread) {
         if (settings.slab_automove == 1) {
-            if (slab_automove_decision(&src, &dest) == 1) {
+            //如果是前面的激烈模式，slab_automove=2,就不用这个线程取选择移动
+            //的slab， 每次失败主动会去移动那些slab
+            if (slab_automove_decision(&src, &dest) == 1) {//这里是具体的选择src和dest的处理函数
                 /* Blind to the return codes. It will retry on its own */
                 slabs_reassign(src, dest);
             }

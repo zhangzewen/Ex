@@ -88,6 +88,11 @@
     } \
 }
 
+// 这几个宏很简单 item中有个union类型的数组，但是数组为空，就是说这个是个变长数组，且data不占用空间
+// 具体可以看看item_make_header这个函数的实现
+// 例如，每次我们在telnet中执行命令的时候 set key 0(flags) 0(expirex) 8(vlen),然后Enter后就会执行process_command，接着执行
+// item_alloc-->do_item_alloc 执行成功后会把连接的状态修改为conn_nread一位着需要在读取vlen + sizeof('\r\n') 长字节的内容填入value
+// 从c->ritem开始
 #define ITEM_key(item) (((char*)&((item)->data)) \
          + (((item)->it_flags & ITEM_CAS) ? sizeof(uint64_t) : 0))
 
